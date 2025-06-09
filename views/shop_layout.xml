@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Incluir CSS personalizado para la tienda -->
+    <template id="assets_frontend_shop" inherit_id="website.assets_frontend" name="Shop Custom CSS">
+        <xpath expr="//link[last()]" position="after">
+            <link rel="stylesheet" type="text/css" href="/certifica_theme/static/src/css/shop_custom.css"/>
+        </xpath>
+    </template>
+    
+    <template id="products_custom_sidebar" inherit_id="website_sale.products" name="Products Custom Sidebar">
+        <!-- Reemplazamos la estructura principal de la página de productos -->
+        <xpath expr="//div[hasclass('oe_website_sale')]" position="replace">
+            <div class="oe_website_sale">
+                <div class="container mt-3">
+                    <div class="row">
+                        <!-- Columna para Filtros (Izquierda) -->
+                        <div class="col-lg-3 col-md-4" id="products_grid_before">
+                            <div class="shop-filters-container">
+                                <h4 class="mt-3 mb-3">Filtros</h4>
+                                
+                                <!-- Filtro por categorías jerárquico -->
+                                <div class="category-filter mt-3 mb-4">
+                                    <h5 class="filter-title">Categorías</h5>
+                                    <ul class="list-unstyled category-hierarchy">
+                                        <!-- Primero mostramos la categoría "Todas" -->
+                                        <li class="category-item">
+                                            <a t-att-href="'/shop'" t-att-class="'active' if not category else ''">
+                                                Todas las categorías
+                                            </a>
+                                        </li>
+                                        
+                                        <!-- Luego mostramos las categorías principales -->
+                                        <t t-foreach="categories" t-as="c">
+                                            <t t-set="has_children" t-value="c.child_id and any(child.product_tmpl_ids for child in c.child_id)"/>
+                                            <li class="category-item" t-att-class="'has-children' if has_children else ''">
+                                                <div class="d-flex align-items-center">
+                                                    <t t-if="has_children">
+                                                        <span class="category-toggle mr-1" t-att-data-category-id="c.id">
+                                                            <i class="fa fa-plus-square-o"></i>
+                                                        </span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="mr-3"></span>
+                                                    </t>
+                                                    <a t-att-href="keep('/shop/category/' + slug(c), category=c.id)"
+                                                       t-att-class="'active' if category and category.id == c.id else ''">
+                                                        <t t-esc="c.name"/>
+                                                    </a>
+                                                </div>
+                                                
+                                                <!-- Subcategorías -->
+                                                <t t-if="has_children">
+                                                    <ul class="list-unstyled subcategory-list ml-3" style="display: none;" 
+                                                        t-att-id="'subcategories-' + str(c.id)">
+                                                        <t t-foreach="c.child_id" t-as="child" t-if="child.product_tmpl_ids">
+                                                            <li class="subcategory-item">
+                                                                <div class="d-flex align-items-center">
+                                                                    <t t-set="has_grandchildren" t-value="child.child_id and any(grandchild.product_tmpl_ids for grandchild in child.child_id)"/>
+                                                                    <t t-if="has_grandchildren">
+                                                                        <span class="subcategory-toggle mr-1" t-att-data-category-id="child.id">
+                                                                            <i class="fa fa-plus-square-o"></i>
+                                                                        </span>
+                                                                    </t>
+                                                                    <t t-else="">
+                                                                        <span class="mr-3"></span>
+                                                                    </t>
+                                                                    <a t-att-href="keep('/shop/category/' + slug(child), category=child.id)"
+                                                                       t-att-class="'active' if category and category.id == child.id else ''">
+                                                                        <t t-esc="child.name"/>
+                                                                    </a>
+                                                                </div>
+                                                                
+                                                                <!-- Sub-subcategorías -->
+                                                                <t t-if="has_grandchildren">
+                                                                    <ul class="list-unstyled grandchild-list ml-3" style="display: none;"
+                                                                        t-att-id="'subcategories-' + str(child.id)">
+                                                                        <t t-foreach="child.child_id" t-as="grandchild" t-if="grandchild.product_tmpl_ids">
+                                                                            <li class="grandchild-item">
+                                                                                <a t-att-href="keep('/shop/category/' + slug(grandchild), category=grandchild.id)"
+                                                                                   t-att-class="'active' if category and category.id == grandchild.id else ''">
+                                                                                    <i class="fa fa-angle-right mr-1"></i>
+                                                                                    <t t-esc="grandchild.name"/>
+                                                                                </a>
+                                                                            </li>
+                                                                        </t>
+                                                                    </ul>
+                                                                </t>
+                                                            </li>
+                                                        </t>
+                                                    </ul>
+                                                </t>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Filtros de atributos disponibles con checkboxes -->
+                                <form id="filters_form" action="/shop" method="get" class="mt-3 mb-3">
+                                    <!-- Mantener parámetros actuales -->
+                                    <input type="hidden" name="search" t-att-value="search or ''"/>
+                                    <t t-if="category">
+                                        <input type="hidden" name="category" t-att-value="category.id"/>
+                                    </t>
+                                    
+                                    <!-- Filtros de atributos -->
+                                    <t t-foreach="attributes" t-as="a">
+                                        <div class="attribute-filter mt-3 mb-4" t-if="a.value_ids">
+                                            <h5 class="filter-title"><t t-esc="a.name"/></h5>
+                                            <div class="attribute-values">
+                                                <t t-foreach="a.value_ids" t-as="v">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" 
+                                                               class="custom-control-input" 
+                                                               t-att-id="'attrib-%s-%s' % (a.id, v.id)"
+                                                               t-att-checked="'checked' if v.id in attrib_set else None"
+                                                               name="attrib"
+                                                               t-att-value="'%s-%s' % (a.id, v.id)"/>
+                                                        <label class="custom-control-label" t-att-for="'attrib-%s-%s' % (a.id, v.id)">
+                                                            <span t-esc="v.name"/>
+                                                        </label>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    
+                                    <!-- Botón para aplicar filtros -->
+                                    <div class="mt-4 mb-3">
+                                        <button type="submit" class="btn btn-primary btn-block">
+                                            Aplicar Filtros
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                <!-- Conservamos los filtros originales de Odoo ocultos -->
+                                <div style="display:none;"><t t-raw="0"/></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Columna para Productos (Derecha) -->
+                        <div class="col-lg-9 col-md-8" id="certifica_shop_products">
+                            <!-- Mantenemos el div products_grid original -->
+                            <div id="products_grid" t-att-class="'products_grid %s' % layout or ''">
+                                
+                                <div class="row">
+                                    <t t-foreach="products" t-as="product">
+                                        <div class="col-lg-4 col-md-4 col-sm-6 col-12 mb-3 product-item-wrapper">
+                                            <div class="card h-100 product-card">
+                                                <!-- Imagen del producto -->
+                                                <div class="product-image-container text-center p-2">
+                                                    <a t-att-href="product.website_url">
+                                                        <img class="img-fluid product-thumbnail" t-att-src="'/web/image/product.template/%s/image_512' % product.id" t-att-alt="product.display_name"/>
+                                                    </a>
+                                                </div>
+                                                <!-- Información del producto -->
+                                                <div class="card-body p-3 d-flex flex-column">
+                                                    <h5 class="card-title product-name">
+                                                        <a t-att-href="product.website_url" t-field="product.display_name"/>
+                                                    </h5>
+                                                    <div class="product-price mt-auto">
+                                                        <span t-field="product.list_price" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                                                    </div>
+                                                    <!-- Botón de añadir al carrito con formulario de Odoo -->
+                                                    <form action="/shop/cart/update" method="post" class="add_to_cart_form">
+                                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                                                        <input type="hidden" name="product_id" t-att-value="product.id" />
+                                                        <input type="hidden" name="product_template_id" t-att-value="product.id" />
+                                                        <input type="hidden" name="add_qty" value="1" />
+                                                        <button type="submit" class="btn btn-primary mt-2 a-submit">
+                                                            <i class="fa fa-shopping-cart"/> Añadir al carrito
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                                
+                                <!-- Paginación -->
+                                <div class="products_pager">
+                                    <t t-call="website.pager"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,564 @@
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Roboto Condensed", Sans-serif !important;
+}
+
+    h1 {
+        font-size: 50px !important; /* Para escritorio */
+    }
+
+    h2 {
+        font-size: 40px !important;
+    }
+    
+    h3 {
+        font-size: 30px !important;
+    }
+    
+    h4 {
+        font-size: 24px !important;
+    }
+
+    @media (max-width: 1024px) { /* Para tabletas */
+        h1 {
+          font-size: 45px !important;
+        }
+        h2 {
+          font-size: 36px !important;
+        }
+        h3 {
+          font-size: 28px !important;
+        }
+        h4 {
+          font-size: 22px !important;
+        }
+      }
+      
+      @media (max-width: 768px) { /* Para celulares */
+        h1 {
+          font-size: 35px !important;
+        }
+        h2 {
+          font-size: 30px !important;
+        }
+        h3 {
+          font-size: 24px !important;
+        }
+        h4 {
+          font-size: 20px !important;
+        }
+      }
+
+      a.btn.btn-outline-secondary.rounded-circle.btn-lg {
+        border-color: #fff;
+        color: #fff;
+    }
+    a.btn.btn-outline-secondary.rounded-circle.btn-lg:hover {
+        background-color: #fff;
+        color: #87465C;
+    }
+    .carousel-indicators li {
+        background-color: #FFFFFF;
+    }
+
+/* Estilos personalizados para el header y menú del theme Certifica */
+.o_header_standard {
+    background-color: #fff;
+    padding: 20px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+.header-column {
+    padding: 15px;
+    text-align: center;
+}
+/* Footer */
+.o_footer {
+    background-color: #343a40;
+    color: #fff;
+    padding: 40px 0;
+    margin-top: 40px;
+}
+.footer-column {
+    padding: 15px;
+}
+.footer-column h4 {
+    color: #fff;
+    margin-bottom: 20px;
+}
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+}
+.footer-column ul li {
+    margin-bottom: 10px;
+}
+.footer-column a {
+    color: #fff;
+    text-decoration: none;
+}
+.footer-column input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 4px;
+}
+.footer-column button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.footer-column button:hover {
+    background-color: #0056b3;
+}
+@media (max-width: 768px) {
+    .header-column, .footer-column {
+        margin-bottom: 20px;
+    }
+}
+.nav-link {
+    font-family: "Roboto Condensed", Sans-serif !important;
+    font-size: 15px;
+    font-weight: 600;
+    color: #87465C !important;
+}
+
+/************************************
+* Header Responsive Layout
+************************************/
+.header-logo {
+    flex: 0 0 16.6667%; /* Corresponds to col-md-2 */
+    max-width: 16.6667%;
+}
+.header-menu {
+    flex: 0 0 50%; /* Corresponds to col-md-6 */
+    max-width: 50%;
+}
+.header-search {
+    flex: 0 0 33.3333%; /* Corresponds to col-md-4 */
+    max-width: 33.3333%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align to the right on larger screens */
+}
+
+/* Search Module Styles */
+.header-search .search-form {
+    width: 100%; /* Take full width of its container column */
+    max-width: 300px; /* Optional: constrain max width of search bar */
+}
+
+.header-search .search-input {
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    height: calc(1.5em + .75rem + 2px); /* Match default Bootstrap input height */
+    padding: .375rem .75rem; /* Match default Bootstrap input padding */
+    font-size: 1rem; /* Match default Bootstrap input font-size */
+}
+
+.header-search .search-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background-color: #87465C; /* Match nav-link color */
+    border-color: #87465C;
+    color: #fff;
+}
+
+.header-search .search-button:hover {
+    background-color: #6c384a; /* Darker shade for hover */
+    border-color: #6c384a;
+}
+
+.header-search .search-button i {
+    color: #fff;
+}
+@media (max-width: 991.98px) { /* Covers md and sm screens */
+    /* On md screens, Bootstrap col-md-* (16.7%, 50%, 33.3%) will apply. */
+    /* On sm screens, Bootstrap col-* (33.3% logo, 100% menu, 100% search) will apply. */
+    /* The flex rules below are to ensure consistency if Bootstrap columns are overridden or for sm specific layout */
+    .header-logo {
+        flex: 0 0 33.3333%; /* col-4 on sm */
+        max-width: 33.3333%;
+    }
+    .header-menu {
+        flex: 0 0 100%; /* col-12 on sm */
+        max-width: 100%;
+        margin-bottom: 10px; /* Add margin when stacking */
+    }
+    .header-search {
+        flex: 0 0 100%; /* col-12 on sm */
+        max-width: 100%;
+        justify-content: center; /* Center search form if it's not full width */
+        margin-bottom: 10px; /* Add margin when stacking */
+    }
+}
+@media (max-width: 767.98px) {
+    .o_header_standard .row {
+        display: flex;
+        flex-wrap: nowrap; /* Ensures items stay on one line */
+        flex-direction: row;
+        align-items: center; /* Vertically align items */
+    }
+
+    .header-logo {
+        flex: 0 0 auto; /* Takes its natural width */
+        order: 1; /* First item */
+        text-align: left !important;
+        padding-right: 10px; /* Space after logo */
+        margin-bottom: 0;
+    }
+
+    .header-search {
+        flex: 1 1 auto; /* Takes up remaining space */
+        order: 2; /* Second item */
+        margin: 0 10px; /* Horizontal space around search bar */
+    }
+
+    /* Ensure the search form and input group within header-search take full available width */
+    .header-search .search-form,
+    .header-search .input-group {
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .header-menu { /* Hamburger menu container */
+        flex: 0 0 auto; /* Takes its natural width */
+        order: 3; /* Third item */
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 0;
+        width: 60%;
+    }
+}
+
+.nav.justify-content-center .nav-item:not(:last-child) {
+    margin-right: 24px;
+}
+
+.footer-bg {
+    position: relative;
+    background-image: url('https://certificalatam.com/wp-content/uploads/2022/07/Potain-Brand-Header-MDT-159-image-1920x640-1.jpg');
+    background-position: 0px -67px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    overflow: hidden;
+}
+.footer-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #68192D;
+    opacity: 0.9;
+    z-index: 1;
+}
+.footer-content {
+    position: relative;
+    z-index: 2;
+}
+.footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+.footer-col {
+    flex: 1 1 0;
+    padding: 15px;
+    color: #fff;
+    /* border-right: 1px solid white; */ /* Comentado para eliminar el borde derecho en desktop y manejarlo en responsive */
+}
+
+.footer-col:last-child {
+    border-right: none;
+}
+.footer-bottom {
+    text-align: center;
+    padding: 10px 0;
+}
+.footer-social-icons {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.footer-social-icons li {
+    display: inline-block;
+    margin-right: 10px;
+}
+.footer-social-icons li a {
+    color: #fff;
+    font-size: 20px; /* Aumenta el tamaño del icono ya que no hay texto */
+    display: inline-flex; /* Ayuda a centrar el ícono si es necesario */
+    align-items: center;
+    justify-content: center;
+}
+.footer-social-icons li a i {
+    margin-right: 0; /* Sin espacio a la derecha ya que no hay texto */
+}
+
+.contact-info-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px; /* Espacio entre ícono y texto, y entre filas */
+    align-items: center; /* Alinea verticalmente íconos y texto */
+}
+
+.contact-info-item {
+    display: contents; /* Permite que los hijos directos (i, span) se coloquen en la cuadrícula */
+}
+
+.contact-info-item i {
+    font-size: 16px; /* Ajusta el tamaño del ícono si es necesario */
+    color: #FFFFFF; /* Color del ícono */
+    justify-self: start; /* Alinea el ícono a la izquierda de su celda */
+}
+
+.contact-info-item span {
+    color: #DDDDDD;
+    font-family: "Roboto Condensed", Sans-serif !important;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.footer-bottom ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+.footer-bottom ul li {
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+}
+@media (max-width: 991.98px) {
+    .footer-row {
+        flex-direction: column;
+        /* align-items: center; Ya no se centra, se alinea a la izquierda por defecto o por .footer-col */
+    }
+    .footer-col {
+        width: 100%;
+        text-align: left; /* Alineación a la izquierda */
+        border-right: none; /* Eliminar borde derecho */
+        border-bottom: 1px solid white; /* Añadir borde inferior */
+        padding-bottom: 15px; /* Espacio para el borde inferior */
+        margin-bottom: 15px; /* Espacio entre columnas */
+    }
+    .footer-col:last-child {
+        border-bottom: none; /* Sin borde inferior para la última columna */
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .footer-bottom ul {
+        flex-direction: column;
+        align-items: center; /* Alinea los items al centro cuando están en columna */
+        gap: 10px;
+    }
+}
+.footer-title {
+    color: #FFFFFF;
+    font-family: "Roboto Condensed", Sans-serif !important;
+    font-size: 16px;
+    font-weight: 900;
+    text-decoration: underline;
+    margin-bottom: 10px;
+}
+.footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+}
+.footer-list-item {
+    color: #DDDDDD;
+    font-family: "Roboto Condensed", Sans-serif !important;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+.footer-desc {
+    color: #DDDDDD;
+    font-family: "Roboto Condensed", Sans-serif !important;
+    font-weight: 400;
+    font-size: 16px;
+    margin-bottom: 8px;
+} 
+
+.footer-list a{
+    color: #DDDDDD !important;
+    font-family: "Roboto Condensed", Sans-serif !important;
+    font-weight: 400;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.footer-title a{
+    color: #FFFFFF !important;
+    font-family: "Roboto Condensed", Sans-serif !important;
+    font-size: 16px;
+    font-weight: 900;
+    text-decoration: underline;
+}
+
+
+/* Estilos para el menú Off-canvas y hamburguesa */
+.header-menu .navbar-toggler {
+    border-color: rgba(0,0,0,.1);
+    color: #87465C; /* Color del icono hamburguesa */
+    padding: .25rem .75rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+}
+
+.header-menu .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(135, 70, 92, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+}
+
+.offcanvas-menu {
+    height: 100%;
+    width: 0; /* Inicialmente oculto, se controla con JS */
+    position: fixed;
+    z-index: 10000; /* Encima del overlay y otros elementos */
+    top: 0;
+    left: 0;
+    background-color: #ffffff; /* Color de fondo del menú */
+    overflow-x: hidden;
+    transition: width 0.3s ease-in-out;
+    padding-top: 60px; /* Espacio para el botón de cierre y/o logo */
+    box-shadow: 3px 0 6px rgba(0,0,0,0.1);
+}
+
+.offcanvas-menu a:not(.closebtn) {
+    padding: 10px 15px 10px 32px;
+    text-decoration: none;
+    font-size: 16px; /* Tamaño de fuente de los ítems del menú */
+    font-family: "Roboto Condensed", Sans-serif !important;
+    font-weight: 600;
+    color: #343a40; /* Color oscuro para el texto */
+    display: block;
+    transition: color 0.3s;
+}
+
+.offcanvas-menu a:hover:not(.closebtn) {
+    color: #87465C; /* Color al pasar el mouse, igual al del menú principal */
+}
+
+.offcanvas-menu .closebtn {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 30px; /* Tamaño del icono de cierre */
+    line-height: 1;
+    color: #343a40;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.offcanvas-menu .closebtn:hover {
+    color: #87465C;
+}
+
+/* Clase para mostrar el menú off-canvas, se añade con JS */
+.offcanvas-menu.open {
+    width: 280px; /* Ancho del menú al abrirse */
+    pointer-events: auto; /* Asegura que el menú sea interactivo */
+}
+
+/* Alineación izquierda para el contenido del menú off-canvas */
+.offcanvas-menu ul.nav.flex-column {
+    align-items: flex-start; /* Alinea los items a la izquierda en el eje transversal */
+    padding-left: 20px;      /* Añade un poco de padding para que no esté pegado al borde */
+    width: 100%;             /* Asegura que la lista ocupe el ancho del menú */
+}
+
+.offcanvas-menu .nav-item {
+    text-align: left;        /* Alinea el texto de cada item a la izquierda */
+    width: 100%;             /* Hace que cada item ocupe el ancho completo */
+}
+
+.offcanvas-menu .nav-link {
+    text-align: left;        /* Doble seguro para la alineación del texto del enlace */
+    display: block;          /* Hace que el enlace ocupe todo el espacio del item */
+    padding: 8px 0px;      /* Ajusta el padding vertical y elimina el horizontal (ya cubierto por ul) */
+}
+
+/* Overlay para el fondo cuando el menú está abierto */
+.offcanvas-overlay {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+    z-index: 1029; /* Debajo del menú off-canvas pero encima del contenido */
+}
+
+.offcanvas-overlay.active {
+    display: block; /* Visible cuando el menú está abierto */
+    pointer-events: auto; /* Asegura que el overlay sea interactivo */
+}
+
+
+/* Ajustes responsivos */
+@media (max-width: 767.98px) { /* Pantallas pequeñas (móviles) */
+    .header-menu > nav {
+        display: none !important; /* Oculta el menú de navegación principal */
+    }
+    .navbar-toggler {
+        display: block !important; /* Asegura que el botón hamburguesa sea visible */
+    }
+    .header-menu.col-8 {
+        display: flex;
+        justify-content: flex-end; /* Alinea el botón hamburguesa a la derecha */
+        align-items: center;
+    }
+    .header-search {
+        margin-top: 10px;
+        flex-basis: 100%; /* Ocupa todo el ancho disponible */
+        order: 3; /* Mueve el buscador debajo del logo y menú en el flujo flex */
+    }
+    .header-search .form-inline {
+        width: 100%;
+        justify-content: center !important;
+    }
+    .header-search .input-group {
+        width: 100%;
+        max-width: 400px; /* Limita el ancho del buscador en móviles */
+        margin: 0 auto;
+    }
+    .row.align-items-center {
+        flex-wrap: wrap; /* Permite que los elementos se envuelvan */
+    }
+    .header-logo.col-4 {
+        flex-basis: auto; /* Ajusta el tamaño del logo si es necesario */
+        width: 30% !important;
+    }
+}
+
+@media (min-width: 768px) { /* Pantallas medianas y grandes (tablets/desktop) */
+    .navbar-toggler {
+        display: none !important; /* Oculta el botón hamburguesa */
+    }
+    .offcanvas-menu,
+    .offcanvas-menu.open {
+        display: none !important; /* Oculta el menú offcanvas y su estado abierto */
+        width: 0 !important;
+    }
+    .header-menu > nav {
+        display: block !important; /* Muestra el menú de navegación principal */
+    }
+    .offcanvas-overlay.active {
+        display: none !important; /* Oculta el overlay */
+    }
+}

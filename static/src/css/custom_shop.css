@@ -1,0 +1,136 @@
+/* Estilos para la barra lateral de la tienda y el contenido de productos */
+
+#certifica_shop_sidebar {
+    padding: 15px;
+    border-right: 1px solid #eee;
+    background-color: #f9f9f9;
+}
+
+#certifica_shop_sidebar h4 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.filter-placeholder p {
+    margin-bottom: 10px;
+    font-style: italic;
+    color: #777;
+}
+
+form.o_wsale_products_searchbar_form, .dropdown.ml-2 {
+    display: none;
+}
+
+li.breadcrumb-item a, li.breadcrumb-item.active span, button.btn.btn-link.mt16.o_add_wishlist_dyn {
+    color: #87465C!important;
+}
+a.o_carousel_product_control.carousel-control-next, a.o_carousel_product_control.carousel-control-prev {
+   background-color: #87465C!important ;
+}
+
+.footer-bottom a {
+    color: #fff!important;
+}
+
+/* Ajustes para asegurar que el contenido de productos no se solape o se rompa demasiado
+   con la nueva estructura de columnas. Esto puede necesitar más ajustes específicos
+   dependiendo de cómo la plantilla original de Odoo reaccione a ser envuelta.
+*/
+#certifica_shop_products_content {
+    padding-left: 15px; /* Para dar un poco de espacio si la sidebar tiene borde */
+}
+
+.btn-primary{
+    background-color: #87465C;
+    border-color: #87465C;
+    font-size: 0.95rem;
+}
+
+button.btn.mt-2.a-submit.bg-transparent.btn-outline-primary.text-primary{
+    border-color: #87465C;
+    color:#87465C !important;
+    font-size: 0.95rem;
+}
+
+.btn.btn-lg.mt16.js_check_product.a-submit.d-block.d-sm-inline-block.bg-transparent.btn-outline-primary.text-primary{
+    border-color: #87465C;
+    color:#87465C !important;
+    font-size: 1.125rem !important;
+}
+
+.category-filter li a {
+    color: #87465C !important;
+}
+
+li.attribute-filter-item span {
+    color: #87465C !important;
+    font-weight: 700 !important;
+}
+
+li.active a {
+    text-decoration: underline;
+}
+
+button.btn.btn-block.bg-transparent.btn-outline-primary.text-primary{
+    color:#87465C;
+}
+
+.custom-control-input:checked ~ .custom-control-label::before{
+    color: #FFFFFF;
+    border-color: #87465C;
+    background-color: #87465C;
+}
+
+label.custom-control-label span{
+    color:#87465C !important;
+}
+
+button.btn.btn-block.bg-transparent.btn-outline-primary.text-primary {
+    color: #87465C !important;
+    border-color: #87465C !important;
+}
+
+li.page-item a{
+    color: #87465C;
+}
+
+.page-item.active .page-link {
+    background-color: #87465C;
+    border-color: #87465C;
+}
+
+.page-link:hover {
+    z-index: 2;
+    color: #FFFFFF;
+    text-decoration: none;
+    background-color: #87465C;
+    border-color: #87465C;
+}
+
+a:hover {
+    color: #87465C;
+    text-decoration: inherit !important;
+}
+
+.btn-outline-primary:not(:disabled):not(.disabled):active{
+    
+}
+
+/* En pantallas pequeñas, podríamos querer que los filtros aparezcan arriba o se oculten en un desplegable */
+@media (max-width: 991.98px) { /* lg breakpoint de Bootstrap */
+    #certifica_shop_sidebar {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 20px;
+    }
+
+    /* 
+       Si decides ocultar los filtros en un botón en móvil, necesitarás JS 
+       y estilos adicionales para ese botón y el comportamiento de mostrar/ocultar.
+       Por ahora, simplemente se apilarán.
+    */
+}

@@ -1,0 +1,389 @@
+/* Estilos personalizados para la tienda */
+
+/* Contenedor de imágenes con tamaño fijo para uniformidad */
+.product-image-container {
+    height: 200px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+/* Asegurar que las imágenes mantengan su relación de aspecto dentro del contenedor fijo */
+.product-thumbnail {
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+/* Efecto hover en las imágenes */
+.product-thumbnail:hover {
+    transform: scale(1.05);
+}
+
+/* Estilo para las tarjetas de productos */
+.product-card {
+    border: 1px solid #e0e0e0;
+    transition: box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Estilo para el nombre del producto */
+.product-name {
+    font-size: 1rem;
+    height: 2.5rem;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+/* Estilo para el precio */
+.product-price {
+    font-weight: bold;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+/* Estilos para los filtros */
+.shop-filters-container {
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+/* Estilos para el menú jerárquico de categorías */
+.category-filter ul li {
+    padding: 5px 0;
+}
+
+.category-filter a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.category-filter a:hover {
+    color: #87465C;
+}
+
+.category-filter a.active {
+    font-weight: bold;
+    color: #87465C;
+}
+
+/* Estilos para los toggles de categorías */
+.category-toggle, .subcategory-toggle {
+    cursor: pointer;
+    color: #87465C;
+    transition: transform 0.2s ease;
+}
+
+.category-toggle:hover, .subcategory-toggle:hover {
+    transform: scale(1.1);
+}
+
+/* Estilos para los diferentes niveles de categorías */
+.category-parent {
+    margin-bottom: 8px;
+}
+
+.category-child {
+    margin: 5px 0;
+}
+
+.category-grandchild {
+    margin: 3px 0;
+    font-size: 0.95em;
+}
+
+/* Indicador de carga */
+.oe_website_sale.oe_loading {
+    position: relative;
+    min-height: 200px;
+}
+
+.oe_website_sale.oe_loading:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #87465C;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1000;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.oe_website_sale.oe_loading > * {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Personalización de los filtros estándar de Odoo */
+.custom-odoo-filters .css_attribute_color {
+    border: 2px solid #f8f9fa;
+    box-shadow: 0 0 0 1px #dee2e6;
+}
+
+.custom-odoo-filters .css_attribute_color.active {
+    border: 3px solid #87465C !important;
+}
+
+.custom-odoo-filters .nav-item {
+    margin-bottom: 5px;
+}
+
+.custom-odoo-filters .nav-link {
+    color: #555;
+    transition: all 0.2s ease;
+}
+
+.custom-odoo-filters .nav-link:hover {
+    color: #87465C;
+}
+
+.custom-odoo-filters .nav-link.active {
+    color: #87465C;
+    font-weight: bold;
+    background-color: rgba(135, 70, 92, 0.1);
+}
+
+.custom-odoo-filters .js_attributes strong {
+    font-size: 1rem;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    display: block;
+    color: #444;
+}
+
+/* Mejora del aspecto del botón de filtrado */
+.custom-odoo-filters .btn-secondary {
+    background-color: #87465C;
+    border-color: #87465C;
+    color: white;
+}
+
+.custom-odoo-filters .btn-secondary:hover {
+    background-color: #734054;
+    border-color: #734054;
+}
+
+/* Margen izquierdo para indicar jerarquía */
+.subcategory-list, .grandchild-list {
+    margin-left: 15px !important;
+    border-left: 1px solid #eee;
+    padding-left: 10px;
+}
+
+/* Animación para expandir/colapsar */
+.subcategory-list, .grandchild-list {
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+/* Estilos para el menú móvil con checkbox hack */
+
+/* Ocultar el checkbox pero mantenerlo accesible */
+.menu-checkbox {
+    position: absolute;
+    left: -9999px;
+}
+
+/* Botón hamburguesa */
+.menu-btn {
+    display: inline-block;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+/* Overlay del menú */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+}
+
+/* Contenedor del menú móvil */
+.menu-movil {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Fuera de la pantalla */
+    width: 280px;
+    height: 100%;
+    background-color: white;
+    z-index: 999;
+    transition: left 0.3s ease-in-out;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+}
+
+/* Header del menú móvil */
+.menu-movil-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+}
+
+/* Botón cerrar */
+.menu-cerrar {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
+
+/* Lista de items del menú */
+.menu-movil-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Items individuales */
+.menu-movil-items li {
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.menu-movil-items a {
+    display: block;
+    padding: 15px;
+    color: #333;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.menu-movil-items a:hover,
+.menu-movil-items a:focus {
+    background-color: #f8f9fa;
+    color: #87465C;
+    padding-left: 20px;
+}
+
+/* Estilo activo cuando el checkbox está marcado */
+#menu-checkbox:checked ~ .menu-movil {
+    left: 0;
+}
+
+#menu-checkbox:checked ~ .menu-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* También hacer que el overlay cierre el menú cuando se hace clic */
+#menu-checkbox:checked ~ .menu-overlay {
+    cursor: pointer;
+}
+
+/* Estilos para el icono del carrito en desktop */
+.cart-icon {
+    font-size: 1.2em;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.cart-icon i {
+    color: #87465C;
+    font-size: 24px;
+    transition: all 0.2s ease;
+}
+
+.cart-icon:hover i {
+    color: #734054;
+    transform: scale(1.1);
+}
+
+.cart-icon .badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #87465C;
+    color: white;
+    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilos para el icono del carrito en móvil */
+.cart-icon-mobile {
+    display: inline-block;
+    position: relative;
+    color: #333;
+    text-decoration: none;
+}
+
+.cart-icon-mobile i {
+    font-size: 20px;
+    color: #87465C;
+}
+
+.cart-icon-mobile .badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #87465C;
+    color: white;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 50%;
+}
+
+/* Ajustes para el formulario de búsqueda */
+.search-form {
+    flex: 1;
+    max-width: 200px;
+}
+
+.search-form .form-control {
+    height: 35px;
+    font-size: 14px;
+}
+
+.search-form .btn-primary {
+    height: 35px;
+    background-color: #87465C;
+    border-color: #87465C;
+}
+
+.search-form .btn-primary:hover {
+    background-color: #734054;
+    border-color: #734054;
+}
+
+/* Ajuste para el contenedor de carrito y búsqueda */
+.d-flex.align-items-center.justify-content-end {
+    height: 100%;
+}

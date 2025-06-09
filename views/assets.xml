@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_frontend" inherit_id="web.assets_frontend" name="Certifica Theme Assets">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/css" href="/certifica_theme/static/src/custom_header.css"/>
+            <link rel="stylesheet" type="text/css" href="/certifica_theme/static/src/css/custom_shop.css"/>
+            <link rel="stylesheet" type="text/css" href="/certifica_theme/static/src/css/shop_custom.css"/>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+            <script type="text/javascript" src="/certifica_theme/static/src/js/custom_search.js"></script>
+            <script type="text/javascript" src="/certifica_theme/static/src/js/category_hierarchy.js"></script>
+            <script type="text/javascript" src="/certifica_theme/static/src/js/attribute_filters.js"></script>
+            <script type="text/javascript" src="/certifica_theme/static/src/js/menu_simple.js"></script>
+        </xpath>
+    </template>
+</odoo>

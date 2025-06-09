@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="custom_header" inherit_id="website.layout" name="Certifica Header">
+        <xpath expr="//header[@id='top']" position="replace">
+            <header id="top" class="o_header_standard">
+                <!-- Menú móvil usando checkbox hack (sin JavaScript) -->
+                <input type="checkbox" id="menu-checkbox" class="menu-checkbox" />
+                <div class="menu-movil">
+                    <div class="menu-movil-header">
+                        <label for="menu-checkbox" class="menu-cerrar">
+                            <i class="fa fa-times"></i>
+                        </label>
+                    </div>
+                    <ul class="menu-movil-items">
+                        <li><a href="/">INICIO</a></li>
+                        <li><a href="/shop">PRODUCTOS</a></li>
+                        <li><a href="/promociones">PROMOCIONES</a></li>
+                        <li><a href="https://certificalatam.com/index.php/contacto/">CONTACTANOS</a></li>
+                    </ul>
+                </div>
+                <label for="menu-checkbox" class="menu-overlay"></label>
+                
+                <!-- Contenido del header -->
+                <div class="container">
+                    <div class="row align-items-center">
+                        <!-- Logo -->
+                        <div class="col-6 col-md-3">
+                            <a href="/">
+                                <img src="/certifica_theme/static/src/img/logo.png" alt="Logo" style="max-height:50px;" />
+                            </a>
+                        </div>
+                        
+                        <!-- Botón hamburguesa y carrito (version móvil) -->
+                        <div class="col-6 d-md-none text-right">
+                            <!-- Icono del carrito (responsive) -->
+                            <a href="/shop/cart" class="cart-icon-mobile mr-3">
+                                <i class="fa fa-shopping-cart"></i>
+                                <span class="badge badge-pill badge-primary cart-quantity" t-esc="website_sale_order and website_sale_order.cart_quantity or '0'" t-att-style="website_sale_order and website_sale_order.cart_quantity and 'display: inline-block' or 'display: none'"/>
+                            </a>
+                            <!-- Botón hamburguesa -->
+                            <label for="menu-checkbox" class="menu-btn">
+                                <i class="fa fa-bars"></i>
+                            </label>
+                        </div>
+                        
+                        <!-- Menú desktop sin icono de carrito -->
+                        <div class="col-md-6 d-none d-md-block text-center">
+                            <ul class="nav justify-content-center">
+                                <li class="nav-item"><a class="nav-link" href="/">INICIO</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/shop">PRODUCTOS</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/promociones">PROMOCIONES</a></li>
+                                <li class="nav-item"><a class="nav-link" href="https://certificalatam.com/index.php/contacto/">CONTACTANOS</a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Carrito y Búsqueda -->
+                        <div class="col-md-3 d-none d-md-block">
+                            <div class="d-flex align-items-center justify-content-end">
+                                <!-- Icono del carrito (desktop) -->
+                                <a href="/shop/cart" class="cart-icon mr-3">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <span class="badge badge-pill badge-primary" t-esc="website_sale_order and website_sale_order.cart_quantity or '0'" t-att-style="website_sale_order and website_sale_order.cart_quantity and 'display: inline-block' or 'display: none'"/>
+                                </a>
+                                <!-- Buscador -->
+                                <form action="/shop" method="get" class="search-form">
+                                    <div class="input-group">
+                                        <input type="text" name="search" class="form-control" placeholder="Buscar..." />
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </xpath>
+    </template>
+    <template id="custom_footer" inherit_id="website.layout" name="Certifica Footer">
+        <xpath expr="//footer[@id='bottom']" position="replace">
+            <footer id="bottom" class="o_footer footer-bg">
+                <div class="footer-overlay"></div>
+                <div class="container footer-content">
+                    <div class="footer-row">
+                        <div class="footer-col">
+                            <div class="footer-title">SERVICIOS</div>
+                            <ul class="footer-list">
+                                <li class="footer-list-item"><a href="https://certificalatam.com/index.php/certificacion/">Inspección</a></li>
+                                <li class="footer-list-item"><a href="https://certificalatam.com/index.php/certificacion/">Certificación</a></li>
+                                <li class="footer-list-item"><a href="https://certificalatam.com/index.php/calibracion/">Calibración y mantenimiento</a></li>
+                                <li class="footer-list-item"><a href="https://certificalatam.com/index.php/capacitacion/">Capacitación</a></li>
+                                <li class="footer-list-item"><a href="https://certificalatam.com/index.php/consultoria/">Consultoría</a></li>
+                            </ul>
+                            <div class="footer-title" style="margin-top:18px;"><a href="https://tienda.certificalatam.com/">TIENDA DE PRODUCTOS</a></div>
+                        </div>
+                        <div class="footer-col">
+                            <div class="footer-title">HORARIO DE ATENCIÓN</div>
+                            <p class="footer-desc">Visítanos en nuestras oficinas de:<br/><strong>Lunes a Viernes 8:00 – 17:00 / Sábado 8:00 – 12:00</strong></p>
+                            <p class="footer-desc">Puedes solicitar una reunión virtual con gusto<br/>atenderemos a tu solicitud.</p>                        </div>
+                        <div class="footer-col">
+                            <div class="footer-title">CONTACTO CERTIFICA</div>
+                            <div class="contact-info-grid">
+                                <div class="contact-info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Calle Gabriela Mistral 212 - 216 Of. 401 Urb. La Calera de la Merced Surquillo</span>
+                                </div>
+                                <div class="contact-info-item">
+                                    <i class="fas fa-phone-alt"></i>
+                                    <span>51 956 768 308 / 51 987 482 941 / (01) 7652730</span>
+                                </div>
+                                <div class="contact-info-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>comercial@certificalatam.com</span>
+                                </div>
+                            </div>
+                            <ul class="footer-list footer-social-icons">
+                                <li class="footer-list-item"><a href="https://www.facebook.com/certificasac" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+                                <li class="footer-list-item"><a href="https://www.linkedin.com/company/certificaciones-y-calibraciones-sas/?viewAsMember=true" target="_blank"><i class="fab fa-linkedin-in"></i></a></li>
+                                <li class="footer-list-item"><a href="https://www.instagram.com/certificasac/" target="_blank"><i class="fab fa-instagram"></i></a></li>
+                                <li class="footer-list-item"><a href="https://www.youtube.com/c/Certificasac" target="_blank"><i class="fab fa-youtube"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <ul>
+                            <li><a href="/politicadeenvios">POLÍTICA DE ENVÍOS</a></li>
+                            <li><a href="/terminosycondiciones">TÉRMINOS Y CONDICIONES</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </footer>
+        </xpath>
+    </template>
+</odoo>
