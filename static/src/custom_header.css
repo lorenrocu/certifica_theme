@@ -640,3 +640,9 @@ button.btn.btn-lg.bg-transparent.btn-outline-primary.text-primary,
     font-size: .9rem !important;
     padding: 6px 30px;
 }
+
+.col-12 h5.text-primary.border-bottom.pb-2.mb-3{
+    color: #87465C!important;
+    font-size: 1.5rem!important;
+    font-family: "Roboto Condensed", Sans-serif!important;
+}
