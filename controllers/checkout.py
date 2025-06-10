@@ -152,15 +152,23 @@ class WebsiteSaleCheckout(WebsiteSale):
         """
         new_values = super(WebsiteSaleCheckout, self).values_preprocess(order, mode, values)
         
-        # Agregar campos personalizados
+        # Verificar si se solicita factura
+        is_invoice_requested = values.get('invoice_type_checkbox') == 'on' or values.get('invoice_type') == 'factura'
+        
+        # Agregar campos personalizados solo si son necesarios
         if 'dni' in values:
             new_values['dni'] = values['dni']
-        if 'ruc' in values:
-            new_values['ruc'] = values['ruc']
-        if 'invoice_type' in values:
-            new_values['invoice_type'] = values['invoice_type']
-        if 'razon_social' in values:
-            new_values['name'] = values['razon_social']  # Mapear razón social al nombre
+            
+        # Solo incluir campos de factura si se solicita factura
+        if is_invoice_requested:
+            if 'ruc' in values:
+                new_values['ruc'] = values['ruc']
+            if 'razon_social' in values:
+                new_values['name'] = values['razon_social']  # Mapear razón social al nombre
+        else:
+            # Si no se solicita factura, asegurarse de que no se incluyan estos campos
+            new_values.pop('ruc', None)
+            new_values.pop('razon_social', None)
             
         return new_values
 
@@ -176,29 +184,63 @@ class WebsiteSaleCheckout(WebsiteSale):
 
         # Validaciones personalizadas
         invoice_type = all_form_values.get('invoice_type', 'boleta')
+        invoice_type_checkbox = all_form_values.get('invoice_type_checkbox')
         dni = all_form_values.get('dni', '').strip()
         ruc = all_form_values.get('ruc', '').strip()
         razon_social = all_form_values.get('razon_social', '').strip()
+        
+        # Determinar el tipo real basado en el checkbox
+        is_invoice_requested = invoice_type_checkbox == 'on' or invoice_type == 'factura'
+        
+        print(f"=== VALIDACIÓN SERVIDOR ===")
+        print(f"invoice_type: {invoice_type}")
+        print(f"invoice_type_checkbox: {invoice_type_checkbox}")
+        print(f"is_invoice_requested: {is_invoice_requested}")
+        print(f"dni: '{dni}'")
+        print(f"ruc: '{ruc}'")
+        print(f"razon_social: '{razon_social}'")
 
-        if invoice_type == 'boleta':
-            # Para boleta se requiere DNI
-            if not dni:
-                error['dni'] = 'missing'
-                error_message.append('DNI es requerido para boleta')
-            elif len(dni) != 8 or not dni.isdigit():
-                error['dni'] = 'invalid'
-                error_message.append('DNI debe tener exactamente 8 dígitos')
-        elif invoice_type == 'factura':
+        if is_invoice_requested:
+            print("Validando para FACTURA")
             # Para factura se requiere RUC y Razón Social
             if not ruc:
                 error['ruc'] = 'missing'
                 error_message.append('RUC es requerido para factura')
+                print("❌ RUC faltante")
             elif len(ruc) != 11 or not ruc.isdigit():
                 error['ruc'] = 'invalid'
                 error_message.append('RUC debe tener exactamente 11 dígitos')
+                print("❌ RUC formato inválido")
+            else:
+                print("✅ RUC válido")
             
             if not razon_social:
                 error['razon_social'] = 'missing'
                 error_message.append('Razón Social es requerida para factura')
+                print("❌ Razón Social faltante")
+            else:
+                print("✅ Razón Social válida")
+        else:
+            print("Validando para BOLETA")
+            # Para boleta, DNI es completamente opcional
+            # Solo validar formato si se proporciona un valor
+            if dni:
+                if len(dni) != 8 or not dni.isdigit():
+                    error['dni'] = 'invalid'
+                    error_message.append('DNI debe tener exactamente 8 dígitos')
+                    print("❌ DNI formato inválido")
+                else:
+                    print("✅ DNI válido")
+            else:
+                print("✅ DNI no proporcionado - es opcional")
+            
+            # Ignorar completamente los campos de factura
+            if 'ruc' in error:
+                del error['ruc']
+            if 'razon_social' in error:
+                del error['razon_social']
+        
+        print(f"Errores encontrados: {len(error)}")
+        print(f"Mensajes de error: {error_message}")
 
         return error, error_message

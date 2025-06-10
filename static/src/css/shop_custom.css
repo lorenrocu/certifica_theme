@@ -373,7 +373,7 @@
 }
 
 .search-form .btn-primary {
-    height: 35px;
+    height: 100%;
     background-color: #87465C;
     border-color: #87465C;
 }

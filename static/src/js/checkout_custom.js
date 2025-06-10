@@ -154,18 +154,27 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
          * Manejar cambio del checkbox de tipo de comprobante
          */
         _onChangeInvoiceType: function (ev) {
+            console.log('📋 CAMBIO EN CHECKBOX DE FACTURA');
             var $checkbox = $(ev.currentTarget);
             var isChecked = $checkbox.is(':checked');
             var $container = $checkbox.closest('#div_invoice_type');
             var $invoiceFields = $('#invoice_fields');
             var $razonSocial = $('#razon_social');
             var $ruc = $('#ruc');
+            var $hiddenInput = this.$('#invoice_type_hidden');
+            
+            console.log('Checkbox marcado:', isChecked);
+            console.log('Campos de factura encontrados:', $invoiceFields.length);
+            console.log('Campo RUC encontrado:', $ruc.length);
+            console.log('Campo Razón Social encontrado:', $razonSocial.length);
             
             // Feedback visual del checkbox
             if (isChecked) {
+                console.log('✅ Activando modo FACTURA');
                 $container.addClass('invoice-selected');
                 console.log('Factura solicitada');
             } else {
+                console.log('✅ Activando modo BOLETA');
                 $container.removeClass('invoice-selected');
                 console.log('Boleta solicitada');
             }
@@ -178,6 +187,9 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
                 // Hacer campos requeridos
                 $razonSocial.attr('required', 'required');
                 $ruc.attr('required', 'required');
+                $hiddenInput.val('factura');
+                
+                console.log('Campos RUC y Razón Social marcados como requeridos');
                 
                 // Enfocar el primer campo
                 setTimeout(function() {
@@ -191,6 +203,9 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
                 // Remover validaciones requeridas
                 $razonSocial.removeAttr('required').removeClass('is-invalid');
                 $ruc.removeAttr('required').removeClass('is-invalid');
+                $hiddenInput.val('boleta');
+                
+                console.log('Campos RUC y Razón Social NO requeridos');
                 
                 // Limpiar valores
                 $razonSocial.val('');
@@ -201,6 +216,8 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
                     $invoiceFields.hide();
                 }, 400);
             }
+            
+            console.log('Valor del input oculto:', $hiddenInput.val());
             
             // Agregar clase CSS para animación del checkbox
             $container.addClass('checkbox-changed');
@@ -213,14 +230,33 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
          * Manejar envío del formulario
          */
         _onSubmitForm: function (ev) {
+            console.log('🚀 EVENTO ENVÍO FORMULARIO INICIADO');
+            console.log('Evento:', ev.type, 'Target:', ev.target.tagName);
+            
             // Asegurar que los campos eliminados no bloqueen el envío
             this.$('input[name="street2"], input[name="zip"]').removeAttr('required');
             
-            // Validación personalizada
-            if (!this._validateForm()) {
+            // Obtener el estado del checkbox de factura
+            var isInvoiceChecked = this.$('input[name="invoice_type"]').is(':checked');
+            var $dniField = this.$('#dni');
+            
+            // Si no está marcada la factura, asegurarse de que el DNI no bloquee el envío
+            if (!isInvoiceChecked) {
+                $dniField.removeAttr('required');
+                $dniField.removeClass('is-invalid');
+            }
+            
+            var isFormValid = this._validateForm();
+            console.log('Resultado validación:', isFormValid);
+            
+            if (!isFormValid) {
+                console.log('❌ FORMULARIO INVÁLIDO - Previniendo envío');
                 ev.preventDefault();
+                ev.stopPropagation();
                 this._showValidationErrors();
                 return false;
+            } else {
+                console.log('✅ FORMULARIO VÁLIDO - Permitiendo envío');
             }
         },
 
@@ -237,6 +273,12 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
             if ($input.attr('id') === 'ruc') {
                 this.$('.ruc-error-message').remove();
             }
+            if ($input.attr('id') === 'dni') {
+                this.$('.dni-error-message').remove();
+            }
+            if ($input.attr('id') === 'razon_social') {
+                this.$('.razon-social-error-message').remove();
+            }
             
             // Remover mensaje de error general si existe
             this.$('.checkout-error-message').remove();
@@ -246,52 +288,37 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
          * Validar el formulario
          */
         _validateForm: function () {
-            var isValid = true;
             var self = this;
+            var isValid = true;
+            var isInvoiceChecked = this.$('input[name="invoice_type"]').is(':checked');
             
-            // Validar campos requeridos
+            // Validar campos requeridos básicos
             this.$('input[required], select[required]').each(function() {
                 var $field = $(this);
-                if (!$field.val() || !$field.val().trim()) {
+                // Ignorar el DNI si no está marcada la factura
+                if ($field.attr('id') === 'dni' && !isInvoiceChecked) {
+                    return true;
+                }
+                
+                if (!$field.val().trim()) {
                     $field.addClass('is-invalid');
                     isValid = false;
+                } else {
+                    $field.removeClass('is-invalid');
                 }
             });
             
-            // Validar email
-            var $email = this.$('input[name="email"]');
-            if ($email.length && $email.val()) {
-                var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test($email.val())) {
-                    $email.addClass('is-invalid');
-                    isValid = false;
-                }
-            }
-            
-            // Validar RUC si está visible y requerido
-            var $ruc = this.$('#ruc');
-            if ($ruc.length && $ruc.is(':visible') && $ruc.attr('required')) {
-                var rucValue = $ruc.val().trim();
-                var rucRegex = /^[0-9]{11}$/;
+            // Validar campos de factura solo si está marcada la opción
+            if (isInvoiceChecked) {
+                var $ruc = this.$('#ruc');
+                var $razonSocial = this.$('#razon_social');
                 
-                if (!rucValue) {
+                if (!$ruc.val().trim()) {
                     $ruc.addClass('is-invalid');
                     isValid = false;
-                } else if (!rucRegex.test(rucValue)) {
-                    $ruc.addClass('is-invalid');
-                    isValid = false;
-                    // Mostrar mensaje específico para RUC
-                    if (!this.$('.ruc-error-message').length) {
-                        $ruc.after('<div class="invalid-feedback ruc-error-message">El RUC debe tener exactamente 11 dígitos</div>');
-                    }
                 }
-            }
-            
-            // Validar Razón Social si está visible y requerida
-            var $razonSocial = this.$('#razon_social');
-            if ($razonSocial.length && $razonSocial.is(':visible') && $razonSocial.attr('required')) {
-                var razonValue = $razonSocial.val().trim();
-                if (!razonValue || razonValue.length < 3) {
+                
+                if (!$razonSocial.val().trim()) {
                     $razonSocial.addClass('is-invalid');
                     isValid = false;
                 }

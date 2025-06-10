@@ -23,8 +23,7 @@
                                name="dni" 
                                placeholder="12345678"
                                pattern="[0-9]{8}"
-                               maxlength="8"
-                               required="false"/>
+                               maxlength="8"/>
                         <small class="text-muted">DNI de 8 dígitos</small>
                     </div>
                 </div>
@@ -96,19 +95,28 @@
                             dniField.style.display = 'none';
                             invoiceFields.style.display = 'block';
                             
-                            // Hacer requeridos los campos de factura
+                            // Hacer campos requeridos y habilitarlos
                             rucInput.setAttribute('required', 'true');
                             razonSocialInput.setAttribute('required', 'true');
+                            rucInput.removeAttribute('disabled');
+                            razonSocialInput.removeAttribute('disabled');
                             dniInput.removeAttribute('required');
+                            dniInput.value = ''; // Limpiar el valor del DNI
                         } else {
                             // Mostrar DNI, ocultar campos de factura
                             dniField.style.display = 'block';
                             invoiceFields.style.display = 'none';
                             
-                            // Hacer requerido el DNI
-                            dniInput.setAttribute('required', 'true');
+                            // Deshabilitar y limpiar campos de factura
                             rucInput.removeAttribute('required');
                             razonSocialInput.removeAttribute('required');
+                            rucInput.setAttribute('disabled', 'disabled');
+                            razonSocialInput.setAttribute('disabled', 'disabled');
+                            rucInput.value = '';
+                            razonSocialInput.value = '';
+                            
+                            // Remover requerido del DNI
+                            dniInput.removeAttribute('required');
                         }
                     }
                     
