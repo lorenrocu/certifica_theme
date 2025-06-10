@@ -1,0 +1,269 @@
+/* =============================================================================
+   CHECKOUT CUSTOMIZATIONS - CERTIFICA THEME
+   ============================================================================= */
+
+/* Ocultar campo Calle 2 (Street 2) */
+.div_street2,
+input[name="street2"],
+label[for="street2"],
+.form-group:has(input[name="street2"]),
+.checkout_autoformat .div_street2 {
+    display: none !important;
+}
+
+/* Ocultar campo Código Postal (Zip Code) */
+.div_zip,
+input[name="zip"],
+label[for="zip"],
+.form-group:has(input[name="zip"]),
+.checkout_autoformat .div_zip {
+    display: none !important;
+}
+
+/* Estilos adicionales para mejorar el formulario de checkout */
+.checkout_autoformat .form-group {
+    margin-bottom: 1rem;
+}
+
+.checkout_autoformat .form-control {
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    transition: border-color 0.3s ease;
+}
+
+.checkout_autoformat .form-control:focus {
+    border-color: #87465C;
+    box-shadow: 0 0 0 0.2rem rgba(135, 70, 92, 0.25);
+}
+
+.checkout_autoformat label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+/* Estilos para el botón de confirmar pedido */
+.checkout_autoformat .btn-primary {
+    background-color: #87465C;
+    border-color: #87465C;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.checkout_autoformat .btn-primary:hover {
+    background-color: #734054;
+    border-color: #734054;
+    transform: translateY(-1px);
+}
+
+/* Mejorar el espaciado del formulario */
+.checkout_autoformat .row {
+    margin-bottom: 1rem;
+}
+
+/* Estilos para campos requeridos */
+.checkout_autoformat .form-group.required label::after {
+    content: " *";
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .checkout_autoformat .form-control {
+        padding: 0.6rem;
+        font-size: 16px; /* Evita zoom en iOS */
+    }
+    
+    .checkout_autoformat .btn-primary {
+        width: 100%;
+        padding: 1rem;
+    }
+}
+
+.form-control {
+    height: calc(2.2rem + 0.68rem + 2px) !important;
+}
+
+/* Estilos para el checkbox de tipo de comprobante */
+#div_invoice_type {
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+#div_invoice_type .custom-control-label {
+    font-size: 1rem;
+    color: #495057;
+    cursor: pointer;
+}
+
+#div_invoice_type .custom-control-label strong {
+    color: #87465C;
+    font-weight: 600;
+}
+
+#div_invoice_type .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #87465C;
+    border-color: #87465C;
+}
+
+#div_invoice_type .custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow: 0 0 0 0.2rem rgba(135, 70, 92, 0.25);
+}
+
+#div_invoice_type small {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Animación suave para el checkbox */
+#div_invoice_type .custom-control-label::before {
+    transition: all 0.3s ease;
+}
+
+#div_invoice_type:hover {
+    background-color: #f1f3f4;
+    border-color: #87465C;
+    transition: all 0.3s ease;
+}
+
+/* Estados del checkbox */
+#div_invoice_type.invoice-selected {
+    background-color: #e8f5e8;
+    border-color: #87465C;
+    box-shadow: 0 2px 4px rgba(135, 70, 92, 0.1);
+}
+
+#div_invoice_type.checkbox-changed {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+}
+
+/* Estilos para los campos de facturación */
+.invoice-fields {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.4s ease;
+    overflow: hidden;
+}
+
+.invoice-fields.show {
+    animation: slideDown 0.4s ease-out;
+}
+
+.invoice-fields.hide {
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        max-height: 200px;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        max-height: 200px;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Estilos para los inputs de facturación */
+#razon_social, #ruc {
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+#razon_social:focus, #ruc:focus {
+    border-color: #87465C;
+    box-shadow: 0 0 0 0.2rem rgba(135, 70, 92, 0.25);
+    outline: none;
+}
+
+#razon_social:valid, #ruc:valid {
+    border-color: #28a745;
+}
+
+#razon_social:invalid, #ruc:invalid {
+    border-color: #dc3545;
+}
+
+/* Estilos para las etiquetas de los campos de facturación */
+.invoice-fields label {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.invoice-fields .text-danger {
+    color: #dc3545 !important;
+}
+
+.invoice-fields small {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    #div_invoice_type {
+        margin-top: 0.75rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+    }
+    
+    #div_invoice_type .custom-control-label {
+        font-size: 0.9rem;
+    }
+    
+    #div_invoice_type small {
+        font-size: 0.8rem;
+    }
+    
+    .invoice-fields {
+        padding: 0.75rem;
+        margin-top: 0.75rem;
+    }
+    
+    .invoice-fields .row {
+        margin: 0;
+    }
+    
+    .invoice-fields .col-md-8,
+    .invoice-fields .col-md-4 {
+        padding: 0 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    #razon_social, #ruc {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+    }
+}

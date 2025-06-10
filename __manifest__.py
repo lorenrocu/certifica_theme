@@ -11,6 +11,7 @@
         'views/layout.xml',
         'views/shop_layout.xml',
         'views/product_page_custom.xml',
+        'views/checkout_custom.xml',
     ],
     'installable': True,
     'application': False,

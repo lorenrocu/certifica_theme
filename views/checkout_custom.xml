@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista personalizada del checkout para mejorar el diseño -->
+    <!-- Nota: Los campos se ocultan mediante CSS en checkout_custom.css -->
+    
+    <!-- Template para agregar checkbox de tipo de comprobante y campos de facturación -->
+    <template id="checkout_invoice_type" name="Invoice Type Checkbox" inherit_id="website_sale.address">
+        <xpath expr="//form[@action='/shop/address']" position="inside">
+            <div class="form-group col-md-12" id="div_invoice_type">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="invoice_type" name="invoice_type" value="1"/>
+                    <label class="custom-control-label" for="invoice_type">
+                        <strong>Solicitar Factura</strong>
+                        <small class="text-muted d-block">Marque esta casilla si necesita factura, de lo contrario se emitirá boleta</small>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Campos de facturación que se muestran cuando se selecciona factura -->
+            <div id="invoice_fields" class="invoice-fields" style="display: none;">
+                <div class="row">
+                    <div class="form-group col-md-8">
+                        <label for="razon_social" class="control-label">
+                            <strong>Razón Social</strong>
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="razon_social" 
+                               name="razon_social" 
+                               placeholder="Ingrese la razón social de su empresa"
+                               required="false"/>
+                        <small class="text-muted">Nombre completo o razón social para la factura</small>
+                    </div>
+                    
+                    <div class="form-group col-md-4">
+                        <label for="ruc" class="control-label">
+                            <strong>RUC</strong>
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="ruc" 
+                               name="ruc" 
+                               placeholder="20123456789"
+                               pattern="[0-9]{11}"
+                               maxlength="11"
+                               required="false"/>
+                        <small class="text-muted">RUC de 11 dígitos</small>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+    
+
+    
+</odoo>

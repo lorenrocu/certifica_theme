@@ -160,13 +160,18 @@ $(document).ready(function() {
     
     // Smooth scroll para navegación interna
     $('a[href^="#"]').on('click', function(e) {
-        var target = $(this.getAttribute('href'));
+        var href = this.getAttribute('href');
         
-        if (target.length) {
-            e.preventDefault();
-            $('html, body').stop().animate({
-                scrollTop: target.offset().top - 100
-            }, 600);
+        // Validar que el href no sea solo '#' o esté vacío
+        if (href && href !== '#' && href.length > 1) {
+            var target = $(href);
+            
+            if (target.length) {
+                e.preventDefault();
+                $('html, body').stop().animate({
+                    scrollTop: target.offset().top - 100
+                }, 600);
+            }
         }
     });
     
