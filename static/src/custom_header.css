@@ -618,3 +618,25 @@ button#o_payment_form_pay{
 button#o_payment_form_pay{
     font-size: .9rem!important;
 }
+
+.d-flex.justify-content-between button.btn.btn-lg.btn-primary,
+.d-flex.justify-content-between a.btn.btn-outline-secondary
+{
+    background-color: #87465C!important;
+    border-color: #87465C!important;
+    color: #fff!important;
+    border-radius: 2.5rem;
+    font-size: .9rem !important;
+    padding: 6px 30px;
+}
+
+button.btn.btn-lg.bg-transparent.btn-outline-primary.text-primary,
+.d-flex.justify-content-between a.btn.btn-outline-secondary:hover
+{
+    background-color: #fff!important;
+    border-color: #87465C!important;
+    color: #87465C!important;
+    border-radius: 2.5rem;
+    font-size: .9rem !important;
+    padding: 6px 30px;
+}

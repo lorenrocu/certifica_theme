@@ -11,7 +11,8 @@
         'views/layout.xml',
         'views/shop_layout.xml',
         'views/product_page_custom.xml',
-        'views/checkout_custom.xml',
+        # 'views/checkout_custom.xml',  # Formulario heredado (comentado)
+        'views/checkout_custom_form.xml',  # Nuevo formulario personalizado
     ],
     'installable': True,
     'application': False,

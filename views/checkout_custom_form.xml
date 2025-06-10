@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Formulario personalizado de checkout completamente nuevo -->
+    <!-- Reemplaza la sección de dirección de envío con nuestro diseño optimizado -->
+    
+    <template id="custom_checkout_form" name="Custom Checkout Form" inherit_id="website_sale.address">
+        <!-- Reemplazamos todo el contenido del formulario de dirección -->
+        <xpath expr="//form[@class='checkout_autoformat']" position="replace">
+            <div id="shipping_and_billing" class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="fa fa-truck mr-2"></i>
+                                Dirección de envío
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <form class="checkout_autoformat" action="/shop/confirm_order" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                
+                                <!-- Información Personal -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="text-primary border-bottom pb-2 mb-3">
+                                            <i class="fa fa-user mr-2"></i>
+                                            Información Personal
+                                        </h5>
+                                    </div>
+                                    
+                                    <!-- Nombre completo -->
+                                    <div class="col-md-12 mb-3">
+                                        <label for="name" class="form-label">
+                                            <strong>Nombre completo</strong>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-user"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="name" 
+                                                   name="name" 
+                                                   placeholder="Ingrese su nombre completo"
+                                                   required="true"
+                                                   t-att-value="partner.name if partner else ''"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- DNI -->
+                                    <div class="col-md-6 mb-3" id="dni_field">
+                                        <label for="dni" class="form-label">
+                                            <strong>DNI</strong>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-id-card"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="dni" 
+                                                   name="dni" 
+                                                   placeholder="12345678"
+                                                   pattern="[0-9]{8}"
+                                                   maxlength="8"
+                                                   required="true"/>
+                                        </div>
+                                        <small class="form-text text-muted">DNI de 8 dígitos</small>
+                                    </div>
+                                    
+                                    <!-- Teléfono -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="phone" class="form-label">
+                                            <strong>Teléfono</strong>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-phone"></i>
+                                                </span>
+                                            </div>
+                                            <input type="tel" 
+                                                   class="form-control" 
+                                                   id="phone" 
+                                                   name="phone" 
+                                                   placeholder="+51 999 999 999"
+                                                   required="true"
+                                                   t-att-value="partner.phone if partner else ''"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tipo de Comprobante -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="text-primary border-bottom pb-2 mb-3">
+                                            <i class="fa fa-file-text mr-2"></i>
+                                            Tipo de Comprobante
+                                        </h5>
+                                    </div>
+                                    
+                                    <div class="col-12 mb-3">
+                                        <div class="card border-info">
+                                            <div class="card-body p-3">
+                                                <div class="custom-control custom-switch">
+                                                    <input type="checkbox" 
+                                                           class="custom-control-input" 
+                                                           id="invoice_type" 
+                                                           name="invoice_type" 
+                                                           value="1"/>
+                                                    <label class="custom-control-label" for="invoice_type">
+                                                        <strong>Solicitar Factura</strong>
+                                                    </label>
+                                                </div>
+                                                <small class="text-muted d-block mt-1">
+                                                    Por defecto se emitirá boleta. Active esta opción solo si necesita factura.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Campos de Facturación (ocultos por defecto) -->
+                                    <div id="invoice_fields" class="col-12" style="display: none;">
+                                        <div class="card border-warning">
+                                            <div class="card-header bg-warning text-dark">
+                                                <h6 class="mb-0">
+                                                    <i class="fa fa-building mr-2"></i>
+                                                    Datos para Facturación
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <!-- RUC -->
+                                                    <div class="col-md-4 mb-3">
+                                                        <label for="ruc" class="form-label">
+                                                            <strong>RUC</strong>
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <div class="input-group">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text">
+                                                                    <i class="fa fa-hashtag"></i>
+                                                                </span>
+                                                            </div>
+                                                            <input type="text" 
+                                                                   class="form-control" 
+                                                                   id="ruc" 
+                                                                   name="ruc" 
+                                                                   placeholder="20123456789"
+                                                                   pattern="[0-9]{11}"
+                                                                   maxlength="11"
+                                                                   required="false"/>
+                                                        </div>
+                                                        <small class="form-text text-muted">RUC de 11 dígitos</small>
+                                                    </div>
+                                                    
+                                                    <!-- Razón Social -->
+                                                    <div class="col-md-8 mb-3">
+                                                        <label for="razon_social" class="form-label">
+                                                            <strong>Razón Social</strong>
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <div class="input-group">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text">
+                                                                    <i class="fa fa-building"></i>
+                                                                </span>
+                                                            </div>
+                                                            <input type="text" 
+                                                                   class="form-control" 
+                                                                   id="razon_social" 
+                                                                   name="razon_social" 
+                                                                   placeholder="Nombre de la empresa o razón social"
+                                                                   required="false"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dirección de Envío -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="text-primary border-bottom pb-2 mb-3">
+                                            <i class="fa fa-map-marker mr-2"></i>
+                                            Dirección de Envío
+                                        </h5>
+                                    </div>
+                                    
+                                    <!-- Dirección -->
+                                    <div class="col-md-12 mb-3">
+                                        <label for="street" class="form-label">
+                                            <strong>Dirección</strong>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-home"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="street" 
+                                                   name="street" 
+                                                   placeholder="Calle, número, distrito"
+                                                   required="true"
+                                                   t-att-value="partner.street if partner else ''"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Ciudad -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="city" class="form-label">
+                                            <strong>Ciudad</strong>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-building-o"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="city" 
+                                                   name="city" 
+                                                   placeholder="Lima"
+                                                   required="true"
+                                                   t-att-value="partner.city if partner else ''"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- País -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="country_id" class="form-label">
+                                            <strong>País</strong>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-globe"></i>
+                                                </span>
+                                            </div>
+                                            <select class="form-control" id="country_id" name="country_id" required="true">
+                                                <option value="">Seleccione un país</option>
+                                                <t t-foreach="countries or []" t-as="country">
+                                                    <option t-att-value="country.id" 
+                                                            t-att-selected="'selected' if partner and partner.country_id.id == country.id else None">
+                                                        <t t-esc="country.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botones de acción -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between">
+                                            <a href="/shop/cart" class="btn btn-outline-secondary">
+                                                <i class="fa fa-arrow-left mr-2"></i>
+                                                Volver al carrito
+                                            </a>
+                                            <button type="submit" class="btn btn-primary btn-lg">
+                                                <i class="fa fa-check mr-2"></i>
+                                                Confirmar pedido
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- JavaScript para funcionalidad del formulario -->
+            <script type="text/javascript">
+                document.addEventListener('DOMContentLoaded', function() {
+                    const invoiceCheckbox = document.getElementById('invoice_type');
+                    const dniField = document.getElementById('dni_field');
+                    const invoiceFields = document.getElementById('invoice_fields');
+                    const dniInput = document.getElementById('dni');
+                    const rucInput = document.getElementById('ruc');
+                    const razonSocialInput = document.getElementById('razon_social');
+                    
+                    function toggleFields() {
+                        if (invoiceCheckbox.checked) {
+                            // Modo Factura: Ocultar DNI, mostrar campos de empresa
+                            dniField.style.display = 'none';
+                            invoiceFields.style.display = 'block';
+                            
+                            // Hacer requeridos los campos de factura
+                            rucInput.setAttribute('required', 'true');
+                            razonSocialInput.setAttribute('required', 'true');
+                            dniInput.removeAttribute('required');
+                            
+                            // Limpiar DNI
+                            dniInput.value = '';
+                        } else {
+                            // Modo Boleta: Mostrar DNI, ocultar campos de empresa
+                            dniField.style.display = 'block';
+                            invoiceFields.style.display = 'none';
+                            
+                            // Hacer requerido el DNI
+                            dniInput.setAttribute('required', 'true');
+                            rucInput.removeAttribute('required');
+                            razonSocialInput.removeAttribute('required');
+                            
+                            // Limpiar campos de empresa
+                            rucInput.value = '';
+                            razonSocialInput.value = '';
+                        }
+                    }
+                    
+                    // Validación de DNI (8 dígitos)
+                    dniInput.addEventListener('input', function() {
+                        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 8);
+                    });
+                    
+                    // Validación de RUC (11 dígitos)
+                    rucInput.addEventListener('input', function() {
+                        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 11);
+                    });
+                    
+                    // Ejecutar al cargar la página
+                    toggleFields();
+                    
+                    // Ejecutar cuando cambie el checkbox
+                    invoiceCheckbox.addEventListener('change', toggleFields);
+                    
+                    // Validación del formulario antes del envío
+                    document.querySelector('.checkout_autoformat').addEventListener('submit', function(e) {
+                        if (invoiceCheckbox.checked) {
+                            if (!rucInput.value || rucInput.value.length !== 11) {
+                                e.preventDefault();
+                                alert('El RUC debe tener exactamente 11 dígitos');
+                                rucInput.focus();
+                                return false;
+                            }
+                            if (!razonSocialInput.value.trim()) {
+                                e.preventDefault();
+                                alert('La razón social es requerida para facturación');
+                                razonSocialInput.focus();
+                                return false;
+                            }
+                        } else {
+                            if (!dniInput.value || dniInput.value.length !== 8) {
+                                e.preventDefault();
+                                alert('El DNI debe tener exactamente 8 dígitos');
+                                dniInput.focus();
+                                return false;
+                            }
+                        }
+                    });
+                });
+            </script>
+        </xpath>
+    </template>
+</odoo>
