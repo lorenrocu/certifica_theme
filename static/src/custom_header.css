@@ -450,7 +450,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .offcanvas-menu a:hover:not(.closebtn) {
-    color: #87465C; /* Color al pasar el mouse, igual al del menú principal */
+    color: #87465C !important; /* Color al pasar el mouse, igual al del menú principal */
 }
 
 .offcanvas-menu .closebtn {
@@ -561,4 +561,60 @@ h1, h2, h3, h4, h5, h6 {
     .offcanvas-overlay.active {
         display: none !important; /* Oculta el overlay */
     }
+}
+
+a.btn.float-right.d-none.d-xl-inline-block.bg-transparent.btn-outline-primary.text-primary, a.text-primary:hover{
+    color: #87465C !important;
+    border:#87465C solid 2px !important;
+    font-size: 0.9rem !important;
+    font-family: "Roboto Condensed", Sans-serif !important;
+}
+
+a.btn.float-right.d-none.d-xl-inline-block.btn-primary{
+    color: #fff!important;
+    font-size: 0.9rem!important;
+    font-family: "Roboto Condensed", Sans-serif !important;
+}
+
+a.text-primary:hover, a.text-primary:focus {
+    color: #87465C !important;
+}
+
+a.js_delete_product.no-decoration,
+a i.fa.fa-plus,
+a i.fa.fa-minus,
+table#cart_products .td-product_name a,
+a.btn.mb32.d-none.d-xl-inline-block.bg-transparent.btn-outline-secondary.text-secondary,
+a.btn.float-right.d-none.d-xl-inline-block.bg-transparent.btn-outline-secondary.text-secondary,
+a.btn.bg-transparent.btn-outline-secondary.text-secondary,
+button#o_payment_form_pay{
+    color: #87465C!important;
+}
+
+button.btn.mt-2.a-submit.btn-primary i, button.btn.mt-2.a-submit.bg-transparent.btn-outline-primary.text-primary i{
+    margin-right: .5rem;
+}
+button.btn.mt-2.a-submit.bg-transparent.btn-outline-primary.text-primary, .btn-primary{
+    font-size: .9rem !important;
+}
+
+a.btn.mb32.d-none.d-xl-inline-block.btn-secondary,
+a.btn.float-right.d-none.d-xl-inline-block.btn-secondary,
+a.btn.btn-secondary,
+button#o_payment_form_pay{
+    background-color: #87465C!important;
+    border-color: #87465C!important;
+    color: #fff!important;
+}
+
+.progress-wizard .progress-wizard-step .progress-wizard-bar{
+    background-color: #87465C!important;
+}
+
+.progress-wizard .progress-wizard-step.active .progress-wizard-dot{
+    background: #87465C!important;
+}
+
+button#o_payment_form_pay{
+    font-size: .9rem!important;
 }

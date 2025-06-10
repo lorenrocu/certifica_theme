@@ -1,0 +1,238 @@
+/* Estilos personalizados para la página de producto individual */
+
+/* Contenedor principal del producto */
+.product-image-section {
+    position: sticky;
+    top: 20px;
+}
+
+/* Imagen principal del producto */
+.product-main-image img {
+    transition: transform 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.product-main-image img:hover {
+    transform: scale(1.05);
+}
+
+/* Galería de imágenes */
+.gallery-thumb {
+    transition: all 0.3s ease;
+    opacity: 0.7;
+}
+
+.gallery-thumb:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    border-color: #87465C !important;
+}
+
+/* Título del producto */
+.product-title {
+    line-height: 1.3;
+    margin-bottom: 1rem;
+}
+
+/* Precio del producto */
+.product-price {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: .5rem;
+}
+
+/* Selector de cantidad */
+.quantity-btn {
+    border-color: #ced4da;
+    width: 40px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity-btn:hover {
+    border-color: #87465C;
+    color: white;
+}
+
+.quantity-input {
+    border-left: none;
+    border-right: none;
+    font-weight: 600;
+}
+
+.quantity-input:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+/* Botón de añadir al carrito */
+.product-add-cart .btn {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(135, 70, 92, 0.2);
+}
+
+.product-add-cart .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(135, 70, 92, 0.3);
+}
+
+/* Información adicional */
+.stock-info .badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+}
+
+.technical-sheet .btn {
+    border-radius: 6px;
+    padding: 0.5rem 1.5rem;
+}
+
+.shipping-info {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+/* Tabs de descripción */
+.product-tabs .nav-tabs {
+    border-bottom: 2px solid #e9ecef;
+}
+
+.product-tabs .nav-link {
+    border: none;
+    color: #6c757d;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.product-tabs .nav-link.active {
+    color: #87465C;
+    border-bottom: 3px solid #87465C;
+    background-color: transparent;
+}
+
+.product-tabs .nav-link:hover {
+    color: #87465C;
+    border-color: transparent;
+}
+
+.tab-content {
+    padding: 2rem 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .product-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .product-price span {
+        font-size: 2rem !important;
+    }
+    
+    .product-add-cart .btn {
+        width: 100%;
+        font-size: 1.1rem !important;
+    }
+    
+    .product-image-section {
+        position: static;
+        margin-bottom: 2rem;
+    }
+    
+    .gallery-thumb {
+        height: 60px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-main-image img {
+        max-height: 300px !important;
+    }
+    
+    .quantity-input {
+        font-size: 1rem !important;
+    }
+    
+    .product-tabs .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Animaciones para mejorar la experiencia */
+.product-details-section > * {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efectos hover para elementos interactivos */
+.btn-outline-primary:hover,
+.technical-sheet .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(135, 70, 92, 0.2);
+    color: white !important;
+    border-color: #87465C !important;
+}
+
+/* Estilo para el badge de stock */
+.badge-success {
+    background-color: #28a745;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+/* Mejoras visuales para la galería */
+.product-image-gallery .row {
+    margin: 0 -5px;
+}
+
+.product-image-gallery .col-3 {
+    padding: 0 5px;
+    margin-bottom: 10px;
+}
+
+button.btn.btn-lg.px-5.py-3.a-submit{
+    font-size: 0.9rem !important;
+    padding: 6px 30px !important;
+    background-color: #87465C;
+    color: #fff !important;
+}
+
+button.btn.btn-lg.px-5.py-3.a-submit.bg-transparent,
+.technical-sheet .btn:hover{
+    border: 2px solid #87465C!important;
+    color: #87465C!important;
+}
+
+input.form-control.text-center.quantity-input {
+    width: 3.5rem;
+}
+
+input.form-control.text-center.quantity-input {
+    text-align: center;
+    width: 3.5rem;
+    align-items: center;
+    align-content: center;
+}
+
+.btn-outline-secondary:hover {
+    color: #FFFFFF !important;
+    background-color: #87465C;
+    border-color: #87465C;
+}

@@ -10,6 +10,7 @@
         'views/assets.xml',
         'views/layout.xml',
         'views/shop_layout.xml',
+        'views/product_page_custom.xml',
     ],
     'installable': True,
     'application': False,
