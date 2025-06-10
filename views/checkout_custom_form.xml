@@ -16,8 +16,9 @@
                             </h4>
                         </div>
                         <div class="card-body">
-                            <form class="checkout_autoformat" action="/shop/confirm_order" method="post">
+                            <form class="checkout_autoformat" action="/shop/address" method="post">
                                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="submitted" value="1"/>
                                 
                                 <!-- Información Personal -->
                                 <div class="row mb-4">
@@ -69,9 +70,32 @@
                                                    placeholder="12345678"
                                                    pattern="[0-9]{8}"
                                                    maxlength="8"
+                                                   t-att-value="partner and partner.dni or ''"
                                                    required="true"/>
                                         </div>
                                         <small class="form-text text-muted">DNI de 8 dígitos</small>
+                                    </div>
+                                    
+                                    <!-- Email -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-label">
+                                            <strong>Email</strong>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-envelope"></i>
+                                                </span>
+                                            </div>
+                                            <input type="email" 
+                                                   class="form-control" 
+                                                   id="email" 
+                                                   name="email" 
+                                                   placeholder="ejemplo@correo.com"
+                                                   required="true"
+                                                   t-att-value="partner.email if partner else ''"/>
+                                        </div>
                                     </div>
                                     
                                     <!-- Teléfono -->
@@ -107,24 +131,26 @@
                                     </div>
                                     
                                     <div class="col-12 mb-3">
-                                        <div class="card border-info">
-                                            <div class="card-body p-3">
-                                                <div class="custom-control custom-switch">
-                                                    <input type="checkbox" 
-                                                           class="custom-control-input" 
-                                                           id="invoice_type" 
-                                                           name="invoice_type" 
-                                                           value="1"/>
-                                                    <label class="custom-control-label" for="invoice_type">
-                                                        <strong>Solicitar Factura</strong>
-                                                    </label>
-                                                </div>
-                                                <small class="text-muted d-block mt-1">
-                                                    Por defecto se emitirá boleta. Active esta opción solo si necesita factura.
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <div class="card border-info">
+                            <div class="card-body p-3">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" 
+                                           class="custom-control-input" 
+                                           id="invoice_type" 
+                                           name="invoice_type_checkbox" 
+                                           value="1"/>
+                                    <label class="custom-control-label" for="invoice_type">
+                                        <strong>Solicitar Factura</strong>
+                                    </label>
+                                </div>
+                                <small class="text-muted d-block mt-1">
+                                    Por defecto se emitirá boleta. Active esta opción solo si necesita factura.
+                                </small>
+                                <!-- Hidden field for invoice type -->
+                                <input type="hidden" id="invoice_type_hidden" name="invoice_type" value="boleta"/>
+                            </div>
+                        </div>
+                    </div>
                                     
                                     <!-- Campos de Facturación (ocultos por defecto) -->
                                     <div id="invoice_fields" class="col-12" style="display: none;">
@@ -138,49 +164,51 @@
                                             <div class="card-body">
                                                 <div class="row">
                                                     <!-- RUC -->
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="ruc" class="form-label">
-                                                            <strong>RUC</strong>
-                                                            <span class="text-danger">*</span>
-                                                        </label>
-                                                        <div class="input-group">
-                                                            <div class="input-group-prepend">
-                                                                <span class="input-group-text">
-                                                                    <i class="fa fa-hashtag"></i>
-                                                                </span>
-                                                            </div>
-                                                            <input type="text" 
-                                                                   class="form-control" 
-                                                                   id="ruc" 
-                                                                   name="ruc" 
-                                                                   placeholder="20123456789"
-                                                                   pattern="[0-9]{11}"
-                                                                   maxlength="11"
-                                                                   required="false"/>
-                                                        </div>
-                                                        <small class="form-text text-muted">RUC de 11 dígitos</small>
-                                                    </div>
-                                                    
-                                                    <!-- Razón Social -->
-                                                    <div class="col-md-8 mb-3">
-                                                        <label for="razon_social" class="form-label">
-                                                            <strong>Razón Social</strong>
-                                                            <span class="text-danger">*</span>
-                                                        </label>
-                                                        <div class="input-group">
-                                                            <div class="input-group-prepend">
-                                                                <span class="input-group-text">
-                                                                    <i class="fa fa-building"></i>
-                                                                </span>
-                                                            </div>
-                                                            <input type="text" 
-                                                                   class="form-control" 
-                                                                   id="razon_social" 
-                                                                   name="razon_social" 
-                                                                   placeholder="Nombre de la empresa o razón social"
-                                                                   required="false"/>
-                                                        </div>
-                                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="ruc" class="form-label">
+                                            <strong>RUC</strong>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-hashtag"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="ruc" 
+                                                   name="ruc" 
+                                                   placeholder="20123456789"
+                                                   pattern="[0-9]{11}"
+                                                   maxlength="11"
+                                                   required="false"
+                                                   t-att-value="partner and (partner.ruc or partner.ruc_custom) or ''"/>
+                                        </div>
+                                        <small class="form-text text-muted">RUC de 11 dígitos</small>
+                                    </div>
+                                    
+                                    <!-- Razón Social -->
+                                    <div class="col-md-8 mb-3">
+                                        <label for="razon_social" class="form-label">
+                                            <strong>Razón Social</strong>
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-building"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="razon_social" 
+                                                   name="razon_social" 
+                                                   placeholder="Nombre de la empresa o razón social"
+                                                   required="false"
+                                                   t-att-value="partner and (partner.commercial_company_name or partner.name) or ''"/>
+                                        </div>
+                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -290,6 +318,7 @@
             <script type="text/javascript">
                 document.addEventListener('DOMContentLoaded', function() {
                     const invoiceCheckbox = document.getElementById('invoice_type');
+                    const invoiceTypeHidden = document.getElementById('invoice_type_hidden');
                     const dniField = document.getElementById('dni_field');
                     const invoiceFields = document.getElementById('invoice_fields');
                     const dniInput = document.getElementById('dni');
@@ -309,6 +338,11 @@
                             
                             // Limpiar DNI
                             dniInput.value = '';
+                            
+                            // Actualizar campo oculto
+                            invoiceTypeHidden.value = 'factura';
+                            
+                            console.log('Modo Factura: RUC y Razón Social requeridos, DNI opcional');
                         } else {
                             // Modo Boleta: Mostrar DNI, ocultar campos de empresa
                             dniField.style.display = 'block';
@@ -322,6 +356,11 @@
                             // Limpiar campos de empresa
                             rucInput.value = '';
                             razonSocialInput.value = '';
+                            
+                            // Actualizar campo oculto
+                            invoiceTypeHidden.value = 'boleta';
+                            
+                            console.log('Modo Boleta: DNI requerido, campos de factura ocultos');
                         }
                     }
                     
