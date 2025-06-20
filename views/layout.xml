@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="custom_header" inherit_id="website.layout" name="Certifica Header">
-        <xpath expr="//header[@id='top']" position="replace">
-            <header id="top" class="o_header_standard">
+        <xpath expr="//header[@id='top']" position="attributes">
+            <attribute name="class">o_header_standard certifica_custom_header</attribute>
+        </xpath>
+        <xpath expr="//header[@id='top']" position="inside">
+            <div class="certifica_header_content">
                 <!-- Menú móvil usando checkbox hack (sin JavaScript) -->
                 <input type="checkbox" id="menu-checkbox" class="menu-checkbox" />
                 <div class="menu-movil">
@@ -76,7 +79,7 @@
                         </div>
                     </div>
                 </div>
-            </header>
+            </div>
         </xpath>
     </template>
     <template id="custom_footer" inherit_id="website.layout" name="Certifica Footer">

@@ -60,7 +60,9 @@ h1, h2, h3, h4, h5, h6 {
         background-color: #FFFFFF;
     }
 
-/* Estilos personalizados para el header y menú del theme Certifica */
+/* Header personalizado */
+.certifica_custom_header,
+.certifica_header_content,
 .o_header_standard {
     background-color: #fff;
     padding: 20px 0;
