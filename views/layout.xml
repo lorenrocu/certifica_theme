@@ -81,6 +81,8 @@
                     </div>
                 </div>
             </div>
+            <!-- Enlace oculto para compatibilidad con módulos que buscan o_logout -->
+            <a id="o_logout" style="display:none !important;"></a>
         </xpath>
     </template>
     <template id="custom_footer" inherit_id="website.layout" name="Certifica Footer">

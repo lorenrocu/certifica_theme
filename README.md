@@ -81,12 +81,32 @@ Tema minimalista y moderno para Odoo 13 con diseño personalizado para el sitio 
 - Botones y elementos táctiles optimizados
 - Imágenes responsive con lazy loading
 
-## Instalación
+## Instalación y Requisitos para usar como Theme Web en Odoo
 
-1. Copiar el módulo en la carpeta `addons` de Odoo
-2. Actualizar la lista de aplicaciones
-3. Instalar el módulo "Certifica Theme"
-4. Activar el tema desde Configuración > Sitio Web > Temas
+### Requisitos mínimos
+- Odoo 13
+- Módulo `website` instalado
+- Módulo `website_sale` instalado (si quieres tienda online)
+- (Opcional) Módulo `stock` instalado si quieres lógica de inventario real
+
+### Instalación
+1. Copia la carpeta `certifica_theme` en tu carpeta de `addons` de Odoo.
+2. Ve a **Apps** en Odoo, actualiza la lista de aplicaciones.
+3. Busca "Certifica Theme" e instálalo.
+4. Ve a **Sitio Web > Configuración > Temas** y selecciona "Certifica Theme" como tema activo.
+
+### Notas importantes
+- El theme personaliza header, footer, página de producto, tienda y checkout.
+- El contador de carrito funciona en todas las páginas si la ruta `/shop/cart/count` está disponible (requiere `website_sale` correctamente instalado y sin conflictos).
+- El stock mostrado en la página de producto es **simulado** por defecto. Si quieres mostrar el stock real, deberás dar permisos de lectura al usuario público sobre el campo `qty_available` del modelo `product.product` (no recomendado en la mayoría de los casos por seguridad).
+- Si tienes módulos personalizados que sobrescriben rutas de `/shop`, pueden interferir con la funcionalidad del theme.
+
+### Personalización
+- Puedes modificar los colores y estilos en los archivos CSS del theme.
+- Si quieres mostrar información adicional (como stock real), revisa la sección correspondiente en este README y los comentarios en los archivos XML.
+
+### Soporte
+Si tienes problemas con la instalación o el funcionamiento del theme, revisa primero los requisitos y dependencias. Si el problema persiste, revisa los logs de Odoo y asegúrate de que no hay conflictos con otros módulos personalizados.
 
 ## Dependencias
 
