@@ -83,6 +83,15 @@ h1, h2, h3, h4, h5, h6 {
 .footer-column {
     padding: 15px;
 }
+
+button.btn.btn-block.bg-transparent.btn-outline-primary.text-primary{
+    font-size: .9rem !important;
+}
+
+a.btn.o_default_snippet_text.btn-primary {
+    font-family: "Roboto Condensed", Sans-serif !important;
+}
+
 .footer-column h4 {
     color: #fff;
     margin-bottom: 20px;

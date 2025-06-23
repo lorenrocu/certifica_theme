@@ -5,9 +5,15 @@ from odoo import http
 from odoo.http import request, Response
 from odoo.addons.website_sale.controllers.main import WebsiteSale
 from odoo.addons.website.controllers.main import QueryURL
+from odoo.addons.website.controllers.main import Website
 
 
 class WebsiteSaleCustom(WebsiteSale):
+    def _prepare_page_values(self, values=None):
+        values = super(WebsiteSaleCustom, self)._prepare_page_values(values)
+        if values:
+            values['website_sale_order'] = request.website.sale_get_order()
+        return values
     """
     Extensión del controlador de la tienda para personalizar funcionalidades
     """
@@ -59,3 +65,8 @@ class WebsiteSaleCustom(WebsiteSale):
         # Para peticiones normales, comportamiento estándar
         return super(WebsiteSaleCustom, self).shop(
             page=page, category=category, search=search, ppg=ppg, **post)
+
+    @http.route(['/shop/cart/quantity'], type='json', auth="public", website=True)
+    def cart_quantity(self):
+        """Devuelve la cantidad de artículos en el carrito como JSON."""
+        return request.website.sale_get_order().cart_quantity or 0

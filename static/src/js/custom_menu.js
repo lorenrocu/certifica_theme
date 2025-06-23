@@ -1,3 +1,5 @@
+console.log('certifica_theme.cart_update cargado');
+
 /**
  * Solución mejorada para:
  * 1. Actualizar el contador del carrito
@@ -7,23 +9,20 @@
 odoo.define('certifica_theme.cart_update', function (require) {
     'use strict';
     
-    var sAnimations = require('website.content.snippets.animation');
-    var core = require('web.core');
-    var _t = core._t;
+    var publicWidget = require('web.public.widget');
     var ajax = require('web.ajax');
     
     // Widget principal para gestionar el carrito
-    sAnimations.registry.CartUpdater = sAnimations.Class.extend({
+    publicWidget.registry.CartUpdater = publicWidget.Widget.extend({
         selector: 'body',
         
         /**
          * @override
          */
         start: function () {
-            this._super.apply(this, arguments);
             this._actualizarContadorCarrito();
             this._setupEventListeners();
-            return this;
+            return this._super.apply(this, arguments);
         },
         
         /**
@@ -32,23 +31,9 @@ odoo.define('certifica_theme.cart_update', function (require) {
         _setupEventListeners: function () {
             var self = this;
             
-            // Escuchar envío de formularios de carrito y convertirlo a AJAX
-            $(document).on('submit', '.add_to_cart_form', function(e) {
-                e.preventDefault(); // Prevenir el envío normal del formulario
-                
-                var $form = $(this);
-                var formData = $form.serializeArray();
-                var formObject = {};
-                
-                // Convertir array de datos del formulario a objeto
-                $.each(formData, function(_, field) {
-                    formObject[field.name] = field.value;
-                });
-                
-                // Añadir producto al carrito mediante AJAX
-                self._agregarAlCarritoAjax($form, formObject);
-                return false;
-            });
+            // DESHABILITADO: Usar el sistema estándar de Odoo para evitar duplicaciones
+            // El widget WebsiteSale de Odoo ya maneja correctamente el carrito
+            // Solo mantenemos la actualización del contador después de cambios en el DOM
             
             // Observar cambios en el DOM para otras interacciones
             if (window.MutationObserver) {
@@ -67,49 +52,8 @@ odoo.define('certifica_theme.cart_update', function (require) {
             }
         },
         
-        /**
-         * Añade un producto al carrito mediante AJAX
-         */
-        _agregarAlCarritoAjax: function($form, formData) {
-            var self = this;
-            var $button = $form.find('button.a-submit');
-            var originalText = $button.html();
-            
-            // Cambiar el texto del botón para indicar que se está procesando
-            $button.html('<i class="fa fa-spinner fa-spin"></i> Agregando...');
-            $button.prop('disabled', true);
-            
-            // Hacer la petición AJAX
-            ajax.jsonRpc('/shop/cart/update_json', 'call', formData)
-                .then(function(data) {
-                    // Actualizar el contador del carrito
-                    self._actualizarContadorCarrito();
-                    
-                    // Cambiar el texto del botón para indicar éxito brevemente
-                    $button.html('<i class="fa fa-check"></i> Agregado');
-                    $button.removeClass('btn-primary').addClass('btn-success');
-                    
-                    // Mostrar notificación de éxito
-                    self._mostrarNotificacion('Producto agregado al carrito', 'success');
-                    
-                    // Restaurar el botón después de un tiempo
-                    setTimeout(function() {
-                        $button.html(originalText);
-                        $button.prop('disabled', false);
-                        $button.removeClass('btn-success').addClass('btn-primary');
-                    }, 1500);
-                })
-                .catch(function(error) {
-                    console.error('Error al agregar al carrito:', error);
-                    
-                    // Restaurar el botón
-                    $button.html(originalText);
-                    $button.prop('disabled', false);
-                    
-                    // Mostrar notificación de error
-                    self._mostrarNotificacion('Error al agregar el producto', 'danger');
-                });
-        },
+        // MÉTODO ELIMINADO: _agregarAlCarritoAjax
+        // Ahora usamos el sistema estándar de Odoo que maneja correctamente el carrito
         
         /**
          * Muestra una notificación temporal
@@ -196,4 +140,5 @@ odoo.define('certifica_theme.cart_update', function (require) {
             }
         }
     });
+    return publicWidget.registry.CartUpdater;
 });

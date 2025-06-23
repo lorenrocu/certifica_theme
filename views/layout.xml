@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Template para hacer disponible website_sale_order globalmente -->
     <template id="custom_header" inherit_id="website.layout" name="Certifica Header">
         <xpath expr="//header[@id='top']" position="attributes">
             <attribute name="class">o_header_standard certifica_custom_header</attribute>
@@ -38,7 +39,7 @@
                             <!-- Icono del carrito (responsive) -->
                             <a href="/shop/cart" class="cart-icon-mobile mr-3">
                                 <i class="fa fa-shopping-cart"></i>
-                                <span class="badge badge-pill badge-primary cart-quantity" t-esc="website_sale_order and website_sale_order.cart_quantity or '0'" t-att-style="website_sale_order and website_sale_order.cart_quantity and 'display: inline-block' or 'display: none'"/>
+                                <span class="badge badge-pill badge-primary cart-quantity my_cart_quantity" t-esc="website_sale_order and website_sale_order.cart_quantity or '0'" t-att-style="website_sale_order and website_sale_order.cart_quantity and 'display: inline-block' or 'display: none'">0</span>
                             </a>
                             <!-- Botón hamburguesa -->
                             <label for="menu-checkbox" class="menu-btn">
@@ -62,7 +63,7 @@
                                 <!-- Icono del carrito (desktop) -->
                                 <a href="/shop/cart" class="cart-icon mr-3">
                                     <i class="fa fa-shopping-cart"></i>
-                                    <span class="badge badge-pill badge-primary" t-esc="website_sale_order and website_sale_order.cart_quantity or '0'" t-att-style="website_sale_order and website_sale_order.cart_quantity and 'display: inline-block' or 'display: none'"/>
+                                    <span class="badge badge-pill badge-primary my_cart_quantity" t-esc="website_sale_order and website_sale_order.cart_quantity or '0'" t-att-style="website_sale_order and website_sale_order.cart_quantity and 'display: inline-block' or 'display: none'">0</span>
                                 </a>
                                 <!-- Buscador -->
                                 <form action="/shop" method="get" class="search-form">
