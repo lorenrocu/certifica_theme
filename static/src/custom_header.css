@@ -54,7 +54,7 @@ h1, h2, h3, h4, h5, h6 {
     }
     a.btn.btn-outline-secondary.rounded-circle.btn-lg:hover {
         background-color: #fff;
-        color: #87465C;
+        color: #87465C !important;
     }
     .carousel-indicators li {
         background-color: #FFFFFF;
