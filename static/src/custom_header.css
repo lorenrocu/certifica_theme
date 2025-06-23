@@ -255,7 +255,7 @@ a.btn.o_default_snippet_text.btn-primary {
 }
 
 .nav.justify-content-center .nav-item:not(:last-child) {
-    margin-right: 24px;
+    margin-right: 10px;
 }
 
 .footer-bg {
