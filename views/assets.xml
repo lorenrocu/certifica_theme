@@ -14,6 +14,7 @@
             <script type="text/javascript" src="/certifica_theme/static/src/js/menu_simple.js"></script>
             <script type="text/javascript" src="/certifica_theme/static/src/js/product_custom.js"></script>
             <script type="text/javascript" src="/certifica_theme/static/src/js/checkout_custom.js"></script>
+            <script type="text/javascript" src="/certifica_theme/static/src/js/custom_menu.js"></script>
         </xpath>
     </template>
 </odoo>

@@ -76,7 +76,6 @@ h1, h2, h3, h4, h5, h6 {
 .certifica_custom_footer,
 .certifica_footer_content,
 .o_footer {
-    background-color: #343a40;
     color: #fff;
     padding: 40px 0;
     margin-top: 40px;
@@ -117,6 +116,11 @@ h1, h2, h3, h4, h5, h6 {
 .footer-column button:hover {
     background-color: #0056b3;
 }
+
+.input-group-append .btn-outline-primary:hover{
+    color: #87465C !important;
+}
+
 @media (max-width: 768px) {
     .header-column, .footer-column {
         margin-bottom: 20px;
@@ -252,13 +256,15 @@ h1, h2, h3, h4, h5, h6 {
     background-repeat: no-repeat;
     background-size: cover;
     overflow: hidden;
+    min-height: 320px; /* Asegura altura mínima para el overlay */
 }
 .footer-overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: #68192D;
-    opacity: 0.9;
+    opacity: 0.9; /* Más transparente para ver la imagen de fondo */
     z-index: 1;
+    pointer-events: none; /* Permite hacer clic en los enlaces del footer */
 }
 .footer-content {
     position: relative;

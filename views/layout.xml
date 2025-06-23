@@ -4,7 +4,7 @@
         <xpath expr="//header[@id='top']" position="attributes">
             <attribute name="class">o_header_standard certifica_custom_header</attribute>
         </xpath>
-        <xpath expr="//header[@id='top']" position="inside">
+        <xpath expr="//header[@id='top']" position="replace">
             <div class="certifica_header_content">
                 <!-- Menú móvil usando checkbox hack (sin JavaScript) -->
                 <input type="checkbox" id="menu-checkbox" class="menu-checkbox" />
@@ -86,8 +86,8 @@
         <xpath expr="//footer[@id='bottom']" position="attributes">
             <attribute name="class">o_footer footer-bg certifica_custom_footer</attribute>
         </xpath>
-        <xpath expr="//footer[@id='bottom']" position="inside">
-            <div class="certifica_footer_content">
+        <xpath expr="//footer[@id='bottom']" position="replace">
+            <div class="footer-bg">
                 <div class="footer-overlay"></div>
                 <div class="container footer-content">
                     <div class="footer-row">
