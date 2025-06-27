@@ -35,9 +35,9 @@
 /* Estilo para el nombre del producto */
 .product-name {
     font-size: 1rem;
-    height: 2.5rem;
-    overflow: hidden;
+    height: auto;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 /* Estilo para el precio */
@@ -392,7 +392,13 @@
 .card-title.product-name {
   text-align: center;
   margin-bottom: 0.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.card-title.product-name a,
 .card-title.product-name .product-title-tooltip {
   display: block;
   white-space: nowrap;
@@ -403,5 +409,11 @@
   font-weight: 500;
   line-height: 1.2;
   color: #4a2c32;
-  margin: 0 auto;
+  text-decoration: none;
+  margin: 0;
+}
+
+.card-title.product-name a:hover {
+  color: #87465C;
+  text-decoration: none;
 }
