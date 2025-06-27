@@ -399,8 +399,7 @@
   position: relative;
 }
 
-.card-title.product-name a,
-.card-title.product-name .product-title-tooltip {
+.card-title.product-name a {
   display: block;
   white-space: nowrap;
   overflow: hidden;
@@ -420,61 +419,36 @@
   text-decoration: none;
 }
 
-/* Tooltip para mostrar el título completo */
-.card-title.product-name a::after {
+/* Tooltip simple y efectivo */
+.product-name a {
+  position: relative;
+}
+
+.product-name a[data-fullname]:hover::after {
   content: attr(data-fullname);
   position: absolute;
-  bottom: calc(100% + 15px);
+  bottom: 120%;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.95);
+  background: #333;
   color: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 400;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
   white-space: nowrap;
-  z-index: 9999;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-  max-width: 280px;
-  text-align: center;
-  line-height: 1.4;
-  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-/* Flecha del tooltip */
-.card-title.product-name a::before {
+.product-name a[data-fullname]:hover::before {
   content: '';
   position: absolute;
-  bottom: calc(100% + 9px);
+  bottom: 110%;
   left: 50%;
   transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid rgba(0, 0, 0, 0.95);
-  z-index: 9999;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.2s ease-in-out;
-  pointer-events: none;
-}
-
-/* Mostrar tooltip al hacer hover con delay */
-.card-title.product-name a:hover::after {
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0.5s;
-}
-
-.card-title.product-name a:hover::before {
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0.5s;
+  border: 5px solid transparent;
+  border-top-color: #333;
+  z-index: 1000;
 }
 
 /* Asegurar que el tooltip no se corte en los bordes */
