@@ -396,6 +396,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .card-title.product-name a,
@@ -411,9 +412,75 @@
   color: #4a2c32;
   text-decoration: none;
   margin: 0;
+  position: relative;
 }
 
 .card-title.product-name a:hover {
   color: #87465C;
   text-decoration: none;
+}
+
+/* Tooltip para mostrar el título completo */
+.card-title.product-name a::after {
+  content: attr(data-fullname);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  transform: translateX(-50%) translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 300px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Flecha del tooltip */
+.card-title.product-name a::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(0, 0, 0, 0.9);
+  z-index: 1001;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+
+/* Mostrar tooltip al hacer hover */
+.card-title.product-name a:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+.card-title.product-name a:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0px);
+}
+
+/* Asegurar que el tooltip no se corte en los bordes */
+.product-card {
+  overflow: visible;
+}
+
+.product-item-wrapper {
+  overflow: visible;
 }
