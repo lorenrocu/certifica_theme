@@ -1,6 +1,10 @@
-h1, h2, h3, h4, h5, h6 {
-    font-family: "Roboto Condensed", Sans-serif !important;
-}
+    body{
+        overflow: hidden !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: "Roboto Condensed", Sans-serif !important;
+    }
 
     h1 {
         font-size: 50px !important; /* Para escritorio */
@@ -18,6 +22,10 @@ h1, h2, h3, h4, h5, h6 {
         font-size: 24px !important;
     }
 
+    h5 {
+        font-size: 16px !important;
+    }
+
     @media (max-width: 1024px) { /* Para tabletas */
         h1 {
           font-size: 45px !important;
@@ -30,6 +38,9 @@ h1, h2, h3, h4, h5, h6 {
         }
         h4 {
           font-size: 22px !important;
+        }
+        h5 {
+            font-size: 16px !important;
         }
       }
       
@@ -45,6 +56,9 @@ h1, h2, h3, h4, h5, h6 {
         }
         h4 {
           font-size: 20px !important;
+        }
+        h5 {
+            font-size: 16px !important;
         }
       }
 
@@ -664,4 +678,9 @@ button.btn.btn-lg.bg-transparent.btn-outline-primary.text-primary,
     color: #87465C!important;
     font-size: 1.5rem!important;
     font-family: "Roboto Condensed", Sans-serif!important;
+}
+
+h5.card-title {
+    margin-top: 10px;
+    margin-bottom: 10px !important;
 }
