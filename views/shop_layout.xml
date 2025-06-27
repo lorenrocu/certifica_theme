@@ -155,7 +155,7 @@
                                                 <!-- Información del producto -->
                                                 <div class="card-body p-3 d-flex flex-column">
                                                     <h5 class="card-title product-name">
-                                                        <a t-att-href="product.website_url" t-field="product.display_name"/>
+                                                        <a t-att-href="product.website_url" t-field="product.display_name" t-att-data-fullname="product.display_name" class="product-title-tooltip"/>
                                                     </h5>
                                                     <div class="product-price mt-auto">
                                                         <span t-field="product.list_price" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
