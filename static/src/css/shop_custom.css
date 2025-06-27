@@ -388,40 +388,20 @@
     height: 100%;
 }
 
-/* Tooltip visual para nombres de productos en la tienda */
+/* Título de producto en una sola línea, centrado y con puntos suspensivos */
+.card-title.product-name {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
 .card-title.product-name .product-title-tooltip {
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  position: relative;
-  cursor: pointer;
   max-width: 100%;
-}
-.card-title.product-name .product-title-tooltip:hover::after {
-  content: attr(data-fullname);
-  position: absolute;
-  left: 0;
-  top: 100%;
-  background: #222;
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 6px;
-  white-space: normal;
-  z-index: 9999;
-  min-width: 200px;
-  max-width: 400px;
-  font-size: 15px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-  margin-top: 8px;
-  pointer-events: none;
-  opacity: 0.97;
-}
-.card-title.product-name .product-title-tooltip:hover {
-  z-index: 10001;
-}
-
-/* Evitar que el tooltip se corte si el contenedor tiene overflow:hidden */
-.card-title.product-name {
-  overflow: visible !important;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #4a2c32;
+  margin: 0 auto;
 }
