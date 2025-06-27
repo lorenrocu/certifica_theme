@@ -593,7 +593,7 @@ a.btn.o_default_snippet_text.btn-primary {
         display: none !important; /* Oculta el overlay */
     }
     .product-details-section h2{
-        font-size: 20px;
+        font-size: 20px !important;
     }
 }
 
@@ -687,5 +687,5 @@ h5.card-title {
 }
 
 .product-details-section h2{
-    font-size: 25px;
+    font-size: 25px !important;
 }
