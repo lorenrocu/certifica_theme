@@ -388,16 +388,17 @@
     height: 100%;
 }
 
-/* Tooltip visual para nombres de productos */
-.product-title-tooltip {
+/* Tooltip visual para nombres de productos en la tienda */
+.card-title.product-name .product-title-tooltip {
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   position: relative;
   cursor: pointer;
+  max-width: 100%;
 }
-.product-title-tooltip:hover::after {
+.card-title.product-name .product-title-tooltip:hover::after {
   content: attr(data-fullname);
   position: absolute;
   left: 0;
@@ -407,7 +408,7 @@
   padding: 6px 14px;
   border-radius: 6px;
   white-space: normal;
-  z-index: 100;
+  z-index: 9999;
   min-width: 200px;
   max-width: 400px;
   font-size: 15px;
@@ -416,6 +417,11 @@
   pointer-events: none;
   opacity: 0.97;
 }
-.product-title-tooltip:hover {
-  z-index: 101;
+.card-title.product-name .product-title-tooltip:hover {
+  z-index: 10001;
+}
+
+/* Evitar que el tooltip se corte si el contenedor tiene overflow:hidden */
+.card-title.product-name {
+  overflow: visible !important;
 }
