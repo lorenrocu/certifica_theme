@@ -69,14 +69,14 @@ class WebsiteSaleCustom(WebsiteSale):
         # Forzamos 18 productos por página
         ppg = 18
         
-        pricelist = request.env['product.pricelist'].sudo().browse(4)
+        pricelist = request.env['product.pricelist'].sudo().browse(1573)
         if pricelist.exists():
             request.env.context = dict(request.env.context, pricelist=pricelist.id)
             website = request.website
             website.pricelist_id = pricelist.id
         
-        # Obtener los IDs de productos con reglas en el pricelist 4
-        item_products = request.env['product.pricelist.item'].sudo().search([('pricelist_id', '=', 4)]).mapped('product_tmpl_id')
+        # Obtener los IDs de productos con reglas en el pricelist 1573
+        item_products = request.env['product.pricelist.item'].sudo().search([('pricelist_id', '=', 1573)]).mapped('product_tmpl_id')
         # Si no hay productos en la lista, forzar un dominio vacío
         if item_products:
             product_filter_domain = [('id', 'in', item_products.ids)]
@@ -129,7 +129,7 @@ class WebsiteSaleCustom(WebsiteSale):
         Sobrescribimos el método cart_update para asegurar que use el pricelist correcto
         """
         # Asegurar que el website use el pricelist correcto
-        pricelist = request.env['product.pricelist'].sudo().browse(4)
+        pricelist = request.env['product.pricelist'].sudo().browse(1573)
         if pricelist.exists():
             request.website.pricelist_id = pricelist.id
         
@@ -142,9 +142,9 @@ class WebsiteSaleCustom(WebsiteSale):
         """
         Método de prueba para verificar que el pricelist funciona correctamente
         """
-        pricelist = request.env['product.pricelist'].sudo().browse(4)
+        pricelist = request.env['product.pricelist'].sudo().browse(1573)
         if not pricelist.exists():
-            return "Error: El pricelist con ID 4 no existe"
+            return "Error: El pricelist con ID 1573 no existe"
         
         # Obtener algunos productos para probar
         products = request.env['product.template'].sudo().search([('sale_ok', '=', True)], limit=5)
