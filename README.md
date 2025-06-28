@@ -156,3 +156,31 @@ Para soporte técnico o personalizaciones adicionales, contactar al desarrollado
 ## Licencia
 
 Este tema está desarrollado específicamente para Certifica y su uso está restringido según los términos acordados.
+
+### Pricelist Específico (ID 4)
+
+El módulo está configurado para usar automáticamente el pricelist con ID 4 en toda la tienda web. Esto incluye:
+
+- **Página de productos**: Los precios mostrados corresponden al pricelist 4
+- **Página individual de producto**: El precio mostrado es del pricelist 4
+- **Carrito de compras**: Los productos se añaden con precios del pricelist 4
+- **Checkout**: Los precios finales corresponden al pricelist 4
+
+#### Verificación
+
+Para verificar que el pricelist funciona correctamente, puedes acceder a:
+```
+/shop/test_pricelist
+```
+
+Esta URL mostrará:
+- Si el pricelist con ID 4 existe
+- Comparación entre precios de lista y precios del pricelist para algunos productos
+
+#### Configuración
+
+Si necesitas cambiar el ID del pricelist, modifica los siguientes archivos:
+
+1. **controllers/main.py**: Cambia el número `4` en las líneas donde se referencia el pricelist
+2. **views/shop_layout.xml**: Cambia `pricelist=4` por el nuevo ID
+3. **views/product_page_custom.xml**: Cambia `pricelist=4` por el nuevo ID

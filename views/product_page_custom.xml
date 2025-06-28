@@ -100,7 +100,7 @@
                                 <!-- Precio -->
                                 <div class="product-price mb-4">
                                     <span class="h2 font-weight-bold" 
-                                          t-field="product.list_price" 
+                                          t-field="product.with_context(pricelist=4).price" 
                                           t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"
                                           style="font-size: 1.5rem; color: #87465C;"/>
                                 </div>
