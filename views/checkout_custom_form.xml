@@ -216,78 +216,87 @@
                                 
                                 <!-- Dirección de Envío -->
                                 <div class="row mb-4">
-                                    <div class="col-12">
-                                        <h5 class="text-primary border-bottom pb-2 mb-3">
-                                            <i class="fa fa-map-marker mr-2"></i>
-                                            Dirección de Envío
-                                        </h5>
-                                    </div>
-                                    
-                                    <!-- Dirección -->
-                                    <div class="col-md-12 mb-3">
-                                        <label for="street" class="form-label">
-                                            <strong>Dirección</strong>
-                                            <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fa fa-home"></i>
-                                                </span>
-                                            </div>
-                                            <input type="text" 
-                                                   class="form-control" 
-                                                   id="street" 
-                                                   name="street" 
-                                                   placeholder="Calle, número, distrito"
-                                                   required="true"
-                                                   t-att-value="partner.street if partner else ''"/>
+                                    <div class="col-12 mb-3">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="shipping_terms_checkbox" name="shipping_terms_checkbox" required="true"/>
+                                            <label class="custom-control-label" for="shipping_terms_checkbox">
+                                                <strong>Envío Gratuito en Lima metropolitana a partir de los 1000 USD, para envíos a provincia por favor contactarse con su asesor.</strong>
+                                            </label>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Ciudad -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="city" class="form-label">
-                                            <strong>Ciudad</strong>
-                                            <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fa fa-building-o"></i>
-                                                </span>
-                                            </div>
-                                            <input type="text" 
-                                                   class="form-control" 
-                                                   id="city" 
-                                                   name="city" 
-                                                   placeholder="Lima"
-                                                   required="true"
-                                                   t-att-value="partner.city if partner else ''"/>
+                                </div>
+                                <div id="shipping_address_fields" style="display: none;">
+                                    <div class="row mb-4">
+                                        <div class="col-12">
+                                            <h5 class="text-primary border-bottom pb-2 mb-3">
+                                                <i class="fa fa-map-marker mr-2"></i>
+                                                Dirección de Envío
+                                            </h5>
                                         </div>
-                                    </div>
-                                    
-                                    <!-- País -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="country_id" class="form-label">
-                                            <strong>País</strong>
-                                            <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fa fa-globe"></i>
-                                                </span>
+                                        <!-- Dirección -->
+                                        <div class="col-md-12 mb-3">
+                                            <label for="street" class="form-label">
+                                                <strong>Dirección</strong>
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">
+                                                        <i class="fa fa-home"></i>
+                                                    </span>
+                                                </div>
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="street" 
+                                                       name="street" 
+                                                       placeholder="Calle, número, distrito"
+                                                       required="true"
+                                                       t-att-value="partner.street if partner else ''"/>
                                             </div>
-                                            <select class="form-control" id="country_id" name="country_id" required="true">
-                                                <option value="">Seleccione un país</option>
-                                                <t t-foreach="countries or []" t-as="country">
-                                                    <option t-att-value="country.id" 
-                                                            t-att-selected="'selected' if partner and partner.country_id.id == country.id else None">
-                                                        <t t-esc="country.name"/>
-                                                    </option>
-                                                </t>
-                                            </select>
+                                        </div>
+                                        <!-- Ciudad -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="city" class="form-label">
+                                                <strong>Ciudad</strong>
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">
+                                                        <i class="fa fa-building-o"></i>
+                                                    </span>
+                                                </div>
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="city" 
+                                                       name="city" 
+                                                       placeholder="Lima"
+                                                       required="true"
+                                                       t-att-value="partner.city if partner else ''"/>
+                                            </div>
+                                        </div>
+                                        <!-- País -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="country_id" class="form-label">
+                                                <strong>País</strong>
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">
+                                                        <i class="fa fa-globe"></i>
+                                                    </span>
+                                                </div>
+                                                <select class="form-control" id="country_id" name="country_id" required="true">
+                                                    <option value="">Seleccione un país</option>
+                                                    <t t-foreach="countries or []" t-as="country">
+                                                        <option t-att-value="country.id" 
+                                                                t-att-selected="'selected' if partner and partner.country_id.id == country.id else None">
+                                                            <t t-esc="country.name"/>
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -315,6 +324,7 @@
             
             <!-- JavaScript para funcionalidad del formulario -->
             <script type="text/javascript">
+                <![CDATA[
                 document.addEventListener('DOMContentLoaded', function() {
                     const invoiceCheckbox = document.getElementById('invoice_type');
                     const invoiceTypeHidden = document.getElementById('invoice_type_hidden');
@@ -403,7 +413,34 @@
                             }
                         }
                     });
+
+                    // Checkbox y campos de dirección
+                    const shippingTermsCheckbox = document.getElementById('shipping_terms_checkbox');
+                    const shippingAddressFields = document.getElementById('shipping_address_fields');
+                    function toggleShippingFields() {
+                        if (shippingTermsCheckbox.checked) {
+                            shippingAddressFields.style.display = 'block';
+                        } else {
+                            shippingAddressFields.style.display = 'none';
+                        }
+                    }
+                    if (shippingTermsCheckbox && shippingAddressFields) {
+                        toggleShippingFields();
+                        shippingTermsCheckbox.addEventListener('change', toggleShippingFields);
+                    }
+                    // Validación del formulario antes del envío
+                    document.querySelector('.checkout_autoformat').addEventListener('submit', function(e) {
+                        // ... existing code ...
+                        // Validar que el checkbox de términos de envío esté marcado
+                        if (shippingTermsCheckbox && !shippingTermsCheckbox.checked) {
+                            e.preventDefault();
+                            alert('Debe aceptar los términos y condiciones de envío para continuar.');
+                            shippingTermsCheckbox.focus();
+                            return false;
+                        }
+                    });
                 });
+                ]]>
             </script>
         </xpath>
     </template>
