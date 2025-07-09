@@ -71,9 +71,7 @@ class WebsiteSaleCustom(WebsiteSale):
         
         pricelist = request.env['product.pricelist'].sudo().browse(1573)
         if pricelist.exists():
-            request.env.context = dict(request.env.context, pricelist=pricelist.id)
-            website = request.website
-            website.pricelist_id = pricelist.id
+            request.session['website_sale_pricelist'] = pricelist.id
         
         # Obtener los IDs de productos con reglas en el pricelist 1573
         item_products = request.env['product.pricelist.item'].sudo().search([('pricelist_id', '=', 1573)]).mapped('product_tmpl_id')
@@ -131,7 +129,7 @@ class WebsiteSaleCustom(WebsiteSale):
         # Asegurar que el website use el pricelist correcto
         pricelist = request.env['product.pricelist'].sudo().browse(1573)
         if pricelist.exists():
-            request.website.pricelist_id = pricelist.id
+            request.session['website_sale_pricelist'] = pricelist.id
         
         # Llamar al método padre
         return super(WebsiteSaleCustom, self).cart_update(
