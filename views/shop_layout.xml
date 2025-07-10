@@ -161,7 +161,7 @@
                                                            class="product-title-tooltip"/>
                                                     </h5>
                                                     <div class="product-price mt-auto">
-                                                        <span t-field="product.with_context(pricelist=4).price" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                                                        <span t-field="product.with_context(pricelist=1573).price" t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
                                                     </div>
                                                     <!-- Botón de añadir al carrito con formulario de Odoo -->
                                                     <form action="/shop/cart/update" method="post" class="add_to_cart_form">
