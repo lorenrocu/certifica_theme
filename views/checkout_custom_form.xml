@@ -421,6 +421,42 @@
                         }
                     });
 
+                    // Opciones de envío: mostrar/ocultar dirección
+                    const shippingOptionDelivery = document.getElementById('shipping_option_delivery');
+                    const shippingOptionPickup = document.getElementById('shipping_option_pickup');
+                    const shippingAddressFields = document.getElementById('shipping_address_fields');
+                    const requiredFields = ['street', 'city', 'country_id'];
+
+                    function setShippingFieldsRequired(required) {
+                        requiredFields.forEach(function(fieldId) {
+                            const field = document.getElementById(fieldId);
+                            if (field) {
+                                if (required) {
+                                    field.setAttribute('required', 'true');
+                                } else {
+                                    field.removeAttribute('required');
+                                }
+                            }
+                        });
+                    }
+
+                    function toggleShippingOption() {
+                        if (shippingOptionPickup.checked) {
+                            shippingAddressFields.style.display = 'none';
+                            setShippingFieldsRequired(false);
+                        } else {
+                            shippingAddressFields.style.display = 'block';
+                            setShippingFieldsRequired(true);
+                        }
+                    }
+
+                    if (shippingOptionDelivery && shippingOptionPickup && shippingAddressFields) {
+                        shippingOptionDelivery.addEventListener('change', toggleShippingOption);
+                        shippingOptionPickup.addEventListener('change', toggleShippingOption);
+                        // Inicializar estado
+                        toggleShippingOption();
+                    }
+
                     // Checkbox y campos de dirección
                     const shippingTermsCheckbox = document.getElementById('shipping_terms_checkbox');
                     const shippingAddressFields = document.getElementById('shipping_address_fields');
@@ -446,37 +482,6 @@
                             return false;
                         }
                     });
-
-                    // Lógica para opciones de envío
-                    const shippingOptionDelivery = document.getElementById('shipping_option_delivery');
-                    const shippingOptionPickup = document.getElementById('shipping_option_pickup');
-                    const shippingAddressFields = document.getElementById('shipping_address_fields');
-                    const streetInput = document.getElementById('street');
-                    const cityInput = document.getElementById('city');
-                    const countryInput = document.getElementById('country_id');
-
-                    function toggleShippingAddressFields() {
-                        if (shippingOptionPickup.checked) {
-                            // Ocultar y deshabilitar requeridos
-                            shippingAddressFields.style.display = 'none';
-                            streetInput.removeAttribute('required');
-                            cityInput.removeAttribute('required');
-                            countryInput.removeAttribute('required');
-                        } else {
-                            // Mostrar y habilitar requeridos
-                            shippingAddressFields.style.display = 'block';
-                            streetInput.setAttribute('required', 'true');
-                            cityInput.setAttribute('required', 'true');
-                            countryInput.setAttribute('required', 'true');
-                        }
-                    }
-
-                    if (shippingOptionDelivery && shippingOptionPickup) {
-                        shippingOptionDelivery.addEventListener('change', toggleShippingAddressFields);
-                        shippingOptionPickup.addEventListener('change', toggleShippingAddressFields);
-                        // Ejecutar al cargar la página
-                        toggleShippingAddressFields();
-                    }
                 });
                 ]]>
             </script>
