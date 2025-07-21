@@ -468,6 +468,19 @@
                 <p>Por favor, sigue las instrucciones para completar el pago por transferencia bancaria.</p>
                 <div class="alert alert-info" style="margin-top: 2em;">
                     <h4>Datos para la transferencia bancaria:</h4>
+                    <!-- Bloque de depuración -->
+                    <t t-if="acquirer">
+                        <p><strong>Acquirer:</strong> <t t-esc="acquirer.name"/></p>
+                        <p><strong>Provider:</strong> <t t-esc="acquirer.provider"/></p>
+                        <p><strong>pending_msg:</strong> <t t-esc="acquirer.pending_msg"/></p>
+                        <p><strong>Campos disponibles:</strong></p>
+                        <ul>
+                            <t t-foreach="acquirer._fields" t-as="f">
+                                <li><t t-esc="f"/></li>
+                            </t>
+                        </ul>
+                    </t>
+                    <!-- Fin bloque de depuración -->
                     <t t-if="acquirer and acquirer.pending_msg">
                         <div t-raw="acquirer.pending_msg"/>
                     </t>
