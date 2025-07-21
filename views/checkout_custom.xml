@@ -130,6 +130,22 @@
         </xpath>
     </template>
     
+    <template id="transfer_form" name="Transferencia Bancaria - Formulario de Pago">
+        <t t-call="website.layout">
+            <div class="container oe_website_payment">
+                <h2>Pago por Transferencia Bancaria</h2>
+                <p>Por favor, realice la transferencia a la siguiente cuenta bancaria:</p>
+                <ul>
+                    <li><strong>Banco:</strong> [Nombre del banco]</li>
+                    <li><strong>Cuenta:</strong> [Número de cuenta]</li>
+                    <li><strong>Titular:</strong> [Nombre del titular]</li>
+                    <li><strong>Referencia:</strong> [Referencia de la orden]</li>
+                </ul>
+                <p>Una vez realizada la transferencia, su pedido será procesado.</p>
+            </div>
+        </t>
+    </template>
+    
 
     
 </odoo>
