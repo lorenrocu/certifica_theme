@@ -460,4 +460,22 @@
             </div>
         </t>
     </template>
+
+    <template id="payment_method_transfer" inherit_id="website_sale.payment">
+        <xpath expr="//div[@id='payment_method']" position="inside">
+            <div class="card mt-2">
+                <div class="card-body">
+                    <h5>Pago por Transferencia Bancaria</h5>
+                    <p>
+                        Realice su pago directamente en nuestra cuenta bancaria.
+                        Por favor, use el número de su pedido como referencia de pago.
+                        Su pedido no será enviado hasta que el importe haya sido recibido en nuestra cuenta.
+                    </p>
+                    <a role="button" href="/shop/payment/transfer" class="btn btn-primary">
+                        Ver Instrucciones de Pago
+                    </a>
+                </div>
+            </div>
+        </xpath>
+    </template>
 </odoo>
