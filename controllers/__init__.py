@@ -2,3 +2,4 @@
 
 from . import main
 from . import checkout
+from . import confirmation
