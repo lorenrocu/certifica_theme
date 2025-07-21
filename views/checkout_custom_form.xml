@@ -445,17 +445,28 @@
         </xpath>
     </template>
 
-    <template id="transfer_form" name="Transferencia Bancaria - Formulario de Pago">
-        <div>
-            <h4>Instrucciones para el pago por transferencia</h4>
-            <p>Por favor, realice la transferencia a la siguiente cuenta bancaria:</p>
-            <ul>
-                <li><strong>Banco:</strong> [Nombre del banco]</li>
-                <li><strong>Cuenta:</strong> [Número de cuenta]</li>
-                <li><strong>Titular:</strong> [Nombre del titular]</li>
-            </ul>
-            <p>Utilice la referencia de su pedido como concepto de la transferencia. Su pedido no será procesado hasta que se haya recibido el importe en nuestra cuenta.</p>
-        </div>
+        <template id="transfer_form" name="Transferencia Bancaria - Formulario de Pago">
+        <t t-call="website.layout">
+            <div class="container oe_website_payment">
+                <h2>Pago por Transferencia Bancaria</h2>
+                <p>Por favor, realice la transferencia a la siguiente cuenta bancaria:</p>
+                <ul>
+                    <li><strong>Banco:</strong> [Nombre del banco]</li>
+                    <li><strong>Cuenta:</strong> [Número de cuenta]</li>
+                    <li><strong>Titular:</strong> [Nombre del titular]</li>
+                    <li><strong>Referencia:</strong> [Referencia de la orden]</li>
+                </ul>
+                <p>Una vez realizada la transferencia, su pedido será procesado.</p>
+            </div>
+        </t>
     </template>
 
+    <template id="theme_inventive.inventive_congratulations_page" name="Página de Felicitaciones (Dummy)">
+        <t t-call="website.layout">
+            <div class="container">
+                <h2>¡Felicidades!</h2>
+                <p>Esta es una plantilla de relleno para evitar errores. Personalízala según tus necesidades.</p>
+            </div>
+        </t>
+    </template>
 </odoo>

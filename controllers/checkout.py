@@ -7,7 +7,6 @@ from odoo.exceptions import ValidationError
 
 
 class WebsiteSaleCheckout(WebsiteSale):
-
     """
     Controlador personalizado para el checkout con campos DNI/RUC
     """
