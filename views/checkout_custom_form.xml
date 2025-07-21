@@ -421,10 +421,10 @@
                         }
                     });
 
-                    // Opciones de envío: mostrar/ocultar dirección
+                    // Declarar shippingAddressFields solo una vez
+                    const shippingAddressFields = document.getElementById('shipping_address_fields');
                     const shippingOptionDelivery = document.getElementById('shipping_option_delivery');
                     const shippingOptionPickup = document.getElementById('shipping_option_pickup');
-                    const shippingAddressFields = document.getElementById('shipping_address_fields');
                     const requiredFields = ['street', 'city', 'country_id'];
 
                     function setShippingFieldsRequired(required) {
@@ -441,7 +441,7 @@
                     }
 
                     function toggleShippingOption() {
-                        if (shippingOptionPickup.checked) {
+                        if (shippingOptionPickup && shippingOptionPickup.checked) {
                             shippingAddressFields.style.display = 'none';
                             setShippingFieldsRequired(false);
                         } else {
@@ -457,13 +457,12 @@
                         toggleShippingOption();
                     }
 
-                    // Checkbox y campos de dirección
+                    // Checkbox y campos de dirección (términos de envío)
                     const shippingTermsCheckbox = document.getElementById('shipping_terms_checkbox');
-                    const shippingAddressFields = document.getElementById('shipping_address_fields');
                     function toggleShippingFields() {
-                        if (shippingTermsCheckbox.checked) {
+                        if (shippingTermsCheckbox && shippingTermsCheckbox.checked) {
                             shippingAddressFields.style.display = 'block';
-                        } else {
+                        } else if (shippingOptionDelivery && shippingOptionDelivery.checked) {
                             shippingAddressFields.style.display = 'none';
                         }
                     }
@@ -471,6 +470,7 @@
                         toggleShippingFields();
                         shippingTermsCheckbox.addEventListener('change', toggleShippingFields);
                     }
+
                     // Validación del formulario antes del envío
                     document.querySelector('.checkout_autoformat').addEventListener('submit', function(e) {
                         // ... existing code ...
