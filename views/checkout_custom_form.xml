@@ -463,17 +463,28 @@
 
     <template id="theme_inventive.inventive_congratulations_page" name="Página de Felicitaciones (Transferencia Bancaria)">
         <t t-call="website.layout">
-            <div class="container">
-                <p>Por favor, sigue las instrucciones para completar el pago por transferencia bancaria.</p>
-                <div class="alert alert-info" style="margin-top: 2em;">
-                    <h4>Datos para la transferencia bancaria:</h4>
-                    <ul>
+            <div class="container" style="max-width: 700px; margin: 40px auto 0 auto;">
+                <div class="text-center mb-4">
+                    <span style="font-size: 4rem; color: #87465C; display: inline-block; margin-bottom: 10px;">
+                        <i class="fa fa-check-circle"></i>
+                    </span>
+                    <h2 style="font-weight: bold; color: #87465C;">¡Felicidades! Tu pedido ha sido registrado</h2>
+                    <p style="font-size: 1.2rem; color: #444;">Por favor, sigue las instrucciones para completar el pago por transferencia bancaria.</p>
+                </div>
+                <div class="alert alert-info p-4" style="margin-top: 2em; font-size: 1.1rem; border-radius: 10px; background: #e3f6fb; border: 1px solid #b6e2f2; color: #155a6a;">
+                    <h4 style="color: #155a6a; font-weight: bold;">Datos para la transferencia bancaria:</h4>
+                    <ul style="margin-bottom: 1.2em;">
                         <li><strong>Banco:</strong> BANCO DE PRUEBA</li>
                         <li><strong>Número de cuenta:</strong> 123-4567890-00</li>
                         <li><strong>Titular de la cuenta:</strong> CERTIFICA SAC</li>
                         <li><strong>Referencia:</strong> El número de tu pedido</li>
                     </ul>
-                    <p>Una vez realizada la transferencia, por favor envía el comprobante a pagos@certifica.com.pe para validar tu pedido.</p>
+                    <p style="margin-bottom: 0;">Una vez realizada la transferencia, por favor envía el comprobante a <a href="mailto:pagos@certifica.com.pe">pagos@certifica.com.pe</a> para validar tu pedido.</p>
+                </div>
+                <div class="text-center mt-5">
+                    <a href="/shop" class="btn btn-lg" style="background: #87465C; color: #fff; border-radius: 25px; padding: 12px 40px; font-size: 1.1rem; box-shadow: 0 2px 8px rgba(135,70,92,0.08);">
+                        <i class="fa fa-arrow-left mr-2"></i> Regresar a la tienda
+                    </a>
                 </div>
             </div>
         </t>
