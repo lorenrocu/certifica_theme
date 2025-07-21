@@ -7,12 +7,6 @@ from odoo.exceptions import ValidationError
 
 
 class WebsiteSaleCheckout(WebsiteSale):
-    @http.route(['/shop/payment/transfer'], type='http', auth='public', website=True, sitemap=False)
-    def payment_transfer(self, **kw):
-        """
-        Renderiza la página con instrucciones para el pago por transferencia bancaria.
-        """
-        return request.render('certifica_theme.transfer_form', {})
 
     """
     Controlador personalizado para el checkout con campos DNI/RUC
