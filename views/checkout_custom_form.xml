@@ -461,11 +461,20 @@
         </t>
     </template>
 
-    <template id="theme_inventive.inventive_congratulations_page" name="Página de Felicitaciones (Dummy)">
+    <template id="theme_inventive.inventive_congratulations_page" name="Página de Felicitaciones (Transferencia Bancaria)">
         <t t-call="website.layout">
             <div class="container">
                 <h2>¡Felicidades!</h2>
-                <p>Esta es una plantilla de relleno para evitar errores. Personalízala según tus necesidades.</p>
+                <p>Por favor, sigue las instrucciones para completar el pago por transferencia bancaria.</p>
+                <div class="alert alert-info" style="margin-top: 2em;">
+                    <h4>Datos para la transferencia bancaria:</h4>
+                    <t t-if="acquirer and acquirer.message">
+                        <div t-raw="acquirer.message"/>
+                    </t>
+                    <t t-if="not (acquirer and acquirer.message)">
+                        <p>No se han configurado instrucciones de pago. Por favor, contacta con soporte.</p>
+                    </t>
+                </div>
             </div>
         </t>
     </template>
