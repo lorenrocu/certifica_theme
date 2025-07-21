@@ -487,6 +487,19 @@
                     <t t-if="not (acquirer and acquirer.pending_msg)">
                         <p>No se han configurado instrucciones de pago. Por favor, contacta con soporte.</p>
                     </t>
+                    <!-- Bloque de depuración de order -->
+                    <t t-if="order">
+                        <p><strong>Order Name:</strong> <t t-esc="order.name"/></p>
+                        <p><strong>Order ID:</strong> <t t-esc="order.id"/></p>
+                        <p><strong>payment_acquirer_id:</strong> <t t-esc="order.payment_acquirer_id and order.payment_acquirer_id.name or 'None'"/></p>
+                        <p><strong>Campos disponibles en order:</strong></p>
+                        <ul>
+                            <t t-foreach="order._fields" t-as="f">
+                                <li><t t-esc="f"/></li>
+                            </t>
+                        </ul>
+                    </t>
+                    <!-- Fin bloque de depuración de order -->
                 </div>
             </div>
         </t>
