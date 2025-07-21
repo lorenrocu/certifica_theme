@@ -468,10 +468,10 @@
                 <p>Por favor, sigue las instrucciones para completar el pago por transferencia bancaria.</p>
                 <div class="alert alert-info" style="margin-top: 2em;">
                     <h4>Datos para la transferencia bancaria:</h4>
-                    <t t-if="acquirer and acquirer.message">
-                        <div t-raw="acquirer.message"/>
+                    <t t-if="acquirer and acquirer.pending_msg">
+                        <div t-raw="acquirer.pending_msg"/>
                     </t>
-                    <t t-if="not (acquirer and acquirer.message)">
+                    <t t-if="not (acquirer and acquirer.pending_msg)">
                         <p>No se han configurado instrucciones de pago. Por favor, contacta con soporte.</p>
                     </t>
                 </div>
