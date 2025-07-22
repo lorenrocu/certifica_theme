@@ -171,79 +171,33 @@ class WebsiteSaleCheckout(WebsiteSale):
 
     def checkout_form_validate(self, mode, all_form_values, data_values):
         shipping_option = all_form_values.get('shipping_option')
-        # Si es recojo, limpia los campos de dirección ANTES de validar
         if shipping_option == 'pickup':
-            for field in ['street', 'city', 'country_id']:
-                all_form_values[field] = ''
-                data_values[field] = ''
-        error, error_message = super(WebsiteSaleCheckout, self).checkout_form_validate(mode, all_form_values, data_values)
+            # Solo valida lo necesario para pickup, ignora dirección
+            error = {}
+            error_message = []
+            # Validaciones personalizadas (DNI, RUC, razón social)
+            invoice_type = all_form_values.get('invoice_type', 'boleta')
+            invoice_type_checkbox = all_form_values.get('invoice_type_checkbox')
+            dni = all_form_values.get('dni', '').strip()
+            ruc = all_form_values.get('ruc', '').strip()
+            razon_social = all_form_values.get('razon_social', '').strip()
+            is_invoice_requested = invoice_type_checkbox == 'on' or invoice_type == 'factura'
 
-        # Validaciones personalizadas
-        invoice_type = all_form_values.get('invoice_type', 'boleta')
-        invoice_type_checkbox = all_form_values.get('invoice_type_checkbox')
-        dni = all_form_values.get('dni', '').strip()
-        ruc = all_form_values.get('ruc', '').strip()
-        razon_social = all_form_values.get('razon_social', '').strip()
-
-        # Determinar el tipo real basado en el checkbox
-        is_invoice_requested = invoice_type_checkbox == 'on' or invoice_type == 'factura'
-
-        print(f"=== VALIDACIÓN SERVIDOR ===")
-        print(f"invoice_type: {invoice_type}")
-        print(f"invoice_type_checkbox: {invoice_type_checkbox}")
-        print(f"is_invoice_requested: {is_invoice_requested}")
-        print(f"dni: '{dni}'")
-        print(f"ruc: '{ruc}'")
-        print(f"razon_social: '{razon_social}'")
-        print(f"shipping_option: '{shipping_option}'")
-
-        # Si es recojo en tienda, eliminar errores de dirección después del super
-        if shipping_option == 'pickup':
-            for field in ['street', 'city', 'country_id']:
-                if field in error:
-                    del error[field]
-
-        if is_invoice_requested:
-            print("Validando para FACTURA")
-            # Para factura se requiere RUC y Razón Social
-            if not ruc:
-                error['ruc'] = 'missing'
-                error_message.append('RUC es requerido para factura')
-                print("❌ RUC faltante")
-            elif len(ruc) != 11 or not ruc.isdigit():
-                error['ruc'] = 'invalid'
-                error_message.append('RUC debe tener exactamente 11 dígitos')
-                print("❌ RUC formato inválido")
+            if is_invoice_requested:
+                if not ruc:
+                    error['ruc'] = 'missing'
+                    error_message.append('RUC es requerido para factura')
+                elif len(ruc) != 11 or not ruc.isdigit():
+                    error['ruc'] = 'invalid'
+                    error_message.append('RUC debe tener exactamente 11 dígitos')
+                if not razon_social:
+                    error['razon_social'] = 'missing'
+                    error_message.append('Razón Social es requerida para factura')
             else:
-                print("✅ RUC válido")
-            
-            if not razon_social:
-                error['razon_social'] = 'missing'
-                error_message.append('Razón Social es requerida para factura')
-                print("❌ Razón Social faltante")
-            else:
-                print("✅ Razón Social válida")
-        else:
-            print("Validando para BOLETA")
-            # Para boleta, DNI es completamente opcional
-            # Solo validar formato si se proporciona un valor
-            if dni:
-                if len(dni) != 8 or not dni.isdigit():
-                    error['dni'] = 'invalid'
-                    error_message.append('DNI debe tener exactamente 8 dígitos')
-                    print("❌ DNI formato inválido")
-                else:
-                    print("✅ DNI válido")
-            else:
-                print("✅ DNI no proporcionado - es opcional")
-            
-            # Ignorar completamente los campos de factura
-            if 'ruc' in error:
-                del error['ruc']
-            if 'razon_social' in error:
-                del error['razon_social']
-        
-        print(f"Errores encontrados: {len(error)}")
-        print(f"Mensajes de error: {error_message}")
-
-        return error, error_message
+                if dni:
+                    if len(dni) != 8 or not dni.isdigit():
+                        error['dni'] = 'invalid'
+                        error_message.append('DNI debe tener exactamente 8 dígitos')
+            return error, error_message
+        # Si no es pickup, sigue el flujo normal
+        return super(WebsiteSaleCheckout, self).checkout_form_validate(mode, all_form_values, data_values)
