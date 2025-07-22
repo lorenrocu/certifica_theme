@@ -444,6 +444,13 @@
                         if (shippingOptionPickup && shippingOptionPickup.checked) {
                             shippingAddressFields.style.display = 'none';
                             setShippingFieldsRequired(false);
+                            // Limpiar valores de los campos de dirección
+                            requiredFields.forEach(function(fieldId) {
+                                const field = document.getElementById(fieldId);
+                                if (field) {
+                                    field.value = '';
+                                }
+                            });
                         } else {
                             shippingAddressFields.style.display = 'block';
                             setShippingFieldsRequired(true);
