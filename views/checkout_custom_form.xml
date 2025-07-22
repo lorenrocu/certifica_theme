@@ -218,15 +218,15 @@
                                 <div class="row mb-4">
                                     <div class="col-12 mb-3">
                                         <div class="custom-control custom-radio mb-2">
-                                            <input type="radio" class="custom-control-input" id="shipping_option_delivery" name="shipping_option" value="delivery" checked="checked"/>
-                                            <label class="custom-control-label" for="shipping_option_delivery">
-                                                <strong>Envío Gratuito en Lima metropolitana a partir de los 1000 USD, para envíos a provincia por favor contactarse con su asesor.</strong>
+                                            <input type="radio" class="custom-control-input" id="shipping_option_pickup" name="shipping_option" value="pickup" checked="checked"/>
+                                            <label class="custom-control-label" for="shipping_option_pickup">
+                                                <strong>Recojo Gratis en las instalaciones de Certifica</strong>
                                             </label>
                                         </div>
                                         <div class="custom-control custom-radio">
-                                            <input type="radio" class="custom-control-input" id="shipping_option_pickup" name="shipping_option" value="pickup"/>
-                                            <label class="custom-control-label" for="shipping_option_pickup">
-                                                <strong>Recojo Gratis en las instalaciones de Certifica</strong>
+                                            <input type="radio" class="custom-control-input" id="shipping_option_delivery" name="shipping_option" value="delivery"/>
+                                            <label class="custom-control-label" for="shipping_option_delivery">
+                                                <strong>Envío Gratuito en Lima metropolitana a partir de los 1000 USD, para envíos a provincia por favor contactarse con su asesor.</strong>
                                             </label>
                                         </div>
                                     </div>
