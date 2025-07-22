@@ -170,13 +170,12 @@ class WebsiteSaleCheckout(WebsiteSale):
         return new_values
 
     def checkout_form_validate(self, mode, all_form_values, data_values):
-        """
-        Validamos el formulario incluyendo validaciones para DNI y RUC
-        """
-        error = dict()
-        error_message = []
-
-        # Llamar validación original
+        shipping_option = all_form_values.get('shipping_option')
+        # Si es recojo, limpia los campos de dirección ANTES de validar
+        if shipping_option == 'pickup':
+            for field in ['street', 'city', 'country_id']:
+                all_form_values[field] = ''
+                data_values[field] = ''
         error, error_message = super(WebsiteSaleCheckout, self).checkout_form_validate(mode, all_form_values, data_values)
 
         # Validaciones personalizadas
@@ -185,7 +184,6 @@ class WebsiteSaleCheckout(WebsiteSale):
         dni = all_form_values.get('dni', '').strip()
         ruc = all_form_values.get('ruc', '').strip()
         razon_social = all_form_values.get('razon_social', '').strip()
-        shipping_option = all_form_values.get('shipping_option')
 
         # Determinar el tipo real basado en el checkbox
         is_invoice_requested = invoice_type_checkbox == 'on' or invoice_type == 'factura'
@@ -199,7 +197,7 @@ class WebsiteSaleCheckout(WebsiteSale):
         print(f"razon_social: '{razon_social}'")
         print(f"shipping_option: '{shipping_option}'")
 
-        # Si es recojo en tienda, eliminar errores de dirección
+        # Si es recojo en tienda, eliminar errores de dirección después del super
         if shipping_option == 'pickup':
             for field in ['street', 'city', 'country_id']:
                 if field in error:
