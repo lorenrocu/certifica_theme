@@ -447,26 +447,24 @@
                         if (shippingOptionPickup && shippingOptionPickup.checked) {
                             shippingAddressFields.style.display = 'none';
                             setShippingFieldsRequired(false);
-                            // Asignar valores ficticios
-                            if (street) { street.value = 'Sin dirección'; street.disabled = true; }
-                            if (city) { city.value = 'Sin dirección'; city.disabled = true; }
+                            if (street) { street.value = 'Sin dirección'; street.readOnly = true; street.style.display = ''; }
+                            if (city) { city.value = 'Sin dirección'; city.readOnly = true; city.style.display = ''; }
                             if (country) {
-                                // Busca la opción Perú y selecciónala
                                 for (let i = 0; i < country.options.length; i++) {
                                     if (country.options[i].text.toLowerCase().includes('peru')) {
                                         country.selectedIndex = i;
                                         break;
                                     }
                                 }
-                                country.disabled = true;
+                                country.readOnly = true;
+                                country.style.display = '';
                             }
                         } else {
                             shippingAddressFields.style.display = 'block';
                             setShippingFieldsRequired(true);
-                            // Habilitar y limpiar los campos
-                            if (street) { street.disabled = false; street.value = ''; }
-                            if (city) { city.disabled = false; city.value = ''; }
-                            if (country) { country.disabled = false; country.selectedIndex = 0; }
+                            if (street) { street.readOnly = false; street.value = ''; }
+                            if (city) { city.readOnly = false; city.value = ''; }
+                            if (country) { country.readOnly = false; country.selectedIndex = 0; }
                         }
                     }
 
