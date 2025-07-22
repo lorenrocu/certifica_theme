@@ -170,29 +170,34 @@ class WebsiteSaleCheckout(WebsiteSale):
         return new_values
 
     def checkout_form_validate(self, mode, all_form_values, data_values):
-        # Solo validaciones personalizadas, nunca dirección
-        error = {}
-        error_message = []
-        invoice_type = all_form_values.get('invoice_type', 'boleta')
-        invoice_type_checkbox = all_form_values.get('invoice_type_checkbox')
-        dni = all_form_values.get('dni', '').strip()
-        ruc = all_form_values.get('ruc', '').strip()
-        razon_social = all_form_values.get('razon_social', '').strip()
-        is_invoice_requested = invoice_type_checkbox == 'on' or invoice_type == 'factura'
+        shipping_option = all_form_values.get('shipping_option')
+        if shipping_option == 'pickup':
+            # Solo valida lo necesario para pickup, ignora dirección
+            error = {}
+            error_message = []
+            # Validaciones personalizadas (DNI, RUC, razón social)
+            invoice_type = all_form_values.get('invoice_type', 'boleta')
+            invoice_type_checkbox = all_form_values.get('invoice_type_checkbox')
+            dni = all_form_values.get('dni', '').strip()
+            ruc = all_form_values.get('ruc', '').strip()
+            razon_social = all_form_values.get('razon_social', '').strip()
+            is_invoice_requested = invoice_type_checkbox == 'on' or invoice_type == 'factura'
 
-        if is_invoice_requested:
-            if not ruc:
-                error['ruc'] = 'missing'
-                error_message.append('RUC es requerido para factura')
-            elif len(ruc) != 11 or not ruc.isdigit():
-                error['ruc'] = 'invalid'
-                error_message.append('RUC debe tener exactamente 11 dígitos')
-            if not razon_social:
-                error['razon_social'] = 'missing'
-                error_message.append('Razón Social es requerida para factura')
-        else:
-            if dni:
-                if len(dni) != 8 or not dni.isdigit():
-                    error['dni'] = 'invalid'
-                    error_message.append('DNI debe tener exactamente 8 dígitos')
-        return error, error_message
+            if is_invoice_requested:
+                if not ruc:
+                    error['ruc'] = 'missing'
+                    error_message.append('RUC es requerido para factura')
+                elif len(ruc) != 11 or not ruc.isdigit():
+                    error['ruc'] = 'invalid'
+                    error_message.append('RUC debe tener exactamente 11 dígitos')
+                if not razon_social:
+                    error['razon_social'] = 'missing'
+                    error_message.append('Razón Social es requerida para factura')
+            else:
+                if dni:
+                    if len(dni) != 8 or not dni.isdigit():
+                        error['dni'] = 'invalid'
+                        error_message.append('DNI debe tener exactamente 8 dígitos')
+            return error, error_message
+        # Si no es pickup, sigue el flujo normal
+        return super(WebsiteSaleCheckout, self).checkout_form_validate(mode, all_form_values, data_values)

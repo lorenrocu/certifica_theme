@@ -441,27 +441,32 @@
                     }
 
                     function toggleShippingOption() {
+                        const street = document.getElementById('street');
+                        const city = document.getElementById('city');
+                        const country = document.getElementById('country_id');
                         if (shippingOptionPickup && shippingOptionPickup.checked) {
                             shippingAddressFields.style.display = 'none';
                             setShippingFieldsRequired(false);
-                            // Limpiar y deshabilitar los campos de dirección
-                            requiredFields.forEach(function(fieldId) {
-                                const field = document.getElementById(fieldId);
-                                if (field) {
-                                    field.value = '';
-                                    field.disabled = true;
+                            // Asignar valores ficticios
+                            if (street) { street.value = 'Sin dirección'; street.disabled = true; }
+                            if (city) { city.value = 'Sin dirección'; city.disabled = true; }
+                            if (country) {
+                                // Busca la opción Perú y selecciónala
+                                for (let i = 0; i < country.options.length; i++) {
+                                    if (country.options[i].text.toLowerCase().includes('peru')) {
+                                        country.selectedIndex = i;
+                                        break;
+                                    }
                                 }
-                            });
+                                country.disabled = true;
+                            }
                         } else {
                             shippingAddressFields.style.display = 'block';
                             setShippingFieldsRequired(true);
-                            // Habilitar los campos de dirección
-                            requiredFields.forEach(function(fieldId) {
-                                const field = document.getElementById(fieldId);
-                                if (field) {
-                                    field.disabled = false;
-                                }
-                            });
+                            // Habilitar y limpiar los campos
+                            if (street) { street.disabled = false; street.value = ''; }
+                            if (city) { city.disabled = false; city.value = ''; }
+                            if (country) { country.disabled = false; country.selectedIndex = 0; }
                         }
                     }
 
