@@ -444,16 +444,24 @@
                         if (shippingOptionPickup && shippingOptionPickup.checked) {
                             shippingAddressFields.style.display = 'none';
                             setShippingFieldsRequired(false);
-                            // Limpiar valores de los campos de dirección
+                            // Limpiar y deshabilitar los campos de dirección
                             requiredFields.forEach(function(fieldId) {
                                 const field = document.getElementById(fieldId);
                                 if (field) {
                                     field.value = '';
+                                    field.disabled = true;
                                 }
                             });
                         } else {
                             shippingAddressFields.style.display = 'block';
                             setShippingFieldsRequired(true);
+                            // Habilitar los campos de dirección
+                            requiredFields.forEach(function(fieldId) {
+                                const field = document.getElementById(fieldId);
+                                if (field) {
+                                    field.disabled = false;
+                                }
+                            });
                         }
                     }
 
