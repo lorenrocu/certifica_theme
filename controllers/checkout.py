@@ -185,10 +185,11 @@ class WebsiteSaleCheckout(WebsiteSale):
         dni = all_form_values.get('dni', '').strip()
         ruc = all_form_values.get('ruc', '').strip()
         razon_social = all_form_values.get('razon_social', '').strip()
-        
+        shipping_option = all_form_values.get('shipping_option')
+
         # Determinar el tipo real basado en el checkbox
         is_invoice_requested = invoice_type_checkbox == 'on' or invoice_type == 'factura'
-        
+
         print(f"=== VALIDACIÓN SERVIDOR ===")
         print(f"invoice_type: {invoice_type}")
         print(f"invoice_type_checkbox: {invoice_type_checkbox}")
@@ -196,6 +197,13 @@ class WebsiteSaleCheckout(WebsiteSale):
         print(f"dni: '{dni}'")
         print(f"ruc: '{ruc}'")
         print(f"razon_social: '{razon_social}'")
+        print(f"shipping_option: '{shipping_option}'")
+
+        # Si es recojo en tienda, eliminar errores de dirección
+        if shipping_option == 'pickup':
+            for field in ['street', 'city', 'country_id']:
+                if field in error:
+                    del error[field]
 
         if is_invoice_requested:
             print("Validando para FACTURA")
