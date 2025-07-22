@@ -478,17 +478,20 @@
                         shippingTermsCheckbox.addEventListener('change', toggleShippingFields);
                     }
 
-                    // Validación del formulario antes del envío
-                    document.querySelector('.checkout_autoformat').addEventListener('submit', function(e) {
-                        // ... existing code ...
-                        // Validar que el checkbox de términos de envío esté marcado
-                        if (shippingTermsCheckbox && !shippingTermsCheckbox.checked) {
-                            e.preventDefault();
-                            alert('Debe aceptar los términos y condiciones de envío para continuar.');
-                            shippingTermsCheckbox.focus();
-                            return false;
-                        }
-                    });
+                    // Validación robusta antes de enviar el formulario
+                    const checkoutForm = document.querySelector('.checkout_autoformat');
+                    if (checkoutForm) {
+                        checkoutForm.addEventListener('submit', function(e) {
+                            if (shippingOptionPickup && shippingOptionPickup.checked) {
+                                requiredFields.forEach(function(fieldId) {
+                                    const field = document.getElementById(fieldId);
+                                    if (field) {
+                                        field.removeAttribute('required');
+                                    }
+                                });
+                            }
+                        });
+                    }
                 });
                 ]]>
             </script>
