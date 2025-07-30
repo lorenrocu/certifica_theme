@@ -18,7 +18,7 @@ class WebsiteSalePaymentValidateCustom(http.Controller):
             if payment_transactions:
                 acquirer = payment_transactions.acquirer_id
         
-        return request.render('theme_inventive.inventive_congratulations_page', {
+        return request.render('certifica_theme.payment_confirmation_page', {
             'order': order,
             'acquirer': acquirer,
         })

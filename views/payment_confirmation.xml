@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template de confirmación de pago personalizado -->
+    <template id="payment_confirmation_page" name="Payment Confirmation Page">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container mt-5 mb-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card shadow">
+                                <div class="card-header bg-success text-white text-center">
+                                    <h2 class="mb-0">
+                                        <i class="fa fa-check-circle mr-2"></i>
+                                        ¡Pago Confirmado!
+                                    </h2>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="mb-4">
+                                        <i class="fa fa-check-circle text-success" style="font-size: 4rem;"></i>
+                                    </div>
+                                    
+                                    <h3 class="text-success mb-3">¡Gracias por tu compra!</h3>
+                                    
+                                    <p class="lead mb-4">
+                                        Tu pago ha sido procesado exitosamente.
+                                    </p>
+                                    
+                                    <t t-if="order">
+                                        <div class="alert alert-info">
+                                            <h5><i class="fa fa-info-circle mr-2"></i>Detalles de tu pedido</h5>
+                                            <p class="mb-1"><strong>Número de pedido:</strong> <span t-esc="order.name"/></p>
+                                            <p class="mb-1"><strong>Total:</strong> <span t-esc="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/></p>
+                                            <t t-if="acquirer">
+                                                <p class="mb-0"><strong>Método de pago:</strong> <span t-esc="acquirer.name"/></p>
+                                            </t>
+                                        </div>
+                                    </t>
+                                    
+                                    <div class="mt-4">
+                                        <p class="mb-3">Recibirás un correo electrónico con los detalles de tu pedido.</p>
+                                        
+                                        <div class="btn-group" role="group">
+                                            <a href="/shop" class="btn btn-primary">
+                                                <i class="fa fa-shopping-cart mr-2"></i>
+                                                Seguir comprando
+                                            </a>
+                                            <a href="/" class="btn btn-secondary">
+                                                <i class="fa fa-home mr-2"></i>
+                                                Ir al inicio
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

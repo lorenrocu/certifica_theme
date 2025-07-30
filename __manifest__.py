@@ -13,6 +13,7 @@
         'views/product_page_custom.xml',
         # 'views/checkout_custom.xml',  # Formulario heredado (comentado)
         'views/checkout_custom_form.xml',  # Nuevo formulario personalizado
+        'views/payment_confirmation.xml',  # Template de confirmación de pago
     ],
     'installable': True,
     'application': False,
