@@ -8,12 +8,6 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-8">
                             <div class="card shadow">
-                                <div class="card-header bg-success text-white text-center">
-                                    <h2 class="mb-0">
-                                        <i class="fa fa-check-circle mr-2"></i>
-                                        ¡Pago Confirmado!
-                                    </h2>
-                                </div>
                                 <div class="card-body text-center">
                                     <div class="mb-4">
                                         <i class="fa fa-check-circle text-success" style="font-size: 4rem;"></i>
@@ -22,7 +16,7 @@
                                     <h3 class="text-success mb-3">¡Gracias por tu compra!</h3>
                                     
                                     <p class="lead mb-4">
-                                        Tu pago ha sido procesado exitosamente.
+                                        Realiza tu pago para procesar tu compra haciendo la transferencia bancaria.
                                     </p>
                                     
                                     <t t-if="order">
@@ -56,9 +50,20 @@
                                                         <div class="alert alert-warning mt-3 mb-0">
                                                             <small>
                                                                 <i class="fa fa-exclamation-triangle mr-1"></i>
-                                                                <strong>Importante:</strong> Envía el comprobante de pago a <strong>pagos@certificalatam.com</strong> 
-                                                                indicando el número de pedido <strong t-esc="order.name"></strong> para procesar tu orden.
+                                                                <strong>Importante:</strong> Envía el comprobante de pago por WhatsApp o email:
                                                             </small>
+                                                            <div class="mt-2">
+                                                                <a t-attf-href="https://wa.me/51987482941?text=Hola,%20adjunto%20comprobante%20de%20pago%20para%20el%20pedido%20{{order.name}}%20por%20un%20total%20de%20S/.%20{{order.amount_total}}" 
+                                                                   class="btn btn-success btn-sm mr-2" target="_blank">
+                                                                    <i class="fab fa-whatsapp mr-1"></i>
+                                                                    Enviar por WhatsApp
+                                                                </a>
+                                                                <a href="mailto:pagos@certificalatam.com?subject=Comprobante de Pago - Pedido" 
+                                                                   class="btn btn-primary btn-sm">
+                                                                    <i class="fa fa-envelope mr-1"></i>
+                                                                    Enviar por Email
+                                                                </a>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </t>
