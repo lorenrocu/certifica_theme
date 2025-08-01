@@ -8,9 +8,12 @@ class SaleOrder(models.Model):
 
     @api.model
     def create(self, vals):
-        """Si la orden proviene del website fuerza la secuencia web, reemplazando cualquier nombre."""
-        if self.env.context.get("from_website"):
-            vals["name"] = self.env["ir.sequence"].next_by_code("sale.order.web")
+        """Si la orden proviene del website fuerza la secuencia web."""
+        if (
+            self.env.context.get("from_website")
+            or vals.get("website_id")
+        ) and vals.get("name", "/") in ("/", False):
+            vals["name"] = self.env["ir.sequence"].next_by_code("sale.order.web") or "/"
         return super().create(vals)
 
 
