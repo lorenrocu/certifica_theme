@@ -35,16 +35,36 @@
                                                             Datos para transferencia bancaria
                                                         </h6>
                                                         <div class="row">
-                                                            <div class="col-md-6">
-                                                                <p class="mb-2"><strong>Banco:</strong> Banco de Crédito del Perú (BCP)</p>
-                                                                <p class="mb-2"><strong>Número de cuenta:</strong> 194-2345678-0-12</p>
-                                                                <p class="mb-2"><strong>Titular:</strong> Certifica Latam S.A.C.</p>
-                                                                <p class="mb-2"><strong>RUC:</strong> 20123456789</p>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <p class="mb-2"><strong>Cuenta interbancaria (CCI):</strong> 002-194-002345678012-34</p>
-                                                                <p class="mb-2"><strong>Moneda:</strong> Soles (PEN)</p>
-                                                                <p class="mb-0"><strong>Tipo de cuenta:</strong> Cuenta Corriente</p>
+                                                            <div class="col-md-12">
+                                                                <h6 class="text-dark mb-3"><strong>BANCO DE CRÉDITO DEL PERÚ (BCP)</strong></h6>
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <p class="mb-2"><strong>Número de cuenta:</strong> 193-2052678-1-29</p>
+                                                                        <p class="mb-2"><strong>Moneda:</strong> Dólares (USD)</p>
+                                                                        <p class="mb-2"><strong>Titular:</strong> Certifica Latam S.A.C.</p>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <p class="mb-2"><strong>Cuenta interbancaria (CCI):</strong> 002-193-002052678129-17</p>
+                                                                        <p class="mb-2"><strong>RUC:</strong> 20123456789</p>
+                                                                        <p class="mb-0"><strong>Tipo de cuenta:</strong> Cuenta Corriente</p>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <hr class="my-3">
+                                                                
+                                                                <h6 class="text-dark mb-3"><strong>BANCO SCOTIABANK</strong></h6>
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <p class="mb-2"><strong>Número de cuenta:</strong> 3914872</p>
+                                                                        <p class="mb-2"><strong>Moneda:</strong> Dólares (USD)</p>
+                                                                        <p class="mb-2"><strong>Titular:</strong> Certifica Latam S.A.C.</p>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <p class="mb-2"><strong>Cuenta interbancaria (CCI):</strong> 009 938 000003914872 21</p>
+                                                                        <p class="mb-2"><strong>RUC:</strong> 20123456789</p>
+                                                                        <p class="mb-0"><strong>Tipo de cuenta:</strong> Cuenta Corriente</p>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <div class="alert alert-warning mt-3 mb-0">
