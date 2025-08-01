@@ -18,12 +18,12 @@ class WebsiteSaleCustom(WebsiteSale):
     Extensión del controlador de la tienda para personalizar funcionalidades
     """
     
-    def _get_search_domain(self, search, category, attrib_values, search_in_description=True):
+    def _get_search_domain(self, search, category, attrib_values):
         """
         Heredamos el método original para mantener la funcionalidad de búsqueda
         """
         return super(WebsiteSaleCustom, self)._get_search_domain(
-            search, category, attrib_values, search_in_description)
+            search, category, attrib_values)
     
     def _get_products_domain(self, search, category, attrib_values):
         """
