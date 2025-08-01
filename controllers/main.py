@@ -85,11 +85,19 @@ class WebsiteSaleCustom(WebsiteSale):
         if request.httprequest.headers.get('X-Requested-With') == 'XMLHttpRequest':
             response = super(WebsiteSaleCustom, self).shop(
                 page=page, category=category, search=search, ppg=ppg, **post)
-            # Filtrar productos en el contexto de respuesta
+            # Filtrar productos en el contexto de respuesta combinando búsqueda con pricelist
             if hasattr(response, 'qcontext') and response.qcontext:
                 products = response.qcontext.get('products')
                 if products:
-                    products = products.search(product_filter_domain)
+                    # Combinar los productos de la búsqueda con los del pricelist
+                    search_product_ids = products.ids
+                    pricelist_product_ids = item_products.ids if item_products else []
+                    # Intersección: productos que están tanto en la búsqueda como en el pricelist
+                    filtered_product_ids = list(set(search_product_ids) & set(pricelist_product_ids))
+                    if filtered_product_ids:
+                        products = request.env['product.template'].sudo().browse(filtered_product_ids)
+                    else:
+                        products = request.env['product.template'].sudo().browse([])
                     products = products.with_context(pricelist=pricelist.id if pricelist.exists() else None)
                     response.qcontext['products'] = products
             products_html = request.env['ir.ui.view']._render_template(
@@ -107,11 +115,19 @@ class WebsiteSaleCustom(WebsiteSale):
         # Para peticiones normales, llamamos al método padre
         response = super(WebsiteSaleCustom, self).shop(
             page=page, category=category, search=search, ppg=ppg, **post)
-        # Filtrar productos en el contexto de respuesta
+        # Filtrar productos en el contexto de respuesta combinando búsqueda con pricelist
         if hasattr(response, 'qcontext') and response.qcontext:
             products = response.qcontext.get('products')
             if products:
-                products = products.search(product_filter_domain)
+                # Combinar los productos de la búsqueda con los del pricelist
+                search_product_ids = products.ids
+                pricelist_product_ids = item_products.ids if item_products else []
+                # Intersección: productos que están tanto en la búsqueda como en el pricelist
+                filtered_product_ids = list(set(search_product_ids) & set(pricelist_product_ids))
+                if filtered_product_ids:
+                    products = request.env['product.template'].sudo().browse(filtered_product_ids)
+                else:
+                    products = request.env['product.template'].sudo().browse([])
                 products = products.with_context(pricelist=pricelist.id if pricelist.exists() else None)
                 response.qcontext['products'] = products
         return response
