@@ -89,15 +89,9 @@ class WebsiteSaleCustom(WebsiteSale):
             if hasattr(response, 'qcontext') and response.qcontext:
                 products = response.qcontext.get('products')
                 if products:
-                    # Combinar los productos de la búsqueda con los del pricelist
-                    search_product_ids = products.ids
-                    pricelist_product_ids = item_products.ids if item_products else []
-                    # Intersección: productos que están tanto en la búsqueda como en el pricelist
-                    filtered_product_ids = list(set(search_product_ids) & set(pricelist_product_ids))
-                    if filtered_product_ids:
-                        products = request.env['product.template'].sudo().browse(filtered_product_ids)
-                    else:
-                        products = request.env['product.template'].sudo().browse([])
+                    # Intersección entre productos de la búsqueda y productos del pricelist
+                    pricelist_products = item_products if item_products else request.env['product.template'].sudo().browse([])
+                    products = products & pricelist_products
                     products = products.with_context(pricelist=pricelist.id if pricelist.exists() else None)
                     response.qcontext['products'] = products
             products_html = request.env['ir.ui.view']._render_template(
@@ -119,15 +113,9 @@ class WebsiteSaleCustom(WebsiteSale):
         if hasattr(response, 'qcontext') and response.qcontext:
             products = response.qcontext.get('products')
             if products:
-                # Combinar los productos de la búsqueda con los del pricelist
-                search_product_ids = products.ids
-                pricelist_product_ids = item_products.ids if item_products else []
-                # Intersección: productos que están tanto en la búsqueda como en el pricelist
-                filtered_product_ids = list(set(search_product_ids) & set(pricelist_product_ids))
-                if filtered_product_ids:
-                    products = request.env['product.template'].sudo().browse(filtered_product_ids)
-                else:
-                    products = request.env['product.template'].sudo().browse([])
+                # Intersección entre productos de la búsqueda y productos del pricelist
+                pricelist_products = item_products if item_products else request.env['product.template'].sudo().browse([])
+                products = products & pricelist_products
                 products = products.with_context(pricelist=pricelist.id if pricelist.exists() else None)
                 response.qcontext['products'] = products
         return response
