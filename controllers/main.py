@@ -18,42 +18,17 @@ class WebsiteSaleCustom(WebsiteSale):
     Extensión del controlador de la tienda para personalizar funcionalidades
     """
     
-    def _get_search_domain(self, search, category, attrib_values):
-        """
-        Heredamos el método original para mantener la funcionalidad de búsqueda
-        """
-        return super(WebsiteSaleCustom, self)._get_search_domain(
-            search, category, attrib_values)
+    def _get_search_domain(self, *args, **kwargs):
+        """Extiende el dominio de búsqueda sin alterar la firma del método padre"""
+        return super(WebsiteSaleCustom, self)._get_search_domain(*args, **kwargs)
     
     def _get_products_domain(self, search, category, attrib_values):
-        """
-        Sobrescribimos el método para obtener productos con pricelist específico
-        """
-        domain = super(WebsiteSaleCustom, self)._get_products_domain(search, category, attrib_values)
-        
-        # Forzar el uso del pricelist con ID 4
-        # Agregamos el dominio para productos que estén en el pricelist 4
-        domain += [('item_ids.pricelist_id', '=', 4)]
-        
-        return domain
+        """Delegamos al método original sin modificaciones para mantener la búsqueda nativa."""
+        return super(WebsiteSaleCustom, self)._get_products_domain(search, category, attrib_values)
     
     def _get_products(self, search, category, attrib_values, **post):
-        """
-        Sobrescribimos el método para obtener productos con pricelist específico
-        """
-        # Obtener el dominio de búsqueda
-        domain = self._get_products_domain(search, category, attrib_values)
-        
-        # Obtener productos con el dominio modificado
-        Product = request.env['product.template'].sudo()
-        products = Product.search(domain)
-        
-        # Aplicar el pricelist específico a los productos
-        pricelist = request.env['product.pricelist'].sudo().browse(4)
-        if pricelist.exists():
-            products = products.with_context(pricelist=pricelist.id)
-        
-        return products
+        """Usamos la lógica original para respetar completamente los filtros de búsqueda."""
+        return super(WebsiteSaleCustom, self)._get_products(search, category, attrib_values, **post)
     
     @http.route([
         '/shop',
