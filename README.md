@@ -184,3 +184,50 @@ Si necesitas cambiar el ID del pricelist, modifica los siguientes archivos:
 1. **controllers/main.py**: Cambia el número `4` en las líneas donde se referencia el pricelist
 2. **views/shop_layout.xml**: Cambia `pricelist=4` por el nuevo ID
 3. **views/product_page_custom.xml**: Cambia `pricelist=4` por el nuevo ID
+
+
+
+
+
+# 🧩 Módulo: sale_order_web_sequence
+
+Este módulo para **Odoo 13** permite que las **cotizaciones creadas desde el sitio web (eCommerce)** usen una **secuencia distinta** con prefijo personalizado (por ejemplo: `T-S001`), sin afectar las cotizaciones creadas manualmente desde el backend.
+
+---
+
+## ✅ Requisitos
+
+- Odoo 13 funcionando correctamente
+- Módulo `website_sale` activado
+- Acceso a una carpeta de módulos personalizados
+- Acceso al servidor (para copiar o clonar el módulo)
+- Acceso al **modo desarrollador** en Odoo
+
+---
+
+---
+
+Ve a Ajustes > Técnico > Secuencias y Códigos de Identificación
+
+Crea una nueva secuencia:
+
+Nombre: Cotizaciones Web
+
+Código: sale.order.web
+
+Prefijo: T-S
+
+Rellenar con ceros: 3 (para tener T-S001, T-S002, ...)
+
+Incremento: 1
+
+---
+
+## 📥 Instalación del módulo
+
+### 1. Clona o copia el módulo
+
+En el servidor, ve a tu carpeta de módulos personalizados:
+
+```bash
+cd /odoo/custom/addons/
