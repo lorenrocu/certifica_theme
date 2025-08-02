@@ -85,6 +85,22 @@
                                                         </div>
                                                     </div>
                                                 </t>
+                                                
+                                                <!-- Botón WhatsApp para pagos con tarjeta -->
+                                                <t t-if="acquirer and acquirer.provider != 'transfer'">
+                                                    <div class="alert alert-success mt-3">
+                                                        <h6 class="text-success mb-3">
+                                                            <i class="fa fa-credit-card mr-2"></i>
+                                                            Pago procesado exitosamente
+                                                        </h6>
+                                                        <p class="mb-3">Tu pago con tarjeta ha sido procesado. ¡Notifica tu compra por WhatsApp!</p>
+                                                        <a t-attf-href="https://wa.me/51987482941?text=Hola,%20he%20realizado%20una%20compra%20con%20tarjeta.%20Pedido:%20{{order.name}}%20por%20un%20total%20de%20{{order.amount_total}}%20{{order.currency_id.symbol}}.%20¡Gracias!" 
+                                                           class="btn btn-success btn-lg" target="_blank">
+                                                            <i class="fab fa-whatsapp mr-2"></i>
+                                                            Notificar compra por WhatsApp
+                                                        </a>
+                                                    </div>
+                                                </t>
                                             </t>
                                         </div>
                                     </t>
