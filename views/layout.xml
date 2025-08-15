@@ -51,7 +51,7 @@
                             <ul class="nav justify-content-center">
                                 <li class="nav-item"><a class="nav-link" href="/">INICIO</a></li>
                                 <li class="nav-item"><a class="nav-link" href="/shop">PRODUCTOS</a></li>
-                                <li class="nav-item"><a class="nav-link" href="https://certificalatam.com/index.php/contacto/">CONTACTANOS</a></li>
+                                <li class="nav-item"><a class="nav-link" href="https://certificalatam.com/index.php/contacto/">CONTÁCTANOS</a></li>
                             </ul>
                         </div>
                         
@@ -139,6 +139,25 @@
                     </div>
                 </div>
             </div>
+        </xpath>
+    </template>
+    
+    <!-- Template para agregar Tawk.to chat -->
+    <template id="tawk_chat_script" inherit_id="website.layout" name="Tawk.to Chat">
+        <xpath expr="//body" position="inside">
+            <!--Start of Tawk.to Script-->
+            <script type="text/javascript">
+                var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+                (function(){
+                    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+                    s1.async=true;
+                    s1.src='https://embed.tawk.to/681a3e66b901ac19118f56ea/1iqj87gfb';
+                    s1.charset='UTF-8';
+                    s1.setAttribute('crossorigin','*');
+                    s0.parentNode.insertBefore(s1,s0);
+                })();
+            </script>
+            <!--End of Tawk.to Script-->
         </xpath>
     </template>
 </odoo>

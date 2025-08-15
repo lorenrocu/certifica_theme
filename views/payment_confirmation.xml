@@ -71,7 +71,7 @@
                                                                 <strong>Importante:</strong> Envía el comprobante de pago por WhatsApp o email:
                                                             </small>
                                                             <div class="mt-2">
-                                                                <a t-attf-href="https://wa.me/51987482941?text=Hola,%20adjunto%20comprobante%20de%20pago%20para%20el%20pedido%20{{order.name}}%20por%20un%20total%20de%20S/.%20{{order.amount_total}}" 
+                                                                <a t-attf-href="https://wa.me/51948087498?text=Hola,%20adjunto%20comprobante%20de%20pago%20para%20el%20pedido%20{{order.name}}%20por%20un%20total%20de%20S/.%20{{order.amount_total}}" 
                                                                    class="btn btn-success btn-sm mr-2" target="_blank">
                                                                     <i class="fab fa-whatsapp mr-1"></i>
                                                                     Enviar por WhatsApp
@@ -94,7 +94,7 @@
                                                             Pago procesado exitosamente
                                                         </h6>
                                                         <p class="mb-3">Tu pago con tarjeta ha sido procesado. ¡Notifica tu compra por WhatsApp!</p>
-                                                        <a t-attf-href="https://wa.me/51987482941?text=Hola,%20he%20realizado%20una%20compra%20con%20tarjeta.%20Pedido:%20{{order.name}}%20por%20un%20total%20de%20{{order.amount_total}}%20{{order.currency_id.symbol}}.%20¡Gracias!" 
+                                                        <a t-attf-href="https://wa.me/51948087498?text=Hola,%20he%20realizado%20una%20compra%20con%20tarjeta.%20Pedido:%20{{order.name}}%20por%20un%20total%20de%20{{order.amount_total}}%20{{order.currency_id.symbol}}.%20¡Gracias!" 
                                                            class="btn btn-success btn-lg" target="_blank">
                                                             <i class="fab fa-whatsapp mr-2"></i>
                                                             Notificar compra por WhatsApp
