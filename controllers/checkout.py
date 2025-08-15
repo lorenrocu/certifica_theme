@@ -152,19 +152,28 @@ class WebsiteSaleCheckout(WebsiteSale):
         # Verificar si se solicita factura
         is_invoice_requested = values.get('invoice_type_checkbox') == 'on' or values.get('invoice_type') == 'factura'
         
-        # Agregar campos personalizados solo si son necesarios
-        if 'dni' in values:
-            new_values['dni'] = values['dni']
+        # Mapear el tipo de comprobante
+        if is_invoice_requested:
+            new_values['invoice_type'] = 'factura'
+        else:
+            new_values['invoice_type'] = 'boleta'
+        
+        # Agregar campos personalizados
+        if 'dni' in values and values['dni']:
+            new_values['dni'] = values['dni'].strip()
             
         # Solo incluir campos de factura si se solicita factura
         if is_invoice_requested:
-            if 'ruc' in values:
-                new_values['ruc'] = values['ruc']
-            if 'razon_social' in values:
-                new_values['name'] = values['razon_social']  # Mapear razón social al nombre
+            if 'ruc' in values and values['ruc']:
+                new_values['ruc'] = values['ruc'].strip()
+                # También mapear al campo ruc_custom para compatibilidad
+                new_values['ruc_custom'] = values['ruc'].strip()
+            if 'razon_social' in values and values['razon_social']:
+                new_values['name'] = values['razon_social'].strip()  # Mapear razón social al nombre
         else:
-            # Si no se solicita factura, asegurarse de que no se incluyan estos campos
+            # Si no se solicita factura, limpiar campos de RUC
             new_values.pop('ruc', None)
+            new_values.pop('ruc_custom', None)
             new_values.pop('razon_social', None)
             
         return new_values

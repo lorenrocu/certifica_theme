@@ -15,7 +15,7 @@
                                     
                                     <!-- Título específico para transferencia bancaria -->
                                     <t t-if="acquirer and acquirer.provider == 'transfer'">
-                                        <h3 class="text-success mb-3">Estas a un paso de completar tu compra!</h3>
+                                        <h3 class="text-success mb-3">¡Estas a un paso de completar tu compra!</h3>
                                     </t>
                                     
                                     <!-- Título para otros métodos de pago -->
