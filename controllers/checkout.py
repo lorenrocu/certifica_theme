@@ -120,44 +120,76 @@ class WebsiteSaleCheckout(WebsiteSale):
         
         Partner = request.env['res.partner']
         if mode[0] == 'new':
-            # Asegurar que el partner no sea el partner público del website
-            # Generar un email único si no se proporciona
-            if not checkout.get('email'):
-                import time
-                checkout['email'] = f"customer_{int(time.time())}@temp.local"
+            try:
+                # Asegurar que el partner no sea el partner público del website
+                # Generar un email único si no se proporciona
+                if not checkout.get('email'):
+                    import time
+                    checkout['email'] = f"customer_{int(time.time())}@temp.local"
+                
+                # Asegurar que el partner tenga un nombre válido
+                if not checkout.get('name'):
+                    checkout['name'] = 'Cliente'
+                
+                # Crear el partner con manejo de errores
+                partner_id = Partner.sudo().create(checkout).id
+                _logger.info(f"Partner creado exitosamente con ID: {partner_id}")
+                
+            except Exception as e:
+                _logger.error(f"Error al crear partner: {e}")
+                _logger.error(f"Datos del checkout: {checkout}")
+                # Re-lanzar la excepción para que el flujo normal de errores la maneje
+                raise
             
-            # Asegurar que el partner tenga un nombre válido
-            if not checkout.get('name'):
-                checkout['name'] = 'Cliente'
-            
-            # Crear el partner
-            partner_id = Partner.sudo().create(checkout).id
-            
-            # Log de verificación del partner creado
-            created_partner = Partner.sudo().browse(partner_id)
-            _logger.info(f"Partner creado con ID: {partner_id}")
-            _logger.info(f"DNI guardado: {created_partner.dni or 'No especificado'}")
-            _logger.info(f"RUC guardado: {created_partner.ruc or 'No especificado'}")
-            _logger.info(f"VAT guardado: {created_partner.vat or 'No especificado'}")
-            _logger.info(f"Tipo de comprobante: {created_partner.invoice_type or 'No especificado'}")
-            _logger.info(f"Nombre guardado: {created_partner.name}")
-            _logger.info(f"Email guardado: {created_partner.email}")
+            # Log de verificación del partner creado con acceso seguro a campos
+            try:
+                created_partner = Partner.sudo().browse(partner_id)
+                _logger.info(f"Partner creado con ID: {partner_id}")
+                _logger.info(f"DNI guardado: {getattr(created_partner, 'dni', None) or 'No especificado'}")
+                _logger.info(f"RUC guardado: {getattr(created_partner, 'ruc', None) or 'No especificado'}")
+                _logger.info(f"VAT guardado: {getattr(created_partner, 'vat', None) or 'No especificado'}")
+                _logger.info(f"Tipo de comprobante: {getattr(created_partner, 'invoice_type', None) or 'No especificado'}")
+                _logger.info(f"Nombre guardado: {getattr(created_partner, 'name', None) or 'No especificado'}")
+                _logger.info(f"Email guardado: {getattr(created_partner, 'email', None) or 'No especificado'}")
+            except Exception as e:
+                _logger.error(f"Error al acceder a campos del partner creado: {e}")
+                _logger.info(f"Partner creado con ID: {partner_id} (información detallada no disponible)")
             
             # Verificar que no sea el partner público
             if partner_id == request.website.partner_id.id:
-                # Si por alguna razón es el mismo, crear uno nuevo con datos únicos
-                checkout['email'] = f"unique_{partner_id}_{int(time.time())}@temp.local"
-                partner_id = Partner.sudo().create(checkout).id
+                try:
+                    # Si por alguna razón es el mismo, crear uno nuevo con datos únicos
+                    checkout['email'] = f"unique_{partner_id}_{int(time.time())}@temp.local"
+                    partner_id = Partner.sudo().create(checkout).id
+                    _logger.info(f"Partner único creado para evitar conflicto con partner público. Nuevo ID: {partner_id}")
+                except Exception as e:
+                    _logger.error(f"Error al crear partner único: {e}")
+                    raise
                 
         elif mode[0] == 'edit':
-            partner_id = int(all_values.get('partner_id', 0))
-            if partner_id:
-                # double check
-                order = request.website.sale_get_order()
-                shippings = Partner.sudo().search([('id', 'child_of', order.partner_id.commercial_partner_id.ids)])
-                if partner_id not in shippings.mapped('id') and partner_id != order.partner_id.id:
-                    return Forbidden()
-                Partner.sudo().browse(partner_id).write(checkout)
+            try:
+                partner_id = int(all_values.get('partner_id', 0))
+                if partner_id:
+                    # double check
+                    order = request.website.sale_get_order()
+                    shippings = Partner.sudo().search([('id', 'child_of', order.partner_id.commercial_partner_id.ids)])
+                    if partner_id not in shippings.mapped('id') and partner_id != order.partner_id.id:
+                        return Forbidden()
+                    Partner.sudo().browse(partner_id).write(checkout)
+                    _logger.info(f"Partner actualizado exitosamente con ID: {partner_id}")
+                    
+            except Exception as e:
+                _logger.error(f"Error al actualizar partner: {e}")
+                _logger.error(f"Partner ID: {partner_id}, Datos: {checkout}")
+                # Re-lanzar la excepción para que el flujo normal de errores la maneje
+                raise
+        
+        # Verificación final del partner_id antes de retornar
+        if not partner_id:
+            _logger.error("Error: partner_id es None o 0 al final de _checkout_form_save")
+            raise ValidationError("Error al crear o actualizar el partner")
+            
+        _logger.info(f"_checkout_form_save completado exitosamente. Partner ID: {partner_id}")
         return partner_id
 
     def values_preprocess(self, order, mode, values):
