@@ -136,11 +136,10 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Log de verificación del partner creado
             created_partner = Partner.sudo().browse(partner_id)
             _logger.info(f"Partner creado con ID: {partner_id}")
-            _logger.info(f"DNI guardado: {created_partner.dni}")
-            _logger.info(f"RUC guardado: {created_partner.ruc}")
-            _logger.info(f"RUC Custom guardado: {created_partner.ruc_custom}")
-            _logger.info(f"Tipo de comprobante guardado: {created_partner.invoice_type}")
+            _logger.info(f"Documento guardado: {created_partner.vat_document_number}")
+            _logger.info(f"Tipo documento guardado: {created_partner.vat_document_type_id.name if created_partner.vat_document_type_id else 'Sin tipo'}")
             _logger.info(f"Nombre guardado: {created_partner.name}")
+            _logger.info(f"Email guardado: {created_partner.email}")
             
             # Verificar que no sea el partner público
             if partner_id == request.website.partner_id.id:
@@ -179,20 +178,22 @@ class WebsiteSaleCheckout(WebsiteSale):
         _logger.info(f"invoice_type_checkbox: {values.get('invoice_type_checkbox')}")
         _logger.info(f"invoice_type: {values.get('invoice_type')}")
         
-        # Mapear el tipo de comprobante
+        # Mapear el tipo de comprobante al campo correcto del modelo
         if is_invoice_requested:
-            new_values['invoice_type'] = 'factura'
+            new_values['l10n_latam_identification_type_id'] = 2  # Factura
         else:
-            new_values['invoice_type'] = 'boleta'
-        _logger.info(f"Tipo de comprobante asignado: {new_values['invoice_type']}")
+            new_values['l10n_latam_identification_type_id'] = 1  # Boleta
+        _logger.info(f"Tipo de comprobante asignado: {'factura' if is_invoice_requested else 'boleta'}")
         
-        # Agregar campos personalizados
+        # Agregar campos personalizados - mapear al modelo correcto
         _logger.info(f"Procesando campos personalizados...")
         _logger.info(f"DNI en values: {values.get('dni')}")
         
         if 'dni' in values and values['dni']:
-            new_values['dni'] = values['dni'].strip()
-            _logger.info(f"DNI procesado: {new_values['dni']}")
+            new_values['vat_document_number'] = values['dni'].strip()
+            # Establecer tipo de documento como DNI (ID 1 típicamente)
+            new_values['vat_document_type_id'] = 1
+            _logger.info(f"DNI procesado: {new_values['vat_document_number']}")
         else:
             _logger.info("DNI no encontrado o vacío")
             
@@ -200,19 +201,15 @@ class WebsiteSaleCheckout(WebsiteSale):
         if is_invoice_requested:
             _logger.info("Procesando campos de factura...")
             if 'ruc' in values and values['ruc']:
-                new_values['ruc'] = values['ruc'].strip()
-                # También mapear al campo ruc_custom para compatibilidad
-                new_values['ruc_custom'] = values['ruc'].strip()
-                _logger.info(f"RUC procesado: {new_values['ruc']}")
+                new_values['vat_document_number'] = values['ruc'].strip()
+                # Establecer tipo de documento como RUC (ID 2 típicamente)
+                new_values['vat_document_type_id'] = 2
+                _logger.info(f"RUC procesado: {new_values['vat_document_number']}")
             if 'razon_social' in values and values['razon_social']:
                 new_values['name'] = values['razon_social'].strip()  # Mapear razón social al nombre
                 _logger.info(f"Razón social procesada: {new_values['name']}")
         else:
-            # Si no se solicita factura, limpiar campos de RUC
-            new_values.pop('ruc', None)
-            new_values.pop('ruc_custom', None)
-            new_values.pop('razon_social', None)
-            _logger.info("Campos de RUC limpiados (no se solicita factura)")
+            _logger.info("Campos de RUC no requeridos para boleta")
             
         _logger.info(f"Valores finales procesados: {new_values}")
         _logger.info("=== FIN CHECKOUT DEBUG - values_preprocess ===")
@@ -225,12 +222,11 @@ class WebsiteSaleCheckout(WebsiteSale):
             error = {}
             error_message = []
             # Validaciones personalizadas (DNI, RUC, razón social)
-            invoice_type = all_form_values.get('invoice_type', 'boleta')
             invoice_type_checkbox = all_form_values.get('invoice_type_checkbox')
             dni = all_form_values.get('dni', '').strip()
             ruc = all_form_values.get('ruc', '').strip()
             razon_social = all_form_values.get('razon_social', '').strip()
-            is_invoice_requested = invoice_type_checkbox == 'on' or invoice_type == 'factura'
+            is_invoice_requested = invoice_type_checkbox == 'on'
 
             if is_invoice_requested:
                 if not ruc:
