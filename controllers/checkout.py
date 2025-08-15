@@ -136,8 +136,10 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Log de verificación del partner creado
             created_partner = Partner.sudo().browse(partner_id)
             _logger.info(f"Partner creado con ID: {partner_id}")
-            _logger.info(f"Documento guardado: {created_partner.vat_document_number}")
-            _logger.info(f"Tipo documento guardado: {created_partner.vat_document_type_id.name if created_partner.vat_document_type_id else 'Sin tipo'}")
+            _logger.info(f"DNI guardado: {created_partner.dni or 'No especificado'}")
+            _logger.info(f"RUC guardado: {created_partner.ruc or 'No especificado'}")
+            _logger.info(f"VAT guardado: {created_partner.vat or 'No especificado'}")
+            _logger.info(f"Tipo de comprobante: {created_partner.invoice_type or 'No especificado'}")
             _logger.info(f"Nombre guardado: {created_partner.name}")
             _logger.info(f"Email guardado: {created_partner.email}")
             
@@ -180,20 +182,18 @@ class WebsiteSaleCheckout(WebsiteSale):
         
         # Mapear el tipo de comprobante al campo correcto del modelo
         if is_invoice_requested:
-            new_values['l10n_latam_identification_type_id'] = 2  # Factura
+            new_values['invoice_type'] = 'factura'
         else:
-            new_values['l10n_latam_identification_type_id'] = 1  # Boleta
-        _logger.info(f"Tipo de comprobante asignado: {'factura' if is_invoice_requested else 'boleta'}")
+            new_values['invoice_type'] = 'boleta'
+        _logger.info(f"Tipo de comprobante asignado: {new_values['invoice_type']}")
         
-        # Agregar campos personalizados - mapear al modelo correcto
+        # Agregar campos personalizados - mapear a los campos del modelo res_partner
         _logger.info(f"Procesando campos personalizados...")
         _logger.info(f"DNI en values: {values.get('dni')}")
         
         if 'dni' in values and values['dni']:
-            new_values['vat_document_number'] = values['dni'].strip()
-            # Establecer tipo de documento como DNI (ID 1 típicamente)
-            new_values['vat_document_type_id'] = 1
-            _logger.info(f"DNI procesado: {new_values['vat_document_number']}")
+            new_values['dni'] = values['dni'].strip()
+            _logger.info(f"DNI procesado: {new_values['dni']}")
         else:
             _logger.info("DNI no encontrado o vacío")
             
@@ -201,10 +201,8 @@ class WebsiteSaleCheckout(WebsiteSale):
         if is_invoice_requested:
             _logger.info("Procesando campos de factura...")
             if 'ruc' in values and values['ruc']:
-                new_values['vat_document_number'] = values['ruc'].strip()
-                # Establecer tipo de documento como RUC (ID 2 típicamente)
-                new_values['vat_document_type_id'] = 2
-                _logger.info(f"RUC procesado: {new_values['vat_document_number']}")
+                new_values['ruc'] = values['ruc'].strip()
+                _logger.info(f"RUC procesado: {new_values['ruc']}")
             if 'razon_social' in values and values['razon_social']:
                 new_values['name'] = values['razon_social'].strip()  # Mapear razón social al nombre
                 _logger.info(f"Razón social procesada: {new_values['name']}")
