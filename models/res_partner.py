@@ -23,7 +23,6 @@ class ResPartner(models.Model):
     # Campo VAT que se mapea automáticamente
     vat = fields.Char('NIF/VAT', readonly=True, help="Se mapea automáticamente desde DNI o RUC")
 
-    @api.constrains('dni')
     def _check_dni(self):
         """
         Validación del DNI:
@@ -36,7 +35,6 @@ class ResPartner(models.Model):
                 if len(dni) != 8 or not dni.isdigit():
                     raise ValidationError('El DNI debe tener exactamente 8 dígitos numéricos.')
 
-    @api.constrains('ruc', 'ruc_custom')
     def _check_ruc(self):
         """
         Validación del RUC:
@@ -51,7 +49,6 @@ class ResPartner(models.Model):
                     if len(ruc) != 11 or not ruc.isdigit():
                         raise ValidationError('El RUC debe tener exactamente 11 dígitos numéricos.')
 
-    @api.constrains('dni', 'ruc', 'invoice_type')
     def _check_document_consistency(self):
         """
         Validación de consistencia entre tipo de comprobante y documento:
@@ -106,7 +103,6 @@ class ResPartner(models.Model):
             partner._update_vat_field(vals)
         return super(ResPartner, self).write(vals)
 
-    @api.onchange('invoice_type', 'dni', 'ruc', 'ruc_custom')
     def _onchange_document_fields(self):
         """
         Actualizar el campo VAT cuando cambian los documentos o el tipo de comprobante
