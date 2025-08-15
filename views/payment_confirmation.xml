@@ -15,9 +15,26 @@
                                     
                                     <h3 class="text-success mb-3">Estas a un paso de completar tu compra!</h3>
                                     
-                                    <p class="lead mb-4">
-                                        Realiza tu pago para procesar tu compra haciendo la transferencia bancaria.
-                                    </p>
+                                    <!-- Mensaje específico para transferencia bancaria -->
+                                    <t t-if="acquirer and acquirer.provider == 'transfer'">
+                                        <p class="lead mb-4">
+                                            Realiza tu pago para procesar tu compra haciendo la transferencia bancaria.
+                                        </p>
+                                    </t>
+                                    
+                                    <!-- Mensaje para otros métodos de pago -->
+                                    <t t-if="acquirer and acquirer.provider != 'transfer'">
+                                        <p class="lead mb-4">
+                                            ¡Tu pago ha sido procesado exitosamente!
+                                        </p>
+                                    </t>
+                                    
+                                    <!-- Mensaje por defecto si no hay acquirer -->
+                                    <t t-if="not acquirer">
+                                        <p class="lead mb-4">
+                                            ¡Gracias por tu compra!
+                                        </p>
+                                    </t>
                                     
                                     <t t-if="order">
                                         <div class="alert alert-info">
