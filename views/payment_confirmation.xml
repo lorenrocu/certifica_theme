@@ -13,7 +13,20 @@
                                         <i class="fa fa-check-circle text-success" style="font-size: 4rem;"></i>
                                     </div>
                                     
-                                    <h3 class="text-success mb-3">Estas a un paso de completar tu compra!</h3>
+                                    <!-- Título específico para transferencia bancaria -->
+                                    <t t-if="acquirer and acquirer.provider == 'transfer'">
+                                        <h3 class="text-success mb-3">Estas a un paso de completar tu compra!</h3>
+                                    </t>
+                                    
+                                    <!-- Título para otros métodos de pago -->
+                                    <t t-if="acquirer and acquirer.provider != 'transfer'">
+                                        <h3 class="text-success mb-3">¡Gracias por tu compra!</h3>
+                                    </t>
+                                    
+                                    <!-- Título por defecto si no hay acquirer -->
+                                    <t t-if="not acquirer">
+                                        <h3 class="text-success mb-3">¡Gracias por tu compra!</h3>
+                                    </t>
                                     
                                     <!-- Mensaje específico para transferencia bancaria -->
                                     <t t-if="acquirer and acquirer.provider == 'transfer'">
