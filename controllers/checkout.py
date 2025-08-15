@@ -111,6 +111,13 @@ class WebsiteSaleCheckout(WebsiteSale):
         """
         Sobrescribimos para manejar los campos personalizados DNI, RUC y tipo de comprobante
         """
+        import logging
+        _logger = logging.getLogger(__name__)
+        
+        _logger.info("=== CHECKOUT DEBUG - _checkout_form_save ===")
+        _logger.info(f"Mode: {mode}")
+        _logger.info(f"Datos a guardar (checkout): {checkout}")
+        
         Partner = request.env['res.partner']
         if mode[0] == 'new':
             # Asegurar que el partner no sea el partner público del website
@@ -125,6 +132,15 @@ class WebsiteSaleCheckout(WebsiteSale):
             
             # Crear el partner
             partner_id = Partner.sudo().create(checkout).id
+            
+            # Log de verificación del partner creado
+            created_partner = Partner.sudo().browse(partner_id)
+            _logger.info(f"Partner creado con ID: {partner_id}")
+            _logger.info(f"DNI guardado: {created_partner.dni}")
+            _logger.info(f"RUC guardado: {created_partner.ruc}")
+            _logger.info(f"RUC Custom guardado: {created_partner.ruc_custom}")
+            _logger.info(f"Tipo de comprobante guardado: {created_partner.invoice_type}")
+            _logger.info(f"Nombre guardado: {created_partner.name}")
             
             # Verificar que no sea el partner público
             if partner_id == request.website.partner_id.id:
@@ -147,35 +163,59 @@ class WebsiteSaleCheckout(WebsiteSale):
         """
         Preprocesamos los valores del formulario incluyendo DNI, RUC y tipo de comprobante
         """
+        import logging
+        _logger = logging.getLogger(__name__)
+        
+        # Log de depuración: datos recibidos del formulario
+        _logger.info("=== CHECKOUT DEBUG - values_preprocess ===")
+        _logger.info(f"Datos recibidos del formulario: {values}")
+        _logger.info(f"Mode: {mode}")
+        
         new_values = super(WebsiteSaleCheckout, self).values_preprocess(order, mode, values)
         
         # Verificar si se solicita factura
         is_invoice_requested = values.get('invoice_type_checkbox') == 'on' or values.get('invoice_type') == 'factura'
+        _logger.info(f"¿Se solicita factura? {is_invoice_requested}")
+        _logger.info(f"invoice_type_checkbox: {values.get('invoice_type_checkbox')}")
+        _logger.info(f"invoice_type: {values.get('invoice_type')}")
         
         # Mapear el tipo de comprobante
         if is_invoice_requested:
             new_values['invoice_type'] = 'factura'
         else:
             new_values['invoice_type'] = 'boleta'
+        _logger.info(f"Tipo de comprobante asignado: {new_values['invoice_type']}")
         
         # Agregar campos personalizados
+        _logger.info(f"Procesando campos personalizados...")
+        _logger.info(f"DNI en values: {values.get('dni')}")
+        
         if 'dni' in values and values['dni']:
             new_values['dni'] = values['dni'].strip()
+            _logger.info(f"DNI procesado: {new_values['dni']}")
+        else:
+            _logger.info("DNI no encontrado o vacío")
             
         # Solo incluir campos de factura si se solicita factura
         if is_invoice_requested:
+            _logger.info("Procesando campos de factura...")
             if 'ruc' in values and values['ruc']:
                 new_values['ruc'] = values['ruc'].strip()
                 # También mapear al campo ruc_custom para compatibilidad
                 new_values['ruc_custom'] = values['ruc'].strip()
+                _logger.info(f"RUC procesado: {new_values['ruc']}")
             if 'razon_social' in values and values['razon_social']:
                 new_values['name'] = values['razon_social'].strip()  # Mapear razón social al nombre
+                _logger.info(f"Razón social procesada: {new_values['name']}")
         else:
             # Si no se solicita factura, limpiar campos de RUC
             new_values.pop('ruc', None)
             new_values.pop('ruc_custom', None)
             new_values.pop('razon_social', None)
+            _logger.info("Campos de RUC limpiados (no se solicita factura)")
             
+        _logger.info(f"Valores finales procesados: {new_values}")
+        _logger.info("=== FIN CHECKOUT DEBUG - values_preprocess ===")
         return new_values
 
     def checkout_form_validate(self, mode, all_form_values, data_values):
