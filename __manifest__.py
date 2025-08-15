@@ -5,9 +5,8 @@
     'version': '13.0.1.0.0',
     'author': 'Lorenzo Romero',
     'website': 'https://helydev.com',
-    'depends': ['website', 'website_sale', 'base'],
+    'depends': ['website', 'website_sale'],
     'data': [
-        # Vistas
         'views/assets.xml',
         'views/layout.xml',
         'views/shop_layout.xml',
