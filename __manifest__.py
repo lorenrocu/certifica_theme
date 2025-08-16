@@ -24,6 +24,7 @@
     ],
     'data': [
         'data/ir_config_parameter.xml',
+        'views/res_partner_form.xml',
         'views/assets.xml',
         'views/layout.xml',
         'views/shop_layout.xml',
