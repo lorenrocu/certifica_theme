@@ -21,7 +21,7 @@ class ResPartner(models.Model):
     ], string='Tipo de Comprobante', default='boleta')
     
     # Campo VAT que se mapea automáticamente
-    vat = fields.Char('NIF/VAT', readonly=True, help="Se mapea automáticamente desde DNI o RUC")
+    vat = fields.Char('NIF/VAT', help="Se mapea automáticamente desde DNI o RUC")
 
     @api.constrains('dni')
     def _check_dni(self):

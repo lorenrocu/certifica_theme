@@ -5,3 +5,4 @@
 .kiro/specs/latam-identification-integration/requirements.md
 .kiro/specs/latam-identification-integration/tasks.md
 .vscode/settings.json
+test_dni_ruc_vat.py
