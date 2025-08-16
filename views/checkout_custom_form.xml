@@ -453,12 +453,39 @@
                         const street = document.getElementById('street');
                         const city = document.getElementById('city');
                         const country = document.getElementById('country_id');
+                        
+                        console.log('=== CAMBIANDO OPCIÓN DE ENVÍO ===');
+                        
                         if (shippingOptionPickup && shippingOptionPickup.checked) {
-                            shippingAddressFields.style.display = 'none';
+                            console.log('Cambiando a modo recogo en tienda');
+                            
+                            // Ocultar campos de dirección
+                            if (shippingAddressFields) {
+                                shippingAddressFields.style.display = 'none';
+                            }
+                            
+                            // Remover validación required
                             setShippingFieldsRequired(false);
-                            if (street) { street.value = 'Sin dirección'; street.readOnly = true; street.style.display = ''; }
-                            if (city) { city.value = 'Sin dirección'; city.readOnly = true; city.style.display = ''; }
+                            
+                            // Establecer valores por defecto
+                            if (street) { 
+                                street.value = 'Sin dirección'; 
+                                street.readOnly = true; 
+                                street.style.display = 'none';
+                                street.removeAttribute('required');
+                                console.log('Campo street: valor por defecto, readonly, required removido');
+                            }
+                            
+                            if (city) { 
+                                city.value = 'Sin dirección'; 
+                                city.readOnly = true; 
+                                city.style.display = 'none';
+                                city.removeAttribute('required');
+                                console.log('Campo city: valor por defecto, readonly, required removido');
+                            }
+                            
                             if (country) {
+                                // Buscar Perú en las opciones
                                 for (let i = 0; i < country.options.length; i++) {
                                     if (country.options[i].text.toLowerCase().includes('peru')) {
                                         country.selectedIndex = i;
@@ -466,22 +493,78 @@
                                     }
                                 }
                                 country.readOnly = true;
-                                country.style.display = '';
+                                country.style.display = 'none';
+                                country.removeAttribute('required');
+                                console.log('Campo country: Perú seleccionado, readonly, required removido');
                             }
-                        } else {
-                            shippingAddressFields.style.display = 'block';
+                            
+                            console.log('✅ Modo recogo configurado correctamente');
+                            
+                        } else if (shippingOptionDelivery && shippingOptionDelivery.checked) {
+                            console.log('Cambiando a modo envío a domicilio');
+                            
+                            // Mostrar campos de dirección
+                            if (shippingAddressFields) {
+                                shippingAddressFields.style.display = 'block';
+                            }
+                            
+                            // Agregar validación required
                             setShippingFieldsRequired(true);
-                            if (street) { street.readOnly = false; street.value = ''; }
-                            if (city) { city.readOnly = false; city.value = ''; }
-                            if (country) { country.readOnly = false; country.selectedIndex = 0; }
+                            
+                            // Habilitar campos para edición
+                            if (street) { 
+                                street.readOnly = false; 
+                                street.value = ''; 
+                                street.style.display = '';
+                                street.setAttribute('required', 'true');
+                                console.log('Campo street: habilitado, vacío, required agregado');
+                            }
+                            
+                            if (city) { 
+                                city.readOnly = false; 
+                                city.value = ''; 
+                                city.style.display = '';
+                                city.setAttribute('required', 'true');
+                                console.log('Campo city: habilitado, vacío, required agregado');
+                            }
+                            
+                            if (country) { 
+                                country.readOnly = false; 
+                                country.selectedIndex = 0; 
+                                country.style.display = '';
+                                country.setAttribute('required', 'true');
+                                console.log('Campo country: habilitado, reset, required agregado');
+                            }
+                            
+                            console.log('✅ Modo envío a domicilio configurado correctamente');
                         }
                     }
 
                     if (shippingOptionDelivery && shippingOptionPickup && shippingAddressFields) {
-                        shippingOptionDelivery.addEventListener('change', toggleShippingOption);
-                        shippingOptionPickup.addEventListener('change', toggleShippingOption);
+                        console.log('=== INICIALIZANDO OPCIONES DE ENVÍO ===');
+                        console.log('shippingOptionDelivery:', shippingOptionDelivery);
+                        console.log('shippingOptionPickup:', shippingOptionPickup);
+                        console.log('shippingAddressFields:', shippingAddressFields);
+                        
+                        shippingOptionDelivery.addEventListener('change', function() {
+                            console.log('Evento change en shippingOptionDelivery');
+                            toggleShippingOption();
+                        });
+                        
+                        shippingOptionPickup.addEventListener('change', function() {
+                            console.log('Evento change en shippingOptionPickup');
+                            toggleShippingOption();
+                        });
+                        
                         // Inicializar estado
+                        console.log('Inicializando estado de envío...');
                         toggleShippingOption();
+                        console.log('✅ Estado de envío inicializado');
+                    } else {
+                        console.warn('⚠️ No se pudieron inicializar las opciones de envío');
+                        if (!shippingOptionDelivery) console.warn('shippingOptionDelivery no encontrado');
+                        if (!shippingOptionPickup) console.warn('shippingOptionPickup no encontrado');
+                        if (!shippingAddressFields) console.warn('shippingAddressFields no encontrado');
                     }
 
                     // Checkbox y campos de dirección (términos de envío)
@@ -502,14 +585,104 @@
                     const checkoutForm = document.querySelector('.checkout_autoformat');
                     if (checkoutForm) {
                         checkoutForm.addEventListener('submit', function(e) {
-                            if (shippingOptionPickup && shippingOptionPickup.checked) {
+                            console.log('=== VALIDACIÓN DEL FORMULARIO ===');
+                            
+                            // Obtener el estado actual de las opciones de envío
+                            const isPickup = shippingOptionPickup && shippingOptionPickup.checked;
+                            const isDelivery = shippingOptionDelivery && shippingOptionDelivery.checked;
+                            
+                            console.log('Opción de envío - Pickup:', isPickup, 'Delivery:', isDelivery);
+                            
+                            if (isPickup) {
+                                // Modo recogo: remover required de campos de dirección
+                                console.log('Modo recogo: removiendo validación de campos de dirección');
                                 requiredFields.forEach(function(fieldId) {
                                     const field = document.getElementById(fieldId);
                                     if (field) {
                                         field.removeAttribute('required');
+                                        console.log(`Campo ${fieldId}: required removido`);
                                     }
                                 });
+                                
+                                // Asegurar que los campos tengan valores por defecto
+                                const street = document.getElementById('street');
+                                const city = document.getElementById('city');
+                                const country = document.getElementById('country_id');
+                                
+                                if (street) street.value = 'Sin dirección';
+                                if (city) city.value = 'Sin dirección';
+                                if (country) {
+                                    // Buscar Perú en las opciones
+                                    for (let i = 0; i < country.options.length; i++) {
+                                        if (country.options[i].text.toLowerCase().includes('peru')) {
+                                            country.selectedIndex = i;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                console.log('Valores por defecto establecidos para modo recogo');
+                                
+                            } else if (isDelivery) {
+                                // Modo envío: validar que los campos de dirección estén llenos
+                                console.log('Modo envío: validando campos de dirección');
+                                
+                                let hasErrors = false;
+                                const errorMessages = [];
+                                
+                                requiredFields.forEach(function(fieldId) {
+                                    const field = document.getElementById(fieldId);
+                                    if (field) {
+                                        const value = field.value.trim();
+                                        if (!value || value === 'Sin dirección') {
+                                            hasErrors = true;
+                                            errorMessages.push(`El campo ${fieldId} es requerido para envío a domicilio`);
+                                            console.log(`Error: campo ${fieldId} vacío o inválido`);
+                                        }
+                                    }
+                                });
+                                
+                                if (hasErrors) {
+                                    e.preventDefault();
+                                    const errorMsg = 'Errores de validación:\n' + errorMessages.join('\n');
+                                    alert(errorMsg);
+                                    console.error('Formulario bloqueado por errores de validación');
+                                    return false;
+                                }
+                                
+                                console.log('Validación de envío a domicilio exitosa');
                             }
+                            
+                            // Validación adicional del DNI/RUC según el tipo de comprobante
+                            const isInvoice = invoiceCheckbox && invoiceCheckbox.checked;
+                            
+                            if (isInvoice) {
+                                // Validar RUC para factura
+                                if (!rucInput.value || rucInput.value.length !== 11) {
+                                    e.preventDefault();
+                                    alert('El RUC debe tener exactamente 11 dígitos para facturación');
+                                    rucInput.focus();
+                                    return false;
+                                }
+                                if (!razonSocialInput.value.trim()) {
+                                    e.preventDefault();
+                                    alert('La razón social es requerida para facturación');
+                                    razonSocialInput.focus();
+                                    return false;
+                                }
+                                console.log('Validación de factura exitosa');
+                            } else {
+                                // Validar DNI para boleta
+                                if (!dniInput.value || dniInput.value.length !== 8) {
+                                    e.preventDefault();
+                                    alert('El DNI debe tener exactamente 8 dígitos');
+                                    dniInput.focus();
+                                    return false;
+                                }
+                                console.log('Validación de boleta exitosa');
+                            }
+                            
+                            console.log('✅ Formulario validado exitosamente, procediendo con el envío');
                         });
                     }
                 });
