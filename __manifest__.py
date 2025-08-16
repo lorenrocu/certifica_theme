@@ -8,10 +8,7 @@
     'depends': ['website', 'website_sale'],
     'data': [
         'data/ir_config_parameter.xml',  # Configuración para deshabilitar validación VAT
-        'data/ir_module_module.xml',     # Deshabilitar módulo base_vat
-        'data/ir_module_module_latam.xml', # Deshabilitar módulo l10n_latam_base
         'data/ir_model_constraint.xml',  # Sobrescribir constraint de VAT
-        'data/ir_model_method.xml',      # Sobrescribir métodos de validación
         'views/assets.xml',
         'views/layout.xml',
         'views/shop_layout.xml',
