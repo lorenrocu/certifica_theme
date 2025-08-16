@@ -130,12 +130,12 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Establecer tipo de comprobante - TEMPORALMENTE COMENTADO PARA EVITAR ERROR
             # checkout['invoice_type'] = 'factura' if is_invoice_requested else 'boleta'
 
-            # Inyectar documentos si vienen del formulario
-            if ruc:
-                checkout['ruc'] = ruc
-            if dni and 'ruc' not in checkout:
-                # Solo setear DNI si no hay RUC (prioridad RUC)
-                checkout['dni'] = dni
+            # Inyectar documentos si vienen del formulario - TEMPORALMENTE COMENTADO
+            # if ruc:
+            #     checkout['ruc'] = ruc
+            # if dni and 'ruc' not in checkout:
+            #     # Solo setear DNI si no hay RUC (prioridad RUC)
+            #     checkout['dni'] = dni
 
             # Mapear razón social al name cuando es factura
             if is_invoice_requested and razon_social:
@@ -178,8 +178,8 @@ class WebsiteSaleCheckout(WebsiteSale):
             try:
                 created_partner = Partner.sudo().browse(partner_id)
                 _logger.info(f"Partner creado con ID: {partner_id}")
-                _logger.info(f"DNI guardado: {getattr(created_partner, 'dni', None) or 'No especificado'}")
-                _logger.info(f"RUC guardado: {getattr(created_partner, 'ruc', None) or 'No especificado'}")
+                # _logger.info(f"DNI guardado: {getattr(created_partner, 'dni', None) or 'No especificado'}")
+                # _logger.info(f"RUC guardado: {getattr(created_partner, 'ruc', None) or 'No especificado'}")
                 _logger.info(f"VAT guardado: {getattr(created_partner, 'vat', None) or 'No especificado'}")
                 # _logger.info(f"Tipo de comprobante: {getattr(created_partner, 'invoice_type', None) or 'No especificado'}")
                 _logger.info(f"Nombre guardado: {getattr(created_partner, 'name', None) or 'No especificado'}")
@@ -258,18 +258,19 @@ class WebsiteSaleCheckout(WebsiteSale):
         _logger.info(f"Procesando campos personalizados...")
         _logger.info(f"DNI en values: {values.get('dni')}")
         
-        if 'dni' in values and values['dni']:
-            new_values['dni'] = values['dni'].strip()
-            _logger.info(f"DNI procesado: {new_values['dni']}")
-        else:
-            _logger.info("DNI no encontrado o vacío")
+        # TEMPORALMENTE COMENTADO - campos personalizados
+        # if 'dni' in values and values['dni']:
+        #     new_values['dni'] = values['dni'].strip()
+        #     _logger.info(f"DNI procesado: {new_values['dni']}")
+        # else:
+        #     _logger.info("DNI no encontrado o vacío")
             
         # Solo incluir campos de factura si se solicita factura
         if is_invoice_requested:
             _logger.info("Procesando campos de factura...")
-            if 'ruc' in values and values['ruc']:
-                new_values['ruc'] = values['ruc'].strip()
-                _logger.info(f"RUC procesado: {new_values['ruc']}")
+            # if 'ruc' in values and values['ruc']:
+            #     new_values['ruc'] = values['ruc'].strip()
+            #     _logger.info(f"RUC procesado: {new_values['ruc']}")
             if 'razon_social' in values and values['razon_social']:
                 new_values['name'] = values['razon_social'].strip()  # Mapear razón social al nombre
                 _logger.info(f"Razón social procesada: {new_values['name']}")
