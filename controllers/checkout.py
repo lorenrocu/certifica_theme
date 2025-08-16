@@ -248,11 +248,11 @@ class WebsiteSaleCheckout(WebsiteSale):
         # Mapear el tipo de comprobante al campo correcto del modelo
         if is_invoice_requested:
             # new_values['invoice_type'] = 'factura'
-        pass
-    else:
-        # new_values['invoice_type'] = 'boleta'
-        pass
-    # _logger.info(f"Tipo de comprobante asignado: {new_values['invoice_type']}")
+            pass
+        else:
+            # new_values['invoice_type'] = 'boleta'
+            pass
+        # _logger.info(f"Tipo de comprobante asignado: {new_values['invoice_type']}")
         
         # Agregar campos personalizados - mapear a los campos del modelo res_partner
         _logger.info(f"Procesando campos personalizados...")
