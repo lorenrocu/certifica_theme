@@ -295,8 +295,8 @@ class WebsiteSaleCheckout(WebsiteSale):
             checkout['country_id'] = 173  # Perú
             self._logger.info("Modo recogo: usando dirección por defecto")
         
-        # Filtrar solo campos válidos de res.partner (EXCLUIR l10n_latam_identification_type_id)
-        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'is_company']
+        # Filtrar solo campos válidos de res.partner (INCLUIR l10n_latam_identification_type_id)
+        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'is_company', 'l10n_latam_identification_type_id']
         filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields and v is not None and v != ''}
         
         self._logger.info(f"Checkout filtrado: {filtered_checkout}")
@@ -313,15 +313,11 @@ class WebsiteSaleCheckout(WebsiteSale):
             partner_id = Partner.create(filtered_checkout).id
             self._logger.info(f"Partner creado: {partner_id}")
         
-        # ACTUALIZAR EL CAMPO DE IDENTIFICACIÓN DESPUÉS DE CREAR/ACTUALIZAR
+        # El campo l10n_latam_identification_type_id ya se incluye en filtered_checkout
         if identification_type_id:
-            success = self._update_partner_identification_type(partner_id, identification_type_id)
-            if success:
-                self._logger.info(f"✅ Campo de identificación actualizado exitosamente para partner {partner_id}")
-            else:
-                self._logger.error(f"❌ No se pudo actualizar el campo de identificación para partner {partner_id}")
+            self._logger.info(f"✅ Campo de identificación incluido en la creación/actualización: {identification_type_id}")
         else:
-            self._logger.warning("⚠️ No se detectó tipo de identificación, no se actualizará el campo")
+            self._logger.warning("⚠️ No se detectó tipo de identificación")
         
         return partner_id
 
