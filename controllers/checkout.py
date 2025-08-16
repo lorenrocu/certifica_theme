@@ -21,13 +21,12 @@ class WebsiteSaleCheckout(WebsiteSale):
             return False
         
         vat_clean = str(vat_number).strip()
-        _logger = logging.getLogger(__name__)
-        _logger.info(f"=== DETECTANDO TIPO DE IDENTIFICACIÓN PARA: {vat_clean} ===")
+        self._logger.info(f"=== DETECTANDO TIPO DE IDENTIFICACIÓN PARA: {vat_clean} ===")
         
         try:
             # Verificar si el modelo está disponible
             if 'l10n_latam.identification.type' not in request.env.registry:
-                _logger.warning("Modelo l10n_latam.identification.type no disponible")
+                self._logger.warning("Modelo l10n_latam.identification.type no disponible")
                 return False
             
             # Buscar el tipo de identificación en la base de datos
@@ -40,10 +39,10 @@ class WebsiteSaleCheckout(WebsiteSale):
                     ('country_id', '=', 173)  # Perú
                 ], limit=1)
                 if dni_type:
-                    _logger.info(f"DNI detectado: {vat_clean} -> Tipo ID: {dni_type.id}")
+                    self._logger.info(f"DNI detectado: {vat_clean} -> Tipo ID: {dni_type.id}")
                     return dni_type.id
                 else:
-                    _logger.warning("No se encontró el tipo DNI en la base de datos")
+                    self._logger.warning("No se encontró el tipo DNI en la base de datos")
                     return False
             
             # Detectar RUC (11 dígitos) - ID 4 en tu base de datos
@@ -53,10 +52,10 @@ class WebsiteSaleCheckout(WebsiteSale):
                     ('country_id', '=', 173)  # Perú
                 ], limit=1)
                 if ruc_type:
-                    _logger.info(f"RUC detectado: {vat_clean} -> Tipo ID: {ruc_type.id}")
+                    self._logger.info(f"RUC detectado: {vat_clean} -> Tipo ID: {ruc_type.id}")
                     return ruc_type.id
                 else:
-                    _logger.warning("No se encontró el tipo RUC en la base de datos")
+                    self._logger.warning("No se encontró el tipo RUC en la base de datos")
                     return False
             
             # Detectar VAT con prefijos peruanos (10 dígitos)
@@ -66,10 +65,10 @@ class WebsiteSaleCheckout(WebsiteSale):
                     ('country_id', '=', 173)  # Perú
                 ], limit=1)
                 if ruc_type:
-                    _logger.info(f"RUC con prefijo detectado: {vat_clean} -> Tipo ID: {ruc_type.id}")
+                    self._logger.info(f"RUC con prefijo detectado: {vat_clean} -> Tipo ID: {ruc_type.id}")
                     return ruc_type.id
                 else:
-                    _logger.warning("No se encontró el tipo RUC en la base de datos")
+                    self._logger.warning("No se encontró el tipo RUC en la base de datos")
                     return False
             
             # Detectar DNI con prefijo 10 (10 dígitos)
@@ -79,10 +78,10 @@ class WebsiteSaleCheckout(WebsiteSale):
                     ('country_id', '=', 173)  # Perú
                 ], limit=1)
                 if dni_type:
-                    _logger.info(f"DNI con prefijo 10 detectado: {vat_clean} -> Tipo ID: {dni_type.id}")
+                    self._logger.info(f"DNI con prefijo 10 detectado: {vat_clean} -> Tipo ID: {dni_type.id}")
                     return dni_type.id
                 else:
-                    _logger.warning("No se encontró el tipo DNI en la base de datos")
+                    self._logger.warning("No se encontró el tipo DNI en la base de datos")
                     return False
             
             # Otros casos - usar DNI por defecto (ID 5)
@@ -92,14 +91,14 @@ class WebsiteSaleCheckout(WebsiteSale):
                     ('country_id', '=', 173)  # Perú
                 ], limit=1)
                 if dni_type:
-                    _logger.info(f"VAT genérico detectado: {vat_clean} -> Usando DNI por defecto ID: {dni_type.id}")
+                    self._logger.info(f"VAT genérico detectado: {vat_clean} -> Usando DNI por defecto ID: {dni_type.id}")
                     return dni_type.id
                 else:
-                    _logger.warning("No se encontró el tipo DNI en la base de datos")
+                    self._logger.warning("No se encontró el tipo DNI en la base de datos")
                     return False
                     
         except Exception as e:
-            _logger.error(f"Error al detectar tipo de identificación: {e}")
+            self._logger.error(f"Error al detectar tipo de identificación: {e}")
             return False
 
     def _update_partner_identification_type(self, partner_id, identification_type_id):
@@ -116,14 +115,14 @@ class WebsiteSaleCheckout(WebsiteSale):
             if partner.exists():
                 # Actualizar el campo directamente
                 partner.write({'l10n_latam_identification_type_id': identification_type_id})
-                _logger.info(f"✅ Campo l10n_latam_identification_type_id actualizado para partner {partner_id}: {identification_type_id}")
+                self._logger.info(f"✅ Campo l10n_latam_identification_type_id actualizado para partner {partner_id}: {identification_type_id}")
                 return True
             else:
-                _logger.warning(f"❌ Partner {partner_id} no encontrado")
+                self._logger.warning(f"❌ Partner {partner_id} no encontrado")
                 return False
                 
         except Exception as e:
-            _logger.error(f"❌ Error al actualizar campo de identificación: {e}")
+            self._logger.error(f"❌ Error al actualizar campo de identificación: {e}")
             return False
 
     @http.route(['/shop/address'], type='http', auth="public", website=True, sitemap=False)
@@ -131,13 +130,12 @@ class WebsiteSaleCheckout(WebsiteSale):
         """
         Sobrescribimos para manejar los campos personalizados DNI, RUC y tipo de comprobante
         """
-        _logger = logging.getLogger(__name__)
-        _logger.info("=== ADDRESS ROUTE ===")
-        _logger.info(f"KW recibidos: {kw}")
+        self._logger.info("=== ADDRESS ROUTE ===")
+        self._logger.info(f"KW recibidos: {kw}")
         
         # Obtener todos los valores del formulario
         all_form_values = request.httprequest.form.to_dict()
-        _logger.info(f"Todos los valores del formulario: {all_form_values}")
+        self._logger.info(f"Todos los valores del formulario: {all_form_values}")
         
         # Obtener valores específicos
         dni = all_form_values.get('dni', '').strip()
@@ -147,28 +145,28 @@ class WebsiteSaleCheckout(WebsiteSale):
         invoice_type_hidden = all_form_values.get('invoice_type', 'boleta')
         shipping_option = all_form_values.get('shipping_option', 'pickup')
         
-        _logger.info(f"DNI extraído: '{dni}'")
-        _logger.info(f"RUC extraído: '{ruc}'")
-        _logger.info(f"Razón Social extraída: '{razon_social}'")
-        _logger.info(f"Checkbox factura: '{invoice_type_checkbox}'")
-        _logger.info(f"Tipo oculto: '{invoice_type_hidden}'")
-        _logger.info(f"Opción de envío: '{shipping_option}'")
+        self._logger.info(f"DNI extraído: '{dni}'")
+        self._logger.info(f"RUC extraído: '{ruc}'")
+        self._logger.info(f"Razón Social extraída: '{razon_social}'")
+        self._logger.info(f"Checkbox factura: '{invoice_type_checkbox}'")
+        self._logger.info(f"Tipo oculto: '{invoice_type_hidden}'")
+        self._logger.info(f"Opción de envío: '{shipping_option}'")
         
         # Determinar si se solicita factura
         is_invoice_requested = invoice_type_checkbox == '1'
         
         if is_invoice_requested:
-            _logger.info("=== MODO FACTURA ===")
+            self._logger.info("=== MODO FACTURA ===")
             if not ruc:
-                _logger.warning("Se solicita factura pero no hay RUC")
+                self._logger.warning("Se solicita factura pero no hay RUC")
                 # Aquí podrías mostrar un error al usuario
             if not razon_social:
-                _logger.warning("Se solicita factura pero no hay razón social")
+                self._logger.warning("Se solicita factura pero no hay razón social")
                 # Aquí podrías mostrar un error al usuario
         else:
-            _logger.info("=== MODO BOLETA ===")
+            self._logger.info("=== MODO BOLETA ===")
             if not dni:
-                _logger.warning("Se solicita boleta pero no hay DNI")
+                self._logger.warning("Se solicita boleta pero no hay DNI")
                 # Aquí podrías mostrar un error al usuario
         
         # Llamar al método original
@@ -178,11 +176,10 @@ class WebsiteSaleCheckout(WebsiteSale):
         """
         Guardar el formulario de checkout con detección automática del tipo de identificación
         """
-        _logger = logging.getLogger(__name__)
-        _logger.info("=== CHECKOUT FORM SAVE ===")
-        _logger.info(f"Mode: {mode}")
-        _logger.info(f"Checkout: {checkout}")
-        _logger.info(f"All values: {all_values}")
+        self._logger.info("=== CHECKOUT FORM SAVE ===")
+        self._logger.info(f"Mode: {mode}")
+        self._logger.info(f"Checkout: {checkout}")
+        self._logger.info(f"All values: {all_values}")
         
         # Obtener valores del formulario
         dni = all_values.get('dni', '').strip()
@@ -192,12 +189,12 @@ class WebsiteSaleCheckout(WebsiteSale):
         invoice_type = all_values.get('invoice_type', 'boleta')
         shipping_option = all_values.get('shipping_option', 'pickup')
         
-        _logger.info(f"DNI: {dni}")
-        _logger.info(f"RUC: {ruc}")
-        _logger.info(f"Razón Social: {razon_social}")
-        _logger.info(f"¿Solicita factura?: {is_invoice_requested}")
-        _logger.info(f"Tipo de comprobante: {invoice_type}")
-        _logger.info(f"Opción de envío: {shipping_option}")
+        self._logger.info(f"DNI: {dni}")
+        self._logger.info(f"RUC: {ruc}")
+        self._logger.info(f"Razón Social: {razon_social}")
+        self._logger.info(f"¿Solicita factura?: {is_invoice_requested}")
+        self._logger.info(f"Tipo de comprobante: {invoice_type}")
+        self._logger.info(f"Opción de envío: {shipping_option}")
         
         # Determinar qué número usar y detectar tipo automáticamente
         identification_type_id = None
@@ -205,18 +202,18 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Modo factura: usar RUC
             checkout['vat'] = ruc
             identification_type_id = self._detect_identification_type_id(ruc)
-            _logger.info(f"Modo factura: RUC {ruc} detectado como ID: {identification_type_id}")
+            self._logger.info(f"Modo factura: RUC {ruc} detectado como ID: {identification_type_id}")
             
             # Si es empresa, usar razón social
             if razon_social:
                 checkout['name'] = razon_social
                 checkout['is_company'] = True
-                _logger.info(f"Empresa: {razon_social}")
+                self._logger.info(f"Empresa: {razon_social}")
         else:
             # Modo boleta: usar DNI
             checkout['vat'] = dni
             identification_type_id = self._detect_identification_type_id(dni)
-            _logger.info(f"Modo boleta: DNI {dni} detectado como ID: {identification_type_id}")
+            self._logger.info(f"Modo boleta: DNI {dni} detectado como ID: {identification_type_id}")
             
             # Si no es empresa, usar nombre personal
             checkout['is_company'] = False
@@ -224,48 +221,48 @@ class WebsiteSaleCheckout(WebsiteSale):
         # Asegurar que el nombre esté presente
         if 'name' not in checkout or not checkout['name']:
             checkout['name'] = all_values.get('name', 'Sin nombre')
-            _logger.info(f"Nombre asignado por defecto: {checkout['name']}")
+            self._logger.info(f"Nombre asignado por defecto: {checkout['name']}")
         
         # Asegurar que el email esté presente
         if 'email' not in checkout or not checkout['email']:
             checkout['email'] = all_values.get('email', '')
-            _logger.info(f"Email asignado: {checkout['email']}")
+            self._logger.info(f"Email asignado: {checkout['email']}")
         
         # Asegurar que el teléfono esté presente
         if 'phone' not in checkout or not checkout['phone']:
             checkout['phone'] = all_values.get('phone', '')
-            _logger.info(f"Teléfono asignado: {checkout['phone']}")
+            self._logger.info(f"Teléfono asignado: {checkout['phone']}")
         
         # Manejar campos de dirección según la opción de envío
         if shipping_option == 'delivery':
             # Envío a domicilio: campos de dirección son requeridos
             if 'street' not in checkout or not checkout['street']:
                 checkout['street'] = all_values.get('street', '')
-                _logger.info(f"Dirección asignada: {checkout['street']}")
+                self._logger.info(f"Dirección asignada: {checkout['street']}")
             
             if 'city' not in checkout or not checkout['city']:
                 checkout['city'] = all_values.get('city', '')
-                _logger.info(f"Ciudad asignada: {checkout['city']}")
+                self._logger.info(f"Ciudad asignada: {checkout['city']}")
             
             if 'country_id' not in checkout or not checkout['country_id']:
                 country_id = all_values.get('country_id', '')
                 if country_id and country_id.isdigit():
                     checkout['country_id'] = int(country_id)
-                    _logger.info(f"País asignado: {checkout['country_id']}")
+                    self._logger.info(f"País asignado: {checkout['country_id']}")
                 else:
-                    _logger.warning(f"País inválido: {country_id}")
+                    self._logger.warning(f"País inválido: {country_id}")
         else:
             # Recojo en tienda: usar valores por defecto
             checkout['street'] = 'Sin dirección'
             checkout['city'] = 'Sin dirección'
             checkout['country_id'] = 173  # Perú
-            _logger.info("Modo recogo: usando dirección por defecto")
+            self._logger.info("Modo recogo: usando dirección por defecto")
         
         # Filtrar solo campos válidos de res.partner (EXCLUIR l10n_latam_identification_type_id)
         valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'is_company']
         filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields and v is not None and v != ''}
         
-        _logger.info(f"Checkout filtrado: {filtered_checkout}")
+        self._logger.info(f"Checkout filtrado: {filtered_checkout}")
         
         # Crear o actualizar el partner
         Partner = request.env['res.partner'].sudo()
@@ -274,20 +271,20 @@ class WebsiteSaleCheckout(WebsiteSale):
             partner_id = int(mode[1])
             partner = Partner.browse(partner_id)
             partner.write(filtered_checkout)
-            _logger.info(f"Partner actualizado: {partner_id}")
+            self._logger.info(f"Partner actualizado: {partner_id}")
         else:
             partner_id = Partner.create(filtered_checkout).id
-            _logger.info(f"Partner creado: {partner_id}")
+            self._logger.info(f"Partner creado: {partner_id}")
         
         # ACTUALIZAR EL CAMPO DE IDENTIFICACIÓN DESPUÉS DE CREAR/ACTUALIZAR
         if identification_type_id:
             success = self._update_partner_identification_type(partner_id, identification_type_id)
             if success:
-                _logger.info(f"✅ Campo de identificación actualizado exitosamente para partner {partner_id}")
+                self._logger.info(f"✅ Campo de identificación actualizado exitosamente para partner {partner_id}")
             else:
-                _logger.error(f"❌ No se pudo actualizar el campo de identificación para partner {partner_id}")
+                self._logger.error(f"❌ No se pudo actualizar el campo de identificación para partner {partner_id}")
         else:
-            _logger.warning("⚠️ No se detectó tipo de identificación, no se actualizará el campo")
+            self._logger.warning("⚠️ No se detectó tipo de identificación, no se actualizará el campo")
         
         return partner_id
 
@@ -295,11 +292,10 @@ class WebsiteSaleCheckout(WebsiteSale):
         """
         Preprocesar valores antes de guardar
         """
-        _logger = logging.getLogger(__name__)
-        _logger.info("=== VALUES PREPROCESS ===")
-        _logger.info(f"Order: {order}")
-        _logger.info(f"Mode: {mode}")
-        _logger.info(f"KW: {kw}")
+        self._logger.info("=== VALUES PREPROCESS ===")
+        self._logger.info(f"Order: {order}")
+        self._logger.info(f"Mode: {mode}")
+        self._logger.info(f"KW: {kw}")
         
         # Obtener valores del formulario
         dni = kw.get('dni', '').strip()
@@ -316,16 +312,16 @@ class WebsiteSaleCheckout(WebsiteSale):
             identification_type_id = self._detect_identification_type_id(ruc)
             if identification_type_id:
                 new_values['l10n_latam_identification_type_id'] = identification_type_id
-            _logger.info(f"Modo factura: RUC {ruc} detectado como ID: {identification_type_id}")
+            self._logger.info(f"Modo factura: RUC {ruc} detectado como ID: {identification_type_id}")
         else:
             # Modo boleta: usar DNI
             new_values['vat'] = dni
             identification_type_id = self._detect_identification_type_id(dni)
             if identification_type_id:
                 new_values['l10n_latam_identification_type_id'] = identification_type_id
-            _logger.info(f"Modo boleta: DNI {dni} detectado como ID: {identification_type_id}")
+            self._logger.info(f"Modo boleta: DNI {dni} detectado como ID: {identification_type_id}")
         
-        _logger.info(f"Nuevos valores: {new_values}")
+        self._logger.info(f"Nuevos valores: {new_values}")
         return new_values
 
     def checkout_form_validate(self, mode, all_form_values, data_values):
