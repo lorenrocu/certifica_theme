@@ -194,20 +194,69 @@ class WebsiteSaleCheckout(WebsiteSale):
             
             self._logger.info(f"KW actualizados: {kw}")
         
-        # Llamar al método original con los datos procesados
-        try:
+        # IMPLEMENTACIÓN PERSONALIZADA PARA EVITAR POSTPROCESAMIENTO DE WEBSITE_SALE
+        if request.httprequest.method == 'POST':
+            try:
+                # Obtener la orden actual
+                order = request.website.sale_get_order()
+                if not order:
+                    self._logger.error("No se encontró orden activa")
+                    return request.redirect('/shop')
+                
+                # Determinar el modo (new/edit)
+                partner_id = kw.get('partner_id')
+                if partner_id and partner_id.isdigit():
+                    mode = ('edit', int(partner_id))
+                else:
+                    mode = ('new', 'billing')
+                
+                # Preprocesar valores
+                data_values = self.values_preprocess(order, mode, kw)
+                
+                # Validar formulario
+                error, error_message = self.checkout_form_validate(mode, all_form_values, data_values)
+                
+                if error:
+                    self._logger.warning(f"Errores de validación: {error}")
+                    # Retornar formulario con errores
+                    return request.render('website_sale.address', {
+                        'website_sale_order': order,
+                        'partner': order.partner_id,
+                        'mode': mode,
+                        'checkout': all_form_values,
+                        'error': error,
+                        'error_message': error_message
+                    })
+                
+                # Guardar datos del formulario
+                partner_id = self._checkout_form_save(mode, all_form_values, data_values)
+                
+                # Actualizar la orden con el nuevo partner
+                if partner_id:
+                    order.partner_id = partner_id
+                    order.partner_invoice_id = partner_id
+                    order.partner_shipping_id = partner_id
+                    self._logger.info(f"Orden actualizada con partner: {partner_id}")
+                
+                self._logger.info("=== FORMULARIO PROCESADO EXITOSAMENTE ===")
+                
+                # REDIRECCIÓN TEMPORALMENTE DESHABILITADA PARA DEBUGGING
+                # return request.redirect('/shop/payment')
+                
+                # Retornar a la página de address para verificar que los datos se guardaron
+                return request.redirect('/shop/address')
+                
+            except Exception as e:
+                self._logger.error(f"Error en procesamiento personalizado: {str(e)}")
+                # Fallback al método original
+                result = super().address(**kw)
+                self._logger.info("Método super().address() ejecutado como fallback")
+                return result
+        else:
+            # Para GET requests, usar el método original
             result = super().address(**kw)
-            self._logger.info("Método super().address() ejecutado exitosamente")
-            
-            # Si es un POST exitoso, forzar redirección a payment
-            if request.httprequest.method == 'POST' and (all_form_values.get('submitted') or len(all_form_values) > 1):
-                self._logger.info("=== FORZANDO REDIRECCIÓN A PAYMENT ===")
-                return request.redirect('/shop/payment')
-            
+            self._logger.info("Método super().address() ejecutado para GET")
             return result
-        except Exception as e:
-            self._logger.error(f"Error en super().address(): {str(e)}")
-            raise
 
     def _checkout_form_save(self, mode, checkout, all_values):
         """
