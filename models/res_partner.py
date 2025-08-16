@@ -74,49 +74,8 @@ class ResPartner(models.Model):
     @api.model
     def create(self, vals):
         """
-        Al crear, detectar automáticamente el tipo de identificación
+        Al crear un partner, mapear DNI o RUC al campo VAT y detectar tipo automáticamente
         """
-        if 'vat' in vals and vals['vat']:
-            # Detectar tipo de identificación
-            identification_type = self._get_identification_type_from_vat(vals['vat'])
-            if identification_type:
-                vals['identification_type'] = identification_type
-        
-        return super().create(vals)
-
-    def write(self, vals):
-        """
-        Al escribir, detectar automáticamente el tipo de identificación
-        """
-        if 'vat' in vals and vals['vat']:
-            # Detectar tipo de identificación
-            identification_type = self._get_identification_type_from_vat(vals['vat'])
-            if identification_type:
-                vals['identification_type'] = identification_type
-        
-        return super().write(vals)
-
-    def get_identification_type_display(self):
-        """
-        Obtener el tipo de identificación para mostrar en la interfaz
-        """
-        type_mapping = {
-            'dni': 'DNI',
-            'ruc': 'RUC',
-            'vat': 'VAT',
-            'passport': 'Pasaporte',
-            'foreign_id': 'Cédula Extranjera',
-            'diplomatic': 'Carné Diplomático',
-            'non_domiciled': 'Documento de No Domiciliado',
-        }
-        return type_mapping.get(self.identification_type, 'VAT')
-
-    @api.model
-    def create(self, vals):
-        """
-        Al crear un partner, mapear DNI o RUC al campo VAT
-        """
-        
         _logger = logging.getLogger(__name__)
         _logger.info("=== CREATE PARTNER ===")
         _logger.info(f"Valores recibidos: {vals}")
@@ -154,6 +113,13 @@ class ResPartner(models.Model):
                 vals['vat'] = ruc
                 _logger.info(f"RUC mapeado a VAT: {vals['vat']}")
         
+        # Detectar tipo de identificación automáticamente si hay VAT
+        if 'vat' in vals and vals['vat']:
+            identification_type = self._get_identification_type_from_vat(vals['vat'])
+            if identification_type:
+                vals['identification_type'] = identification_type
+                _logger.info(f"Tipo de identificación detectado: {identification_type}")
+        
         _logger.info(f"Valores finales antes de crear: {vals}")
         
         # Llamar al método create del modelo padre
@@ -161,7 +127,7 @@ class ResPartner(models.Model):
 
     def write(self, vals):
         """
-        Al escribir, mapear DNI o RUC al campo VAT
+        Al escribir, mapear DNI o RUC al campo VAT y detectar tipo automáticamente
         """
         _logger = logging.getLogger(__name__)
         _logger.info("=== WRITE PARTNER ===")
@@ -202,7 +168,29 @@ class ResPartner(models.Model):
                 vals['vat'] = ruc
                 _logger.info(f"RUC mapeado a VAT: {vals['vat']}")
         
+        # Detectar tipo de identificación automáticamente si hay VAT
+        if 'vat' in vals and vals['vat']:
+            identification_type = self._get_identification_type_from_vat(vals['vat'])
+            if identification_type:
+                vals['identification_type'] = identification_type
+                _logger.info(f"Tipo de identificación detectado: {identification_type}")
+        
         _logger.info(f"Valores finales antes de escribir: {vals}")
         
         # Llamar al método write del modelo padre
         return super().write(vals)
+
+    def get_identification_type_display(self):
+        """
+        Obtener el tipo de identificación para mostrar en la interfaz
+        """
+        type_mapping = {
+            'dni': 'DNI',
+            'ruc': 'RUC',
+            'vat': 'VAT',
+            'passport': 'Pasaporte',
+            'foreign_id': 'Cédula Extranjera',
+            'diplomatic': 'Carné Diplomático',
+            'non_domiciled': 'Documento de No Domiciliado',
+        }
+        return type_mapping.get(self.identification_type, 'VAT')

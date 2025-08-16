@@ -141,11 +141,8 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Si no es empresa, usar nombre personal
             checkout['is_company'] = False
         
-        # Agregar el tipo de comprobante
-        checkout['invoice_type'] = invoice_type
-        
         # Filtrar solo campos válidos de res.partner
-        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'identification_type', 'is_company', 'invoice_type']
+        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'identification_type', 'is_company']
         filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields}
         
         _logger.info(f"Checkout filtrado: {filtered_checkout}")
