@@ -7,6 +7,7 @@
     'website': 'https://helydev.com',
     'depends': ['website', 'website_sale'],
     'data': [
+        'data/ir_config_parameter.xml',  # Configuración para deshabilitar validación VAT
         'views/assets.xml',
         'views/layout.xml',
         'views/shop_layout.xml',

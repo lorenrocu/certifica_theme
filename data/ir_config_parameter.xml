@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Deshabilitar validación de VAT para permitir DNI y RUC peruanos -->
+        <record id="disable_vat_validation" model="ir.config_parameter">
+            <field name="key">base_vat.disable_validation</field>
+            <field name="value">True</field>
+        </record>
+        
+        <!-- Configurar formato de VAT flexible para Perú -->
+        <record id="flexible_vat_format" model="ir.config_parameter">
+            <field name="key">base_vat.flexible_format</field>
+            <field name="value">True</field>
+        </record>
+    </data>
+</odoo>
