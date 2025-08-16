@@ -70,7 +70,7 @@
                                                    placeholder="12345678"
                                                    pattern="[0-9]{8}"
                                                    maxlength="8"
-                                                   t-att-value="partner and partner.dni or ''"/>
+                                                   t-att-value="partner and partner.vat or ''"/>
                                         </div>
                                         <small class="form-text text-muted">DNI de 8 dígitos</small>
                                     </div>
@@ -182,7 +182,7 @@
                                                    pattern="[0-9]{11}"
                                                    maxlength="11"
                                                    required="false"
-                                                   t-att-value="partner and (partner.ruc or partner.ruc_custom) or ''"/>
+                                                   t-att-value="partner and partner.vat or ''"/>
                                         </div>
                                         <small class="form-text text-muted">RUC de 11 dígitos</small>
                                     </div>
