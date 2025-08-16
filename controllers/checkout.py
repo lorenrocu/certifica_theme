@@ -181,7 +181,7 @@ class WebsiteSaleCheckout(WebsiteSale):
                 _logger.info(f"DNI guardado: {getattr(created_partner, 'dni', None) or 'No especificado'}")
                 _logger.info(f"RUC guardado: {getattr(created_partner, 'ruc', None) or 'No especificado'}")
                 _logger.info(f"VAT guardado: {getattr(created_partner, 'vat', None) or 'No especificado'}")
-                _logger.info(f"Tipo de comprobante: {getattr(created_partner, 'invoice_type', None) or 'No especificado'}")
+                # _logger.info(f"Tipo de comprobante: {getattr(created_partner, 'invoice_type', None) or 'No especificado'}")
                 _logger.info(f"Nombre guardado: {getattr(created_partner, 'name', None) or 'No especificado'}")
                 _logger.info(f"Email guardado: {getattr(created_partner, 'email', None) or 'No especificado'}")
             except Exception as e:
@@ -247,10 +247,12 @@ class WebsiteSaleCheckout(WebsiteSale):
         
         # Mapear el tipo de comprobante al campo correcto del modelo
         if is_invoice_requested:
-            new_values['invoice_type'] = 'factura'
-        else:
-            new_values['invoice_type'] = 'boleta'
-        _logger.info(f"Tipo de comprobante asignado: {new_values['invoice_type']}")
+            # new_values['invoice_type'] = 'factura'
+        pass
+    else:
+        # new_values['invoice_type'] = 'boleta'
+        pass
+    # _logger.info(f"Tipo de comprobante asignado: {new_values['invoice_type']}")
         
         # Agregar campos personalizados - mapear a los campos del modelo res_partner
         _logger.info(f"Procesando campos personalizados...")
