@@ -16,38 +16,63 @@ class WebsiteSaleCheckout(WebsiteSale):
     def _detect_identification_type(self, vat_number):
         """
         Detectar automáticamente el tipo de identificación basándose en el número
+        usando el sistema nativo de l10n_latam_base
         """
         if not vat_number:
-            return 'vat'
+            return False
         
         vat_clean = str(vat_number).strip()
         _logger = logging.getLogger(__name__)
         _logger.info(f"=== DETECTANDO TIPO DE IDENTIFICACIÓN PARA: {vat_clean} ===")
         
-        # Detectar DNI (8 dígitos)
-        if len(vat_clean) == 8 and vat_clean.isdigit():
-            _logger.info(f"DNI detectado: {vat_clean}")
-            return 'dni'
-        
-        # Detectar RUC (11 dígitos)
-        elif len(vat_clean) == 11 and vat_clean.isdigit():
-            _logger.info(f"RUC detectado: {vat_clean}")
-            return 'ruc'
-        
-        # Detectar VAT con prefijos peruanos (10 dígitos)
-        elif len(vat_clean) == 10 and vat_clean.startswith(('10', '20', '15', '16', '17')):
-            _logger.info(f"RUC con prefijo detectado: {vat_clean}")
-            return 'ruc'
-        
-        # Detectar DNI con prefijo 10 (10 dígitos)
-        elif len(vat_clean) == 10 and vat_clean.startswith('10'):
-            _logger.info(f"DNI con prefijo 10 detectado: {vat_clean}")
-            return 'dni'
-        
-        # Otros casos
-        else:
-            _logger.info(f"VAT genérico detectado: {vat_clean}")
-            return 'vat'
+        try:
+            # Buscar tipos de identificación disponibles
+            identification_types = request.env['l10n_latam.identification.type'].sudo().search([
+                ('active', '=', True)
+            ])
+            
+            _logger.info(f"Tipos de identificación disponibles: {identification_types.mapped('name')}")
+            
+            # Detectar DNI (8 dígitos)
+            if len(vat_clean) == 8 and vat_clean.isdigit():
+                dni_type = identification_types.filtered(lambda x: x.name.lower() == 'dni')
+                if dni_type:
+                    _logger.info(f"DNI detectado: {vat_clean} -> {dni_type[0].name}")
+                    return dni_type[0]
+            
+            # Detectar RUC (11 dígitos)
+            elif len(vat_clean) == 11 and vat_clean.isdigit():
+                ruc_type = identification_types.filtered(lambda x: x.name.lower() == 'ruc')
+                if ruc_type:
+                    _logger.info(f"RUC detectado: {vat_clean} -> {ruc_type[0].name}")
+                    return ruc_type[0]
+            
+            # Detectar VAT con prefijos peruanos (10 dígitos)
+            elif len(vat_clean) == 10 and vat_clean.startswith(('10', '20', '15', '16', '17')):
+                ruc_type = identification_types.filtered(lambda x: x.name.lower() == 'ruc')
+                if ruc_type:
+                    _logger.info(f"RUC con prefijo detectado: {vat_clean} -> {ruc_type[0].name}")
+                    return ruc_type[0]
+            
+            # Detectar DNI con prefijo 10 (10 dígitos)
+            elif len(vat_clean) == 10 and vat_clean.startswith('10'):
+                dni_type = identification_types.filtered(lambda x: x.name.lower() == 'dni')
+                if dni_type:
+                    _logger.info(f"DNI con prefijo 10 detectado: {vat_clean} -> {dni_type[0].name}")
+                    return dni_type[0]
+            
+            # Buscar tipo de identificación fiscal por defecto
+            default_type = identification_types.filtered(lambda x: x.is_vat)
+            if default_type:
+                _logger.info(f"Usando tipo de identificación fiscal por defecto: {default_type[0].name}")
+                return default_type[0]
+            
+            _logger.info("No se pudo determinar el tipo de identificación")
+            return False
+            
+        except Exception as e:
+            _logger.error(f"Error al buscar tipos de identificación: {e}")
+            return False
 
     @http.route(['/shop/address'], type='http', auth="public", website=True, sitemap=False)
     def address(self, **kw):
@@ -123,8 +148,9 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Modo factura: usar RUC
             checkout['vat'] = ruc
             identification_type = self._detect_identification_type(ruc)
-            checkout['identification_type'] = identification_type
-            _logger.info(f"Modo factura: RUC {ruc} detectado como {identification_type}")
+            if identification_type:
+                checkout['l10n_latam_identification_type_id'] = identification_type.id
+            _logger.info(f"Modo factura: RUC {ruc} detectado como {identification_type.name if identification_type else 'No detectado'}")
             
             # Si es empresa, usar razón social
             if razon_social:
@@ -135,8 +161,9 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Modo boleta: usar DNI
             checkout['vat'] = dni
             identification_type = self._detect_identification_type(dni)
-            checkout['identification_type'] = identification_type
-            _logger.info(f"Modo boleta: DNI {dni} detectado como {identification_type}")
+            if identification_type:
+                checkout['l10n_latam_identification_type_id'] = identification_type.id
+            _logger.info(f"Modo boleta: DNI {dni} detectado como {identification_type.name if identification_type else 'No detectado'}")
             
             # Si no es empresa, usar nombre personal
             checkout['is_company'] = False
@@ -145,7 +172,7 @@ class WebsiteSaleCheckout(WebsiteSale):
         checkout['invoice_type'] = invoice_type
         
         # Filtrar solo campos válidos de res.partner
-        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'identification_type', 'is_company', 'invoice_type']
+        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'l10n_latam_identification_type_id', 'is_company', 'invoice_type']
         filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields}
         
         _logger.info(f"Checkout filtrado: {filtered_checkout}")
@@ -186,13 +213,17 @@ class WebsiteSaleCheckout(WebsiteSale):
         if is_invoice_requested and ruc:
             # Modo factura: usar RUC
             new_values['vat'] = ruc
-            new_values['identification_type'] = self._detect_identification_type(ruc)
-            _logger.info(f"Modo factura: RUC {ruc} detectado como {new_values['identification_type']}")
+            identification_type = self._detect_identification_type(ruc)
+            if identification_type:
+                new_values['l10n_latam_identification_type_id'] = identification_type.id
+            _logger.info(f"Modo factura: RUC {ruc} detectado como {identification_type.name if identification_type else 'No detectado'}")
         else:
             # Modo boleta: usar DNI
             new_values['vat'] = dni
-            new_values['identification_type'] = self._detect_identification_type(dni)
-            _logger.info(f"Modo boleta: DNI {dni} detectado como {new_values['identification_type']}")
+            identification_type = self._detect_identification_type(dni)
+            if identification_type:
+                new_values['l10n_latam_identification_type_id'] = identification_type.id
+            _logger.info(f"Modo boleta: DNI {dni} detectado como {identification_type.name if identification_type else 'No detectado'}")
         
         _logger.info(f"Nuevos valores: {new_values}")
         return new_values
