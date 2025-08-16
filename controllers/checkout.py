@@ -129,22 +129,18 @@ class WebsiteSaleCheckout(WebsiteSale):
             if is_invoice_requested and ruc:
                 # Para factura, usar RUC en VAT
                 checkout['vat'] = ruc
-                checkout['ruc'] = ruc
                 _logger.info(f"RUC mapeado a VAT: {ruc}")
             elif not is_invoice_requested and dni:
                 # Para boleta, usar DNI en VAT
                 checkout['vat'] = dni
-                checkout['dni'] = dni
                 _logger.info(f"DNI mapeado a VAT: {dni}")
             elif ruc:
                 # Si hay RUC pero no se especificó tipo, usarlo como VAT
                 checkout['vat'] = ruc
-                checkout['ruc'] = ruc
                 _logger.info(f"RUC mapeado a VAT (tipo no especificado): {ruc}")
             elif dni:
                 # Si hay DNI pero no se especificó tipo, usarlo como VAT
                 checkout['vat'] = dni
-                checkout['dni'] = dni
                 _logger.info(f"DNI mapeado a VAT (tipo no especificado): {dni}")
 
             # Mapear razón social al name cuando es factura
@@ -152,9 +148,8 @@ class WebsiteSaleCheckout(WebsiteSale):
                 checkout['name'] = razon_social
                 _logger.info(f"Razón social asignada como nombre: {razon_social}")
 
-            # Solo incluir campos que existen en el modelo res.partner
-            # Remover campos que no existen para evitar errores
-            valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'dni', 'ruc']
+            # Solo incluir campos que existen en el modelo res.partner estándar
+            valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat']
             filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields}
             
             _logger.info(f"Datos filtrados para guardar: {filtered_checkout}")
@@ -191,8 +186,6 @@ class WebsiteSaleCheckout(WebsiteSale):
             try:
                 created_partner = Partner.sudo().browse(partner_id)
                 _logger.info(f"Partner creado con ID: {partner_id}")
-                _logger.info(f"DNI guardado: {getattr(created_partner, 'dni', None) or 'No especificado'}")
-                _logger.info(f"RUC guardado: {getattr(created_partner, 'ruc', None) or 'No especificado'}")
                 _logger.info(f"VAT guardado: {getattr(created_partner, 'vat', None) or 'No especificado'}")
                 _logger.info(f"Nombre guardado: {getattr(created_partner, 'name', None) or 'No especificado'}")
                 _logger.info(f"Email guardado: {getattr(created_partner, 'email', None) or 'No especificado'}")
@@ -257,25 +250,6 @@ class WebsiteSaleCheckout(WebsiteSale):
         _logger.info(f"invoice_type_checkbox: {values.get('invoice_type_checkbox')}")
         _logger.info(f"invoice_type: {values.get('invoice_type')}")
         
-        # Agregar campos personalizados - mapear a los campos del modelo res_partner
-        _logger.info(f"Procesando campos personalizados...")
-        _logger.info(f"DNI en values: {values.get('dni')}")
-        _logger.info(f"RUC en values: {values.get('ruc')}")
-        
-        # Procesar DNI si está presente
-        if 'dni' in values and values['dni']:
-            new_values['dni'] = values['dni'].strip()
-            _logger.info(f"DNI procesado: {new_values['dni']}")
-        else:
-            _logger.info("DNI no encontrado o vacío")
-            
-        # Procesar RUC si está presente (independientemente del tipo de comprobante)
-        if 'ruc' in values and values['ruc']:
-            new_values['ruc'] = values['ruc'].strip()
-            _logger.info(f"RUC procesado: {new_values['ruc']}")
-        else:
-            _logger.info("RUC no encontrado o vacío")
-            
         # Mapear documentos al campo VAT según el tipo de comprobante
         if is_invoice_requested and values.get('ruc'):
             # Para factura, usar RUC en VAT
