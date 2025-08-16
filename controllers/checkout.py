@@ -130,12 +130,15 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Establecer tipo de comprobante - TEMPORALMENTE COMENTADO PARA EVITAR ERROR
             # checkout['invoice_type'] = 'factura' if is_invoice_requested else 'boleta'
 
-            # Inyectar documentos si vienen del formulario - TEMPORALMENTE COMENTADO
-            # if ruc:
-            #     checkout['ruc'] = ruc
-            # if dni and 'ruc' not in checkout:
-            #     # Solo setear DNI si no hay RUC (prioridad RUC)
-            #     checkout['dni'] = dni
+            # Mapear documentos directamente al campo VAT estándar de Odoo
+            if ruc:
+                checkout['vat'] = ruc
+                _logger.info(f"RUC mapeado a VAT: {ruc}")
+            elif dni:
+                checkout['vat'] = dni
+                _logger.info(f"DNI mapeado a VAT: {dni}")
+            else:
+                _logger.info("No se encontró RUC ni DNI para mapear a VAT")
 
             # Mapear razón social al name cuando es factura
             if is_invoice_requested and razon_social:
