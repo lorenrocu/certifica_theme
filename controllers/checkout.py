@@ -131,6 +131,7 @@ class WebsiteSaleCheckout(WebsiteSale):
         Sobrescribimos para manejar los campos personalizados DNI, RUC y tipo de comprobante
         """
         self._logger.info("=== ADDRESS ROUTE ===")
+        self._logger.info(f"Method: {request.httprequest.method}")
         self._logger.info(f"KW recibidos: {kw}")
         
         # Obtener todos los valores del formulario
@@ -138,7 +139,7 @@ class WebsiteSaleCheckout(WebsiteSale):
         self._logger.info(f"Todos los valores del formulario: {all_form_values}")
         
         # Verificar si es un envío de formulario (POST con datos)
-        if request.httprequest.method == 'POST' and all_form_values.get('submitted'):
+        if request.httprequest.method == 'POST' and (all_form_values.get('submitted') or len(all_form_values) > 1):
             self._logger.info("=== PROCESANDO ENVÍO DE FORMULARIO ===")
             
             # Obtener valores específicos
@@ -162,16 +163,21 @@ class WebsiteSaleCheckout(WebsiteSale):
                 self._logger.info("=== MODO FACTURA ===")
                 if ruc:
                     kw['vat'] = ruc
+                    all_form_values['vat'] = ruc
                     self._logger.info(f"VAT establecido a RUC: {ruc}")
                 if razon_social:
                     kw['name'] = razon_social
+                    all_form_values['name'] = razon_social
                     kw['is_company'] = True
+                    all_form_values['is_company'] = True
                     self._logger.info(f"Nombre establecido a razón social: {razon_social}")
             else:
                 self._logger.info("=== MODO BOLETA ===")
                 if dni:
                     kw['vat'] = dni
+                    all_form_values['vat'] = dni
                     kw['is_company'] = False
+                    all_form_values['is_company'] = False
                     self._logger.info(f"VAT establecido a DNI: {dni}")
             
             # Agregar campos personalizados a kw para que estén disponibles en el procesamiento
@@ -181,10 +187,21 @@ class WebsiteSaleCheckout(WebsiteSale):
             kw['invoice_type_checkbox'] = invoice_type_checkbox
             kw['shipping_option'] = shipping_option
             
+            # Asegurar que los campos básicos estén presentes
+            for field in ['name', 'email', 'phone']:
+                if field in all_form_values and all_form_values[field]:
+                    kw[field] = all_form_values[field]
+            
             self._logger.info(f"KW actualizados: {kw}")
         
         # Llamar al método original con los datos procesados
-        return super().address(**kw)
+        try:
+            result = super().address(**kw)
+            self._logger.info("Método super().address() ejecutado exitosamente")
+            return result
+        except Exception as e:
+            self._logger.error(f"Error en super().address(): {str(e)}")
+            raise
 
     def _checkout_form_save(self, mode, checkout, all_values):
         """
@@ -345,14 +362,15 @@ class WebsiteSaleCheckout(WebsiteSale):
         self._logger.info("=== CHECKOUT FORM VALIDATE ===")
         self._logger.info(f"Mode: {mode}")
         self._logger.info(f"All form values: {all_form_values}")
+        self._logger.info(f"Data values: {data_values}")
         
         shipping_option = all_form_values.get('shipping_option', 'pickup')
         
-        if shipping_option == 'pickup':
-            # Solo valida lo necesario para pickup, ignora dirección
-            error = {}
-            error_message = []
-            
+        # Inicializar errores
+        error = {}
+        error_message = []
+        
+        try:
             # Validaciones personalizadas (DNI, RUC, razón social)
             invoice_type_checkbox = all_form_values.get('invoice_type_checkbox')
             dni = all_form_values.get('dni', '').strip()
@@ -383,31 +401,44 @@ class WebsiteSaleCheckout(WebsiteSale):
                     error_message.append('DNI debe tener exactamente 8 dígitos')
                     self._logger.warning(f"Error: DNI inválido - {dni}")
             
-            # Validar campos básicos requeridos
-            name = all_form_values.get('name', '').strip()
-            email = all_form_values.get('email', '').strip()
-            phone = all_form_values.get('phone', '').strip()
-            
-            if not name:
-                error['name'] = 'missing'
-                error_message.append('Nombre es requerido')
-                self._logger.warning("Error: Nombre faltante")
-            
-            if not email:
-                error['email'] = 'missing'
-                error_message.append('Email es requerido')
-                self._logger.warning("Error: Email faltante")
-            
-            if not phone:
-                error['phone'] = 'missing'
-                error_message.append('Teléfono es requerido')
-                self._logger.warning("Error: Teléfono faltante")
+            # Validar campos básicos requeridos solo para pickup
+            if shipping_option == 'pickup':
+                name = all_form_values.get('name', '').strip()
+                email = all_form_values.get('email', '').strip()
+                phone = all_form_values.get('phone', '').strip()
+                
+                if not name:
+                    error['name'] = 'missing'
+                    error_message.append('Nombre es requerido')
+                    self._logger.warning("Error: Nombre faltante")
+                
+                if not email:
+                    error['email'] = 'missing'
+                    error_message.append('Email es requerido')
+                    self._logger.warning("Error: Email faltante")
+                
+                if not phone:
+                    error['phone'] = 'missing'
+                    error_message.append('Teléfono es requerido')
+                    self._logger.warning("Error: Teléfono faltante")
             
             self._logger.info(f"Errores encontrados: {error}")
             self._logger.info(f"Mensajes de error: {error_message}")
             
-            return error, error_message
-        
-        # Si no es pickup, sigue el flujo normal
-        self._logger.info("Usando validación estándar (no pickup)")
-        return super(WebsiteSaleCheckout, self).checkout_form_validate(mode, all_form_values, data_values)
+            # Si hay errores personalizados, retornarlos
+            if error:
+                return error, error_message
+            
+            # Si no hay errores personalizados y no es pickup, usar validación estándar
+            if shipping_option != 'pickup':
+                self._logger.info("Usando validación estándar (no pickup)")
+                return super(WebsiteSaleCheckout, self).checkout_form_validate(mode, all_form_values, data_values)
+            
+            # Si es pickup y no hay errores, retornar sin errores
+            self._logger.info("Validación exitosa para pickup")
+            return {}, []
+            
+        except Exception as e:
+            self._logger.error(f"Error en checkout_form_validate: {str(e)}")
+            # En caso de error, usar validación estándar como fallback
+            return super(WebsiteSaleCheckout, self).checkout_form_validate(mode, all_form_values, data_values)
