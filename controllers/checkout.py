@@ -116,7 +116,40 @@ class WebsiteSaleCheckout(WebsiteSale):
         
         _logger.info("=== CHECKOUT DEBUG - _checkout_form_save ===")
         _logger.info(f"Mode: {mode}")
-        _logger.info(f"Datos a guardar (checkout): {checkout}")
+        _logger.info(f"Datos a guardar (checkout) ANTES de merge: {checkout}")
+        
+        # --- Asegurar que los campos personalizados lleguen a create()/write() ---
+        # Algunos flujos de website_sale filtran llaves desconocidas en values_postprocess,
+        # por lo que integramos directamente desde all_values antes de persistir.
+        try:
+            dni = (all_values.get('dni') or '').strip()
+            ruc = (all_values.get('ruc') or '').strip()
+            razon_social = (all_values.get('razon_social') or '').strip()
+            is_invoice_requested = all_values.get('invoice_type_checkbox') == 'on' or all_values.get('invoice_type') == 'factura'
+
+            # Establecer tipo de comprobante
+            checkout['invoice_type'] = 'factura' if is_invoice_requested else 'boleta'
+
+            # Inyectar documentos si vienen del formulario
+            if ruc:
+                checkout['ruc'] = ruc
+            if dni and 'ruc' not in checkout:
+                # Solo setear DNI si no hay RUC (prioridad RUC)
+                checkout['dni'] = dni
+
+            # Mapear razón social al name cuando es factura
+            if is_invoice_requested and razon_social:
+                checkout['name'] = razon_social
+
+            # Calcular VAT explícitamente (prioridad RUC > DNI)
+            if checkout.get('ruc'):
+                checkout['vat'] = checkout['ruc']
+            elif checkout.get('dni'):
+                checkout['vat'] = checkout['dni']
+
+            _logger.info(f"Datos a guardar (checkout) DESPUÉS de merge: {checkout}")
+        except Exception as e:
+            _logger.warning(f"No se pudo consolidar campos personalizados en checkout: {e}")
         
         Partner = request.env['res.partner']
         if mode[0] == 'new':
