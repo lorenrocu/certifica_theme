@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista de formulario personalizada para res.partner -->
+        <record id="view_partner_form_custom" model="ir.ui.view">
+            <field name="name">res.partner.form.custom</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <!-- El campo l10n_latam_identification_type_id ya está incluido en la vista base
+                     solo necesitamos asegurarnos de que se muestre correctamente -->
+                
+                <!-- Modificar el campo VAT para que se actualice automáticamente el tipo -->
+                <xpath expr="//field[@name='vat']" position="attributes">
+                    <attribute name="on_change">1</attribute>
+                </xpath>
+                
+                <!-- Asegurar que el campo de tipo de identificación sea visible -->
+                <xpath expr="//field[@name='l10n_latam_identification_type_id']" position="attributes">
+                    <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
