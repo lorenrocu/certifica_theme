@@ -127,8 +127,8 @@ class WebsiteSaleCheckout(WebsiteSale):
             razon_social = (all_values.get('razon_social') or '').strip()
             is_invoice_requested = all_values.get('invoice_type_checkbox') == 'on' or all_values.get('invoice_type') == 'factura'
 
-            # Establecer tipo de comprobante
-            checkout['invoice_type'] = 'factura' if is_invoice_requested else 'boleta'
+            # Establecer tipo de comprobante - TEMPORALMENTE COMENTADO PARA EVITAR ERROR
+            # checkout['invoice_type'] = 'factura' if is_invoice_requested else 'boleta'
 
             # Inyectar documentos si vienen del formulario
             if ruc:
