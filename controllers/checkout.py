@@ -141,9 +141,39 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Si no es empresa, usar nombre personal
             checkout['is_company'] = False
         
+        # Asegurar que el nombre esté presente
+        if 'name' not in checkout or not checkout['name']:
+            checkout['name'] = all_values.get('name', 'Sin nombre')
+            _logger.info(f"Nombre asignado por defecto: {checkout['name']}")
+        
+        # Asegurar que el email esté presente
+        if 'email' not in checkout or not checkout['email']:
+            checkout['email'] = all_values.get('email', '')
+            _logger.info(f"Email asignado: {checkout['email']}")
+        
+        # Asegurar que el teléfono esté presente
+        if 'phone' not in checkout or not checkout['phone']:
+            checkout['phone'] = all_values.get('phone', '')
+            _logger.info(f"Teléfono asignado: {checkout['phone']}")
+        
+        # Asegurar que la dirección esté presente
+        if 'street' not in checkout or not checkout['street']:
+            checkout['street'] = all_values.get('street', '')
+            _logger.info(f"Dirección asignada: {checkout['street']}")
+        
+        # Asegurar que la ciudad esté presente
+        if 'city' not in checkout or not checkout['city']:
+            checkout['city'] = all_values.get('city', '')
+            _logger.info(f"Ciudad asignada: {checkout['city']}")
+        
+        # Asegurar que el país esté presente
+        if 'country_id' not in checkout or not checkout['country_id']:
+            checkout['country_id'] = all_values.get('country_id', '')
+            _logger.info(f"País asignado: {checkout['country_id']}")
+        
         # Filtrar solo campos válidos de res.partner
         valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'identification_type', 'is_company']
-        filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields}
+        filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields and v is not None and v != ''}
         
         _logger.info(f"Checkout filtrado: {filtered_checkout}")
         
