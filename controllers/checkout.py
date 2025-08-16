@@ -121,12 +121,14 @@ class WebsiteSaleCheckout(WebsiteSale):
         razon_social = all_form_values.get('razon_social', '').strip()
         invoice_type_checkbox = all_form_values.get('invoice_type_checkbox', '')
         invoice_type_hidden = all_form_values.get('invoice_type', 'boleta')
+        shipping_option = all_form_values.get('shipping_option', 'pickup')
         
         _logger.info(f"DNI extraído: '{dni}'")
         _logger.info(f"RUC extraído: '{ruc}'")
         _logger.info(f"Razón Social extraída: '{razon_social}'")
         _logger.info(f"Checkbox factura: '{invoice_type_checkbox}'")
         _logger.info(f"Tipo oculto: '{invoice_type_hidden}'")
+        _logger.info(f"Opción de envío: '{shipping_option}'")
         
         # Determinar si se solicita factura
         is_invoice_requested = invoice_type_checkbox == '1'
@@ -164,12 +166,14 @@ class WebsiteSaleCheckout(WebsiteSale):
         razon_social = all_values.get('razon_social', '').strip()
         is_invoice_requested = all_values.get('invoice_type_checkbox') == '1'
         invoice_type = all_values.get('invoice_type', 'boleta')
+        shipping_option = all_values.get('shipping_option', 'pickup')
         
         _logger.info(f"DNI: {dni}")
         _logger.info(f"RUC: {ruc}")
         _logger.info(f"Razón Social: {razon_social}")
         _logger.info(f"¿Solicita factura?: {is_invoice_requested}")
         _logger.info(f"Tipo de comprobante: {invoice_type}")
+        _logger.info(f"Opción de envío: {shipping_option}")
         
         # Determinar qué número usar y detectar tipo automáticamente
         if is_invoice_requested and ruc:
@@ -211,24 +215,30 @@ class WebsiteSaleCheckout(WebsiteSale):
             checkout['phone'] = all_values.get('phone', '')
             _logger.info(f"Teléfono asignado: {checkout['phone']}")
         
-        # Asegurar que la dirección esté presente
-        if 'street' not in checkout or not checkout['street']:
-            checkout['street'] = all_values.get('street', '')
-            _logger.info(f"Dirección asignada: {checkout['street']}")
-        
-        # Asegurar que la ciudad esté presente
-        if 'city' not in checkout or not checkout['city']:
-            checkout['city'] = all_values.get('city', '')
-            _logger.info(f"Ciudad asignada: {checkout['city']}")
-        
-        # Asegurar que el país esté presente y sea entero
-        if 'country_id' not in checkout or not checkout['country_id']:
-            country_id = all_values.get('country_id', '')
-            if country_id and country_id.isdigit():
-                checkout['country_id'] = int(country_id)
-                _logger.info(f"País asignado: {checkout['country_id']}")
-            else:
-                _logger.warning(f"País inválido: {country_id}")
+        # Manejar campos de dirección según la opción de envío
+        if shipping_option == 'delivery':
+            # Envío a domicilio: campos de dirección son requeridos
+            if 'street' not in checkout or not checkout['street']:
+                checkout['street'] = all_values.get('street', '')
+                _logger.info(f"Dirección asignada: {checkout['street']}")
+            
+            if 'city' not in checkout or not checkout['city']:
+                checkout['city'] = all_values.get('city', '')
+                _logger.info(f"Ciudad asignada: {checkout['city']}")
+            
+            if 'country_id' not in checkout or not checkout['country_id']:
+                country_id = all_values.get('country_id', '')
+                if country_id and country_id.isdigit():
+                    checkout['country_id'] = int(country_id)
+                    _logger.info(f"País asignado: {checkout['country_id']}")
+                else:
+                    _logger.warning(f"País inválido: {country_id}")
+        else:
+            # Recojo en tienda: usar valores por defecto
+            checkout['street'] = 'Sin dirección'
+            checkout['city'] = 'Sin dirección'
+            checkout['country_id'] = 173  # Perú
+            _logger.info("Modo recogo: usando dirección por defecto")
         
         # Filtrar solo campos válidos de res.partner
         valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'l10n_latam_identification_type_id', 'is_company']
