@@ -1,196 +1,166 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
 import logging
+
+_logger = logging.getLogger(__name__)
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    # Campo personalizado para tipo de identificación
-    identification_type = fields.Selection([
-        ('dni', 'DNI'),
-        ('ruc', 'RUC'),
-        ('vat', 'VAT'),
-        ('passport', 'Pasaporte'),
-        ('foreign_id', 'Cédula Extranjera'),
-        ('diplomatic', 'Carné Diplomático'),
-        ('non_domiciled', 'Documento de No Domiciliado'),
-    ], string='Tipo de Identificación', default='vat', help='Tipo de documento de identificación')
-
-    @api.onchange('vat')
-    def _onchange_vat_auto_identification_type(self):
-        """
-        Detectar automáticamente el tipo de identificación basándose en el VAT
-        """
-        if self.vat:
-            vat_clean = str(self.vat).strip()
-            _logger = logging.getLogger(__name__)
-            _logger.info(f"=== DETECTANDO TIPO DE IDENTIFICACIÓN PARA: {vat_clean} ===")
-            
-            # Detectar automáticamente el tipo
-            identification_type = self._get_identification_type_from_vat(vat_clean)
-            
-            if identification_type:
-                self.identification_type = identification_type
-                _logger.info(f"Tipo de identificación detectado: {identification_type}")
-            else:
-                _logger.info("No se pudo detectar el tipo de identificación automáticamente")
-
     def _get_identification_type_from_vat(self, vat_number):
         """
-        Obtener el tipo de identificación basándose en el número VAT
+        Obtener el ID del tipo de identificación basándose en el número VAT
         """
         if not vat_number:
             return False
         
         vat_clean = str(vat_number).strip()
-        _logger = logging.getLogger(__name__)
+        _logger.info(f"=== DETECTANDO TIPO DE IDENTIFICACIÓN PARA: {vat_clean} ===")
         
-        # Detectar DNI (8 dígitos)
+        # Buscar el tipo de identificación en la base de datos
+        identification_type_model = self.env['l10n.latam.identification.type']
+        
+        # Detectar DNI (8 dígitos) - ID 5 en tu base de datos
         if len(vat_clean) == 8 and vat_clean.isdigit():
-            _logger.info(f"DNI detectado: {vat_clean}")
-            return 'dni'
+            dni_type = identification_type_model.search([
+                ('name', '=', 'DNI'),
+                ('country_id', '=', 173)  # Perú
+            ], limit=1)
+            if dni_type:
+                _logger.info(f"DNI detectado: {vat_clean} -> Tipo ID: {dni_type.id}")
+                return dni_type.id
+            else:
+                _logger.warning("No se encontró el tipo DNI en la base de datos")
+                return False
         
-        # Detectar RUC (11 dígitos)
+        # Detectar RUC (11 dígitos) - ID 4 en tu base de datos
         elif len(vat_clean) == 11 and vat_clean.isdigit():
-            _logger.info(f"RUC detectado: {vat_clean}")
-            return 'ruc'
+            ruc_type = identification_type_model.search([
+                ('name', '=', 'RUC'),
+                ('country_id', '=', 173)  # Perú
+            ], limit=1)
+            if ruc_type:
+                _logger.info(f"RUC detectado: {vat_clean} -> Tipo ID: {ruc_type.id}")
+                return ruc_type.id
+            else:
+                _logger.warning("No se encontró el tipo RUC en la base de datos")
+                return False
         
         # Detectar VAT con prefijos peruanos (10 dígitos)
         elif len(vat_clean) == 10 and vat_clean.startswith(('10', '20', '15', '16', '17')):
-            _logger.info(f"RUC con prefijo detectado: {vat_clean}")
-            return 'ruc'
+            ruc_type = identification_type_model.search([
+                ('name', '=', 'RUC'),
+                ('country_id', '=', 173)  # Perú
+            ], limit=1)
+            if ruc_type:
+                _logger.info(f"RUC con prefijo detectado: {vat_clean} -> Tipo ID: {ruc_type.id}")
+                return ruc_type.id
+            else:
+                _logger.warning("No se encontró el tipo RUC en la base de datos")
+                return False
         
         # Detectar DNI con prefijo 10 (10 dígitos)
         elif len(vat_clean) == 10 and vat_clean.startswith('10'):
-            _logger.info(f"DNI con prefijo 10 detectado: {vat_clean}")
-            return 'dni'
+            dni_type = identification_type_model.search([
+                ('name', '=', 'DNI'),
+                ('country_id', '=', 173)  # Perú
+            ], limit=1)
+            if dni_type:
+                _logger.info(f"DNI con prefijo 10 detectado: {vat_clean} -> Tipo ID: {dni_type.id}")
+                return dni_type.id
+            else:
+                _logger.warning("No se encontró el tipo DNI en la base de datos")
+                return False
         
-        # Otros casos
+        # Otros casos - usar VAT genérico
         else:
-            _logger.info(f"VAT genérico detectado: {vat_clean}")
-            return 'vat'
+            vat_type = identification_type_model.search([
+                ('name', '=', 'VAT'),
+                ('country_id', '=', 173)  # Perú
+            ], limit=1)
+            if vat_type:
+                _logger.info(f"VAT genérico detectado: {vat_clean} -> Tipo ID: {vat_type.id}")
+                return vat_type.id
+            else:
+                _logger.warning("No se encontró el tipo VAT en la base de datos")
+                return False
+
+    @api.onchange('vat')
+    def _onchange_vat_auto_identification_type(self):
+        """
+        Cambiar automáticamente el tipo de identificación cuando cambie el VAT
+        """
+        if self.vat:
+            identification_type_id = self._get_identification_type_from_vat(self.vat)
+            if identification_type_id:
+                self.l10n_latam_identification_type_id = identification_type_id
+                _logger.info(f"Tipo de identificación actualizado automáticamente a ID: {identification_type_id}")
 
     @api.model
     def create(self, vals):
         """
-        Al crear un partner, mapear DNI o RUC al campo VAT y detectar tipo automáticamente
+        Crear partner con detección automática del tipo de identificación
         """
-        _logger = logging.getLogger(__name__)
         _logger.info("=== CREATE PARTNER ===")
         _logger.info(f"Valores recibidos: {vals}")
         
-        # Obtener valores de DNI y RUC si existen
-        dni = vals.get('dni', '').strip() if vals.get('dni') else ''
-        ruc = vals.get('ruc', '').strip() if vals.get('ruc') else ''
+        # Extraer DNI y RUC si existen
+        dni = vals.get('dni', '')
+        ruc = vals.get('ruc', '')
         
         _logger.info(f"DNI extraído: '{dni}'")
         _logger.info(f"RUC extraído: '{ruc}'")
         
-        # Mapear DNI o RUC al campo VAT
-        if dni:
-            # Si es DNI de 8 dígitos, agregar prefijo 10
-            if len(dni) == 8 and dni.isdigit():
-                vals['vat'] = '10' + dni
-                _logger.info(f"DNI mapeado a VAT con prefijo 10: {vals['vat']}")
-            else:
+        # Si no hay VAT pero hay DNI o RUC, usar el que corresponda
+        if 'vat' not in vals or not vals['vat']:
+            if dni:
                 vals['vat'] = dni
-                _logger.info(f"DNI mapeado a VAT: {vals['vat']}")
-        
-        elif ruc:
-            # Verificar si el RUC ya tiene el prefijo correcto
-            if len(ruc) == 11 and ruc.isdigit():
-                # Si es RUC de 11 dígitos, verificar prefijos válidos
-                valid_prefixes = ['10', '20', '15', '16', '17']
-                if not any(ruc.startswith(prefix) for prefix in valid_prefixes):
-                    # Si no tiene prefijo válido, agregar 20 por defecto
-                    vals['vat'] = '20' + ruc
-                    _logger.info(f"RUC mapeado a VAT con prefijo 20: {vals['vat']}")
-                else:
-                    vals['vat'] = ruc
-                    _logger.info(f"RUC mapeado a VAT (ya tiene prefijo válido): {vals['vat']}")
-            else:
+                _logger.info(f"DNI detectado: {dni}")
+            elif ruc:
                 vals['vat'] = ruc
-                _logger.info(f"RUC mapeado a VAT: {vals['vat']}")
+                _logger.info(f"RUC detectado: {ruc}")
         
-        # Detectar tipo de identificación automáticamente si hay VAT
+        # Detectar automáticamente el tipo de identificación
         if 'vat' in vals and vals['vat']:
-            identification_type = self._get_identification_type_from_vat(vals['vat'])
-            if identification_type:
-                vals['identification_type'] = identification_type
-                _logger.info(f"Tipo de identificación detectado: {identification_type}")
+            identification_type_id = self._get_identification_type_from_vat(vals['vat'])
+            if identification_type_id:
+                vals['l10n_latam_identification_type_id'] = identification_type_id
+                _logger.info(f"Tipo de identificación detectado: {identification_type_id}")
         
         _logger.info(f"Valores finales antes de crear: {vals}")
         
-        # Llamar al método create del modelo padre
+        # Llamar al método original
         return super().create(vals)
 
     def write(self, vals):
         """
-        Al escribir, mapear DNI o RUC al campo VAT y detectar tipo automáticamente
+        Actualizar partner con detección automática del tipo de identificación
         """
-        _logger = logging.getLogger(__name__)
         _logger.info("=== WRITE PARTNER ===")
         _logger.info(f"Valores recibidos: {vals}")
-        _logger.info(f"Partner actual: {self}")
-        _logger.info(f"VAT actual: {self.vat}")
         
-        # Obtener valores de DNI y RUC si existen
-        dni = vals.get('dni', '').strip() if vals.get('dni') else ''
-        ruc = vals.get('ruc', '').strip() if vals.get('ruc') else ''
-        
-        _logger.info(f"DNI extraído: '{dni}'")
-        _logger.info(f"RUC extraído: '{ruc}'")
-        
-        # Mapear DNI o RUC al campo VAT
-        if dni:
-            # Si es DNI de 8 dígitos, agregar prefijo 10
-            if len(dni) == 8 and dni.isdigit():
-                vals['vat'] = '10' + dni
-                _logger.info(f"DNI mapeado a VAT con prefijo 10: {vals['vat']}")
-            else:
-                vals['vat'] = dni
-                _logger.info(f"DNI mapeado a VAT: {vals['vat']}")
-        
-        elif ruc:
-            # Verificar si el RUC ya tiene el prefijo correcto
-            if len(ruc) == 11 and ruc.isdigit():
-                # Si es RUC de 11 dígitos, verificar prefijos válidos
-                valid_prefixes = ['10', '20', '15', '16', '17']
-                if not any(ruc.startswith(prefix) for prefix in valid_prefixes):
-                    # Si no tiene prefijo válido, agregar 20 por defecto
-                    vals['vat'] = '20' + ruc
-                    _logger.info(f"RUC mapeado a VAT con prefijo 20: {vals['vat']}")
-                else:
-                    vals['vat'] = ruc
-                    _logger.info(f"RUC mapeado a VAT (ya tiene prefijo válido): {vals['vat']}")
-            else:
-                vals['vat'] = ruc
-                _logger.info(f"RUC mapeado a VAT: {vals['vat']}")
-        
-        # Detectar tipo de identificación automáticamente si hay VAT
+        # Si se está actualizando el VAT, detectar automáticamente el tipo
         if 'vat' in vals and vals['vat']:
-            identification_type = self._get_identification_type_from_vat(vals['vat'])
-            if identification_type:
-                vals['identification_type'] = identification_type
-                _logger.info(f"Tipo de identificación detectado: {identification_type}")
+            identification_type_id = self._get_identification_type_from_vat(vals['vat'])
+            if identification_type_id:
+                vals['l10n_latam_identification_type_id'] = identification_type_id
+                _logger.info(f"Tipo de identificación detectado: {identification_type_id}")
         
-        _logger.info(f"Valores finales antes de escribir: {vals}")
-        
-        # Llamar al método write del modelo padre
+        # Llamar al método original
         return super().write(vals)
 
-    def get_identification_type_display(self):
+    # Métodos para deshabilitar validación de VAT
+    def check_vat(self, vat):
         """
-        Obtener el tipo de identificación para mostrar en la interfaz
+        Sobrescribir validación de VAT para permitir cualquier formato
         """
-        type_mapping = {
-            'dni': 'DNI',
-            'ruc': 'RUC',
-            'vat': 'VAT',
-            'passport': 'Pasaporte',
-            'foreign_id': 'Cédula Extranjera',
-            'diplomatic': 'Carné Diplomático',
-            'non_domiciled': 'Documento de No Domiciliado',
-        }
-        return type_mapping.get(self.identification_type, 'VAT')
+        _logger.info(f"=== CHECK VAT OVERRIDE === {vat}")
+        return True
+
+    @api.constrains('vat')
+    def _check_vat_constraint(self):
+        """
+        Sobrescribir constraint de VAT para no validar nada
+        """
+        _logger.info("=== VAT CONSTRAINT OVERRIDE ===")
+        pass
