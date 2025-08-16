@@ -19,6 +19,9 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
             'change input[name="invoice_type"]': '_onChangeInvoiceType',
             'submit': '_onSubmitForm',
             'input .form-control': '_onInputChange',
+            'input input[name="vat"]': '_onVatInputChange',
+            'keyup input[name="vat"]': '_onVatInputChange',
+            'paste input[name="vat"]': '_onVatInputChange',
         },
 
         /**
@@ -350,6 +353,127 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
                     scrollTop: this.$('.checkout-error-message').offset().top - 100
                 }, 500);
             }
+        },
+
+        /**
+         * Manejar cambios en el campo VAT para autoselección de tipo de documento
+         */
+        _onVatInputChange: function (ev) {
+            var self = this;
+            var $vatInput = $(ev.currentTarget);
+            var vatValue = $vatInput.val().trim();
+            
+            // Usar setTimeout para manejar el evento paste correctamente
+            setTimeout(function() {
+                vatValue = $vatInput.val().trim();
+                self._autoSelectDocumentType(vatValue);
+            }, 10);
+        },
+
+        /**
+         * Autoseleccionar el tipo de documento basado en el número ingresado
+         */
+        _autoSelectDocumentType: function (vatValue) {
+            console.log('🔍 Autoselección de tipo de documento para:', vatValue);
+            
+            // Buscar el selector de tipo de documento
+            var $documentTypeSelect = this.$('select[name="l10n_latam_identification_type_id"]');
+            
+            // Si no existe el selector estándar, buscar alternativas
+            if (!$documentTypeSelect.length) {
+                $documentTypeSelect = this.$('select[name="vat_type"]');
+            }
+            if (!$documentTypeSelect.length) {
+                $documentTypeSelect = this.$('select[name="document_type"]');
+            }
+            if (!$documentTypeSelect.length) {
+                $documentTypeSelect = this.$('select').filter(function() {
+                    return $(this).find('option').text().toLowerCase().includes('dni') || 
+                           $(this).find('option').text().toLowerCase().includes('ruc');
+                });
+            }
+            
+            if (!$documentTypeSelect.length) {
+                console.log('⚠️ No se encontró selector de tipo de documento');
+                return;
+            }
+            
+            console.log('✅ Selector de tipo de documento encontrado:', $documentTypeSelect.attr('name'));
+            
+            // Lógica de autoselección basada en la longitud del número
+            var selectedValue = null;
+            var selectedText = '';
+            
+            if (vatValue.length === 8 && /^\d{8}$/.test(vatValue)) {
+                // Es un DNI (8 dígitos numéricos)
+                selectedValue = this._findOptionByText($documentTypeSelect, ['DNI', 'dni']);
+                selectedText = 'DNI';
+                console.log('📋 Detectado DNI de 8 dígitos');
+            } else if (vatValue.length === 11 && /^\d{11}$/.test(vatValue)) {
+                // Es un RUC (11 dígitos numéricos)
+                selectedValue = this._findOptionByText($documentTypeSelect, ['RUC', 'ruc']);
+                selectedText = 'RUC';
+                console.log('📋 Detectado RUC de 11 dígitos');
+            } else if (vatValue.length > 0) {
+                // Número incompleto o formato no reconocido
+                console.log('⚠️ Formato de documento no reconocido:', vatValue);
+                return;
+            } else {
+                // Campo vacío, no hacer nada
+                return;
+            }
+            
+            // Aplicar la selección si se encontró una opción válida
+            if (selectedValue) {
+                $documentTypeSelect.val(selectedValue).trigger('change');
+                console.log('✅ Tipo de documento autoseleccionado:', selectedText, 'con valor:', selectedValue);
+                
+                // Mostrar feedback visual temporal
+                this._showDocumentTypeNotification(selectedText);
+            } else {
+                console.log('❌ No se encontró opción para:', selectedText);
+            }
+        },
+
+        /**
+         * Buscar opción en el select por texto
+         */
+        _findOptionByText: function ($select, textOptions) {
+            var foundValue = null;
+            
+            $select.find('option').each(function() {
+                var optionText = $(this).text().trim();
+                var optionValue = $(this).val();
+                
+                for (var i = 0; i < textOptions.length; i++) {
+                    if (optionText.toLowerCase().includes(textOptions[i].toLowerCase()) ||
+                        optionValue.toLowerCase().includes(textOptions[i].toLowerCase())) {
+                        foundValue = optionValue;
+                        return false; // Salir del each
+                    }
+                }
+            });
+            
+            return foundValue;
+        },
+
+        /**
+         * Mostrar notificación temporal de autoselección
+         */
+        _showDocumentTypeNotification: function (documentType) {
+            var $notification = $('<div class="alert alert-info document-type-notification" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">' +
+                '<i class="fa fa-check-circle mr-2"></i>' +
+                'Tipo de documento autoseleccionado: <strong>' + documentType + '</strong>' +
+                '</div>');
+            
+            $('body').append($notification);
+            
+            // Remover la notificación después de 3 segundos
+            setTimeout(function() {
+                $notification.fadeOut(500, function() {
+                    $(this).remove();
+                });
+            }, 3000);
         }
     });
 
