@@ -102,6 +102,30 @@ class WebsiteSaleCheckout(WebsiteSale):
             _logger.error(f"Error al detectar tipo de identificación: {e}")
             return False
 
+    def _update_partner_identification_type(self, partner_id, identification_type_id):
+        """
+        Actualizar el campo l10n_latam_identification_type_id del partner después de crearlo
+        """
+        if not partner_id or not identification_type_id:
+            return False
+        
+        try:
+            Partner = request.env['res.partner'].sudo()
+            partner = Partner.browse(partner_id)
+            
+            if partner.exists():
+                # Actualizar el campo directamente
+                partner.write({'l10n_latam_identification_type_id': identification_type_id})
+                _logger.info(f"✅ Campo l10n_latam_identification_type_id actualizado para partner {partner_id}: {identification_type_id}")
+                return True
+            else:
+                _logger.warning(f"❌ Partner {partner_id} no encontrado")
+                return False
+                
+        except Exception as e:
+            _logger.error(f"❌ Error al actualizar campo de identificación: {e}")
+            return False
+
     @http.route(['/shop/address'], type='http', auth="public", website=True, sitemap=False)
     def address(self, **kw):
         """
@@ -176,12 +200,11 @@ class WebsiteSaleCheckout(WebsiteSale):
         _logger.info(f"Opción de envío: {shipping_option}")
         
         # Determinar qué número usar y detectar tipo automáticamente
+        identification_type_id = None
         if is_invoice_requested and ruc:
             # Modo factura: usar RUC
             checkout['vat'] = ruc
             identification_type_id = self._detect_identification_type_id(ruc)
-            if identification_type_id:
-                checkout['l10n_latam_identification_type_id'] = identification_type_id
             _logger.info(f"Modo factura: RUC {ruc} detectado como ID: {identification_type_id}")
             
             # Si es empresa, usar razón social
@@ -193,8 +216,6 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Modo boleta: usar DNI
             checkout['vat'] = dni
             identification_type_id = self._detect_identification_type_id(dni)
-            if identification_type_id:
-                checkout['l10n_latam_identification_type_id'] = identification_type_id
             _logger.info(f"Modo boleta: DNI {dni} detectado como ID: {identification_type_id}")
             
             # Si no es empresa, usar nombre personal
@@ -240,8 +261,8 @@ class WebsiteSaleCheckout(WebsiteSale):
             checkout['country_id'] = 173  # Perú
             _logger.info("Modo recogo: usando dirección por defecto")
         
-        # Filtrar solo campos válidos de res.partner
-        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'l10n_latam_identification_type_id', 'is_company']
+        # Filtrar solo campos válidos de res.partner (EXCLUIR l10n_latam_identification_type_id)
+        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'is_company']
         filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields and v is not None and v != ''}
         
         _logger.info(f"Checkout filtrado: {filtered_checkout}")
@@ -257,6 +278,16 @@ class WebsiteSaleCheckout(WebsiteSale):
         else:
             partner_id = Partner.create(filtered_checkout).id
             _logger.info(f"Partner creado: {partner_id}")
+        
+        # ACTUALIZAR EL CAMPO DE IDENTIFICACIÓN DESPUÉS DE CREAR/ACTUALIZAR
+        if identification_type_id:
+            success = self._update_partner_identification_type(partner_id, identification_type_id)
+            if success:
+                _logger.info(f"✅ Campo de identificación actualizado exitosamente para partner {partner_id}")
+            else:
+                _logger.error(f"❌ No se pudo actualizar el campo de identificación para partner {partner_id}")
+        else:
+            _logger.warning("⚠️ No se detectó tipo de identificación, no se actualizará el campo")
         
         return partner_id
 
