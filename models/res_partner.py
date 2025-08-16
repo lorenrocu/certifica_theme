@@ -60,20 +60,43 @@ class ResPartner(models.Model):
         Método auxiliar para actualizar el campo VAT desde DNI o RUC
         Prioridad: RUC > DNI (si ambos están presentes, usar RUC)
         """
+        import logging
+        _logger = logging.getLogger(__name__)
+        
+        _logger.info("=== DEPURACION VAT - _update_vat_field ===")
+        _logger.info(f"Partner ID: {self.id if hasattr(self, 'id') else 'NEW'}")
+        _logger.info(f"Valores recibidos: {vals}")
+        
+        vat_before = vals.get('vat', 'NO_PRESENTE')
+        _logger.info(f"VAT ANTES de mapeo: {vat_before}")
+        
         # Priorizar RUC si está presente
         if 'ruc' in vals and vals['ruc']:
             vals['vat'] = vals['ruc']
+            _logger.info(f"Mapeando RUC '{vals['ruc']}' al VAT")
         elif 'ruc_custom' in vals and vals['ruc_custom']:
             vals['vat'] = vals['ruc_custom']
+            _logger.info(f"Mapeando RUC_CUSTOM '{vals['ruc_custom']}' al VAT")
         elif 'dni' in vals and vals['dni']:
             vals['vat'] = vals['dni']
+            _logger.info(f"Mapeando DNI '{vals['dni']}' al VAT")
         # Si no hay valores nuevos, usar los existentes
         elif hasattr(self, 'ruc') and self.ruc:
             vals['vat'] = self.ruc
+            _logger.info(f"Usando RUC existente '{self.ruc}' para VAT")
         elif hasattr(self, 'ruc_custom') and self.ruc_custom:
             vals['vat'] = self.ruc_custom
+            _logger.info(f"Usando RUC_CUSTOM existente '{self.ruc_custom}' para VAT")
         elif hasattr(self, 'dni') and self.dni:
             vals['vat'] = self.dni
+            _logger.info(f"Usando DNI existente '{self.dni}' para VAT")
+        else:
+            _logger.info("NO SE PUDO MAPEAR VAT - Sin documentos disponibles")
+        
+        vat_after = vals.get('vat', 'NO_PRESENTE')
+        _logger.info(f"VAT DESPUÉS de mapeo: {vat_after}")
+        _logger.info("=== FIN DEPURACION VAT ===")
+        _logger.info(f"Vals finales: {vals}")
 
     @api.model
     def create(self, vals):
