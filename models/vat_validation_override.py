@@ -158,3 +158,53 @@ class VATValidationOverride(models.Model):
         _logger = logging.getLogger(__name__)
         _logger.info("=== VALIDACIÓN LATAM PERÚ ESPECÍFICA DESHABILITADA ===")
         return True
+
+    # Métodos adicionales para interceptar validaciones específicas
+    def _check_vat_latam_base_check(self, *args, **kwargs):
+        """
+        Deshabilitar la validación específica del módulo l10n_latam_base
+        """
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== VALIDACIÓN LATAM BASE CHECK DESHABILITADA ===")
+        return True
+
+    def _check_vat_latam_base_validate(self, *args, **kwargs):
+        """
+        Deshabilitar la validación específica del módulo l10n_latam_base
+        """
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== VALIDACIÓN LATAM BASE VALIDATE DESHABILITADA ===")
+        return True
+
+    # Métodos para interceptar validaciones en el nivel más bajo
+    def _check_vat_latam_base_validate_vat(self, *args, **kwargs):
+        """
+        Deshabilitar la validación específica del módulo l10n_latam_base
+        """
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== VALIDACIÓN LATAM BASE VALIDATE VAT DESHABILITADA ===")
+        return True
+
+    def _check_vat_latam_base_check_vat(self, *args, **kwargs):
+        """
+        Deshabilitar la validación específica del módulo l10n_latam_base
+        """
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== VALIDACIÓN LATAM BASE CHECK VAT DESHABILITADA ===")
+        return True
+
+    def _check_vat_latam_base_validate_peru(self, *args, **kwargs):
+        """
+        Deshabilitar la validación específica del módulo l10n_latam_base
+        """
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== VALIDACIÓN LATAM BASE VALIDATE PERU DESHABILITADA ===")
+        return True
+
+    def _check_vat_latam_base_check_peru(self, *args, **kwargs):
+        """
+        Deshabilitar la validación específica del módulo l10n_latam_base
+        """
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== VALIDACIÓN LATAM BASE CHECK PERU DESHABILITADA ===")
+        return True
