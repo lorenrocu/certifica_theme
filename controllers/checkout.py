@@ -166,10 +166,14 @@ class WebsiteSaleCheckout(WebsiteSale):
             checkout['city'] = all_values.get('city', '')
             _logger.info(f"Ciudad asignada: {checkout['city']}")
         
-        # Asegurar que el país esté presente
+        # Asegurar que el país esté presente y sea entero
         if 'country_id' not in checkout or not checkout['country_id']:
-            checkout['country_id'] = all_values.get('country_id', '')
-            _logger.info(f"País asignado: {checkout['country_id']}")
+            country_id = all_values.get('country_id', '')
+            if country_id and country_id.isdigit():
+                checkout['country_id'] = int(country_id)
+                _logger.info(f"País asignado: {checkout['country_id']}")
+            else:
+                _logger.warning(f"País inválido: {country_id}")
         
         # Filtrar solo campos válidos de res.partner
         valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'identification_type', 'is_company']
