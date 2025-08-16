@@ -17,73 +17,83 @@ class ResPartner(models.Model):
         vat_clean = str(vat_number).strip()
         _logger.info(f"=== DETECTANDO TIPO DE IDENTIFICACIÓN PARA: {vat_clean} ===")
         
-        # Buscar el tipo de identificación en la base de datos
-        identification_type_model = self.env['l10n.latam.identification.type']
-        
-        # Detectar DNI (8 dígitos) - ID 5 en tu base de datos
-        if len(vat_clean) == 8 and vat_clean.isdigit():
-            dni_type = identification_type_model.search([
-                ('name', '=', 'DNI'),
-                ('country_id', '=', 173)  # Perú
-            ], limit=1)
-            if dni_type:
-                _logger.info(f"DNI detectado: {vat_clean} -> Tipo ID: {dni_type.id}")
-                return dni_type.id
-            else:
-                _logger.warning("No se encontró el tipo DNI en la base de datos")
+        try:
+            # Verificar si el modelo está disponible
+            if 'l10n.latam.identification.type' not in self.env.registry:
+                _logger.warning("Modelo l10n.latam.identification.type no disponible")
                 return False
-        
-        # Detectar RUC (11 dígitos) - ID 4 en tu base de datos
-        elif len(vat_clean) == 11 and vat_clean.isdigit():
-            ruc_type = identification_type_model.search([
-                ('name', '=', 'RUC'),
-                ('country_id', '=', 173)  # Perú
-            ], limit=1)
-            if ruc_type:
-                _logger.info(f"RUC detectado: {vat_clean} -> Tipo ID: {ruc_type.id}")
-                return ruc_type.id
+            
+            # Buscar el tipo de identificación en la base de datos
+            identification_type_model = self.env['l10n.latam.identification.type']
+            
+            # Detectar DNI (8 dígitos) - ID 5 en tu base de datos
+            if len(vat_clean) == 8 and vat_clean.isdigit():
+                dni_type = identification_type_model.search([
+                    ('name', '=', 'DNI'),
+                    ('country_id', '=', 173)  # Perú
+                ], limit=1)
+                if dni_type:
+                    _logger.info(f"DNI detectado: {vat_clean} -> Tipo ID: {dni_type.id}")
+                    return dni_type.id
+                else:
+                    _logger.warning("No se encontró el tipo DNI en la base de datos")
+                    return False
+            
+            # Detectar RUC (11 dígitos) - ID 4 en tu base de datos
+            elif len(vat_clean) == 11 and vat_clean.isdigit():
+                ruc_type = identification_type_model.search([
+                    ('name', '=', 'RUC'),
+                    ('country_id', '=', 173)  # Perú
+                ], limit=1)
+                if ruc_type:
+                    _logger.info(f"RUC detectado: {vat_clean} -> Tipo ID: {ruc_type.id}")
+                    return ruc_type.id
+                else:
+                    _logger.warning("No se encontró el tipo RUC en la base de datos")
+                    return False
+            
+            # Detectar VAT con prefijos peruanos (10 dígitos)
+            elif len(vat_clean) == 10 and vat_clean.startswith(('10', '20', '15', '16', '17')):
+                ruc_type = identification_type_model.search([
+                    ('name', '=', 'RUC'),
+                    ('country_id', '=', 173)  # Perú
+                ], limit=1)
+                if ruc_type:
+                    _logger.info(f"RUC con prefijo detectado: {vat_clean} -> Tipo ID: {ruc_type.id}")
+                    return ruc_type.id
+                else:
+                    _logger.warning("No se encontró el tipo RUC en la base de datos")
+                    return False
+            
+            # Detectar DNI con prefijo 10 (10 dígitos)
+            elif len(vat_clean) == 10 and vat_clean.startswith('10'):
+                dni_type = identification_type_model.search([
+                    ('name', '=', 'DNI'),
+                    ('country_id', '=', 173)  # Perú
+                ], limit=1)
+                if dni_type:
+                    _logger.info(f"DNI con prefijo 10 detectado: {vat_clean} -> Tipo ID: {dni_type.id}")
+                    return dni_type.id
+                else:
+                    _logger.warning("No se encontró el tipo DNI en la base de datos")
+                    return False
+            
+            # Otros casos - usar VAT genérico
             else:
-                _logger.warning("No se encontró el tipo RUC en la base de datos")
-                return False
-        
-        # Detectar VAT con prefijos peruanos (10 dígitos)
-        elif len(vat_clean) == 10 and vat_clean.startswith(('10', '20', '15', '16', '17')):
-            ruc_type = identification_type_model.search([
-                ('name', '=', 'RUC'),
-                ('country_id', '=', 173)  # Perú
-            ], limit=1)
-            if ruc_type:
-                _logger.info(f"RUC con prefijo detectado: {vat_clean} -> Tipo ID: {ruc_type.id}")
-                return ruc_type.id
-            else:
-                _logger.warning("No se encontró el tipo RUC en la base de datos")
-                return False
-        
-        # Detectar DNI con prefijo 10 (10 dígitos)
-        elif len(vat_clean) == 10 and vat_clean.startswith('10'):
-            dni_type = identification_type_model.search([
-                ('name', '=', 'DNI'),
-                ('country_id', '=', 173)  # Perú
-            ], limit=1)
-            if dni_type:
-                _logger.info(f"DNI con prefijo 10 detectado: {vat_clean} -> Tipo ID: {dni_type.id}")
-                return dni_type.id
-            else:
-                _logger.warning("No se encontró el tipo DNI en la base de datos")
-                return False
-        
-        # Otros casos - usar VAT genérico
-        else:
-            vat_type = identification_type_model.search([
-                ('name', '=', 'VAT'),
-                ('country_id', '=', 173)  # Perú
-            ], limit=1)
-            if vat_type:
-                _logger.info(f"VAT genérico detectado: {vat_clean} -> Tipo ID: {vat_type.id}")
-                return vat_type.id
-            else:
-                _logger.warning("No se encontró el tipo VAT en la base de datos")
-                return False
+                vat_type = identification_type_model.search([
+                    ('name', '=', 'VAT'),
+                    ('country_id', '=', 173)  # Perú
+                ], limit=1)
+                if vat_type:
+                    _logger.info(f"VAT genérico detectado: {vat_clean} -> Tipo ID: {vat_type.id}")
+                    return vat_type.id
+                else:
+                    _logger.warning("No se encontró el tipo VAT en la base de datos")
+                    return False
+                    
+        except Exception as e:
+            _logger.error(f"Error al detectar tipo de identificación: {e}")
+            return False
 
     @api.onchange('vat')
     def _onchange_vat_auto_identification_type(self):
