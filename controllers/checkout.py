@@ -125,9 +125,6 @@ class WebsiteSaleCheckout(WebsiteSale):
             razon_social = (all_values.get('razon_social') or '').strip()
             is_invoice_requested = all_values.get('invoice_type_checkbox') == 'on' or all_values.get('invoice_type') == 'factura'
 
-            # Establecer tipo de comprobante
-            checkout['invoice_type'] = 'factura' if is_invoice_requested else 'boleta'
-
             # Mapear documentos al campo VAT según el tipo de comprobante
             if is_invoice_requested and ruc:
                 # Para factura, usar RUC en VAT
@@ -155,30 +152,38 @@ class WebsiteSaleCheckout(WebsiteSale):
                 checkout['name'] = razon_social
                 _logger.info(f"Razón social asignada como nombre: {razon_social}")
 
-            _logger.info(f"Datos a guardar (checkout) DESPUÉS de procesar: {checkout}")
+            # Solo incluir campos que existen en el modelo res.partner
+            # Remover campos que no existen para evitar errores
+            valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'dni', 'ruc']
+            filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields}
+            
+            _logger.info(f"Datos filtrados para guardar: {filtered_checkout}")
+            
         except Exception as e:
             _logger.warning(f"Error al procesar campos personalizados en checkout: {e}")
+            # En caso de error, usar solo campos básicos
+            filtered_checkout = {k: v for k, v in checkout.items() if k in ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat']}
         
         Partner = request.env['res.partner']
         if mode[0] == 'new':
             try:
                 # Asegurar que el partner no sea el partner público del website
                 # Generar un email único si no se proporciona
-                if not checkout.get('email'):
+                if not filtered_checkout.get('email'):
                     import time
-                    checkout['email'] = f"customer_{int(time.time())}@temp.local"
+                    filtered_checkout['email'] = f"customer_{int(time.time())}@temp.local"
                 
                 # Asegurar que el partner tenga un nombre válido
-                if not checkout.get('name'):
-                    checkout['name'] = 'Cliente'
+                if not filtered_checkout.get('name'):
+                    filtered_checkout['name'] = 'Cliente'
                 
                 # Crear el partner con manejo de errores
-                partner_id = Partner.sudo().create(checkout).id
+                partner_id = Partner.sudo().create(filtered_checkout).id
                 _logger.info(f"Partner creado exitosamente con ID: {partner_id}")
                 
             except Exception as e:
                 _logger.error(f"Error al crear partner: {e}")
-                _logger.error(f"Datos del checkout: {checkout}")
+                _logger.error(f"Datos del checkout: {filtered_checkout}")
                 # Re-lanzar la excepción para que el flujo normal de errores la maneje
                 raise
             
@@ -189,7 +194,6 @@ class WebsiteSaleCheckout(WebsiteSale):
                 _logger.info(f"DNI guardado: {getattr(created_partner, 'dni', None) or 'No especificado'}")
                 _logger.info(f"RUC guardado: {getattr(created_partner, 'ruc', None) or 'No especificado'}")
                 _logger.info(f"VAT guardado: {getattr(created_partner, 'vat', None) or 'No especificado'}")
-                _logger.info(f"Tipo de comprobante: {getattr(created_partner, 'invoice_type', None) or 'No especificado'}")
                 _logger.info(f"Nombre guardado: {getattr(created_partner, 'name', None) or 'No especificado'}")
                 _logger.info(f"Email guardado: {getattr(created_partner, 'email', None) or 'No especificado'}")
             except Exception as e:
@@ -200,8 +204,8 @@ class WebsiteSaleCheckout(WebsiteSale):
             if partner_id == request.website.partner_id.id:
                 try:
                     # Si por alguna razón es el mismo, crear uno nuevo con datos únicos
-                    checkout['email'] = f"unique_{partner_id}_{int(time.time())}@temp.local"
-                    partner_id = Partner.sudo().create(checkout).id
+                    filtered_checkout['email'] = f"unique_{partner_id}_{int(time.time())}@temp.local"
+                    partner_id = Partner.sudo().create(filtered_checkout).id
                     _logger.info(f"Partner único creado para evitar conflicto con partner público. Nuevo ID: {partner_id}")
                 except Exception as e:
                     _logger.error(f"Error al crear partner único: {e}")
@@ -216,12 +220,12 @@ class WebsiteSaleCheckout(WebsiteSale):
                     shippings = Partner.sudo().search([('id', 'child_of', order.partner_id.commercial_partner_id.ids)])
                     if partner_id not in shippings.mapped('id') and partner_id != order.partner_id.id:
                         return Forbidden()
-                    Partner.sudo().browse(partner_id).write(checkout)
+                    Partner.sudo().browse(partner_id).write(filtered_checkout)
                     _logger.info(f"Partner actualizado exitosamente con ID: {partner_id}")
                     
             except Exception as e:
                 _logger.error(f"Error al actualizar partner: {e}")
-                _logger.error(f"Partner ID: {partner_id}, Datos: {checkout}")
+                _logger.error(f"Partner ID: {partner_id}, Datos: {filtered_checkout}")
                 # Re-lanzar la excepción para que el flujo normal de errores la maneje
                 raise
         
@@ -252,13 +256,6 @@ class WebsiteSaleCheckout(WebsiteSale):
         _logger.info(f"¿Se solicita factura? {is_invoice_requested}")
         _logger.info(f"invoice_type_checkbox: {values.get('invoice_type_checkbox')}")
         _logger.info(f"invoice_type: {values.get('invoice_type')}")
-        
-        # Mapear el tipo de comprobante al campo correcto del modelo
-        if is_invoice_requested:
-            new_values['invoice_type'] = 'factura'
-        else:
-            new_values['invoice_type'] = 'boleta'
-        _logger.info(f"Tipo de comprobante asignado: {new_values['invoice_type']}")
         
         # Agregar campos personalizados - mapear a los campos del modelo res_partner
         _logger.info(f"Procesando campos personalizados...")
