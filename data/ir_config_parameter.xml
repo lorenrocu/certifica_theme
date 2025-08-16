@@ -1,52 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <!-- Configuraciones para deshabilitar validación de VAT -->
-        <record id="base_vat_disable_validation" model="ir.config_parameter">
+        <!-- Deshabilitar completamente la validación de VAT -->
+        <record id="disable_vat_validation" model="ir.config_parameter">
             <field name="key">base_vat.disable_validation</field>
             <field name="value">True</field>
         </record>
         
-        <record id="base_vat_flexible_format" model="ir.config_parameter">
+        <!-- Permitir formato flexible de VAT -->
+        <record id="flexible_vat_format" model="ir.config_parameter">
             <field name="key">base_vat.flexible_format</field>
             <field name="value">True</field>
         </record>
         
-        <record id="l10n_pe_disable_vat_validation" model="ir.config_parameter">
+        <!-- Deshabilitar validación específica para Perú -->
+        <record id="disable_peru_vat_validation" model="ir.config_parameter">
             <field name="key">l10n_pe.disable_vat_validation</field>
             <field name="value">True</field>
         </record>
         
-        <record id="l10n_latam_base_disable_vat_validation" model="ir.config_parameter">
+        <!-- Deshabilitar validación del módulo l10n_latam_base -->
+        <record id="disable_latam_vat_validation" model="ir.config_parameter">
             <field name="key">l10n_latam_base.disable_vat_validation</field>
             <field name="value">True</field>
-        </record>
-        
-        <!-- Configuraciones para manejo de errores y transacciones -->
-        <record id="database_transaction_timeout" model="ir.config_parameter">
-            <field name="key">database.transaction_timeout</field>
-            <field name="value">30</field>
-        </record>
-        
-        <record id="database_connection_retry" model="ir.config_parameter">
-            <field name="key">database.connection_retry</field>
-            <field name="value">3</field>
-        </record>
-        
-        <record id="website_sale_checkout_timeout" model="ir.config_parameter">
-            <field name="key">website_sale.checkout_timeout</field>
-            <field name="value">60</field>
-        </record>
-        
-        <!-- Configuraciones para debugging -->
-        <record id="certifica_theme_debug_mode" model="ir.config_parameter">
-            <field name="key">certifica_theme.debug_mode</field>
-            <field name="value">True</field>
-        </record>
-        
-        <record id="certifica_theme_log_level" model="ir.config_parameter">
-            <field name="key">certifica_theme.log_level</field>
-            <field name="value">DEBUG</field>
         </record>
     </data>
 </odoo>
