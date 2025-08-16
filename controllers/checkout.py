@@ -130,13 +130,13 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Establecer tipo de comprobante - TEMPORALMENTE COMENTADO PARA EVITAR ERROR
             # checkout['invoice_type'] = 'factura' if is_invoice_requested else 'boleta'
 
-            # Mapear documentos directamente al campo VAT estándar de Odoo
+            # Mapear documentos directamente al campo VAT estándar de Odoo con prefijo PE
             if ruc:
-                checkout['vat'] = ruc
-                _logger.info(f"RUC mapeado a VAT: {ruc}")
+                checkout['vat'] = f"PE{ruc}"
+                _logger.info(f"RUC mapeado a VAT: PE{ruc}")
             elif dni:
-                checkout['vat'] = dni
-                _logger.info(f"DNI mapeado a VAT: {dni}")
+                checkout['vat'] = f"PE{dni}"
+                _logger.info(f"DNI mapeado a VAT: PE{dni}")
             else:
                 _logger.info("No se encontró RUC ni DNI para mapear a VAT")
 
