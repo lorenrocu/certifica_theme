@@ -198,6 +198,12 @@ class WebsiteSaleCheckout(WebsiteSale):
         try:
             result = super().address(**kw)
             self._logger.info("Método super().address() ejecutado exitosamente")
+            
+            # Si es un POST exitoso, forzar redirección a payment
+            if request.httprequest.method == 'POST' and (all_form_values.get('submitted') or len(all_form_values) > 1):
+                self._logger.info("=== FORZANDO REDIRECCIÓN A PAYMENT ===")
+                return request.redirect('/shop/payment')
+            
             return result
         except Exception as e:
             self._logger.error(f"Error en super().address(): {str(e)}")
