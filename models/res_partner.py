@@ -6,23 +6,64 @@ import logging
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+    # Campo personalizado para tipo de identificación
+    identification_type = fields.Selection([
+        ('dni', 'DNI'),
+        ('ruc', 'RUC'),
+        ('vat', 'VAT'),
+        ('passport', 'Pasaporte'),
+        ('foreign_id', 'Cédula Extranjera'),
+        ('diplomatic', 'Carné Diplomático'),
+        ('non_domiciled', 'Documento de No Domiciliado'),
+    ], string='Tipo de Identificación', default='vat', help='Tipo de documento de identificación')
+
+    @api.model
+    def _check_available_fields(self):
+        """
+        Verificar qué campos están disponibles en el modelo
+        """
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== VERIFICANDO CAMPOS DISPONIBLES ===")
+        
+        # Obtener todos los campos del modelo
+        model_fields = self._fields
+        _logger.info(f"Campos disponibles en res.partner: {list(model_fields.keys())}")
+        
+        # Verificar si existe el campo de tipo de identificación
+        if 'l10n_latam_identification_type_id' in model_fields:
+            _logger.info("✅ Campo l10n_latam_identification_type_id encontrado")
+            field_info = model_fields['l10n_latam_identification_type_id']
+            _logger.info(f"Tipo de campo: {field_info.type}")
+            _logger.info(f"Relación: {field_info.comodel_name if hasattr(field_info, 'comodel_name') else 'N/A'}")
+        else:
+            _logger.warning("❌ Campo l10n_latam_identification_type_id NO encontrado")
+        
+        # Verificar si existe el modelo de tipos de identificación
+        try:
+            identification_types = self.env['l10n_latam.identification.type'].search([])
+            _logger.info(f"✅ Modelo l10n_latam.identification.type encontrado")
+            _logger.info(f"Tipos disponibles: {identification_types.mapped('name')}")
+        except Exception as e:
+            _logger.error(f"❌ Error al acceder a l10n_latam.identification.type: {e}")
+        
+        return True
+
     @api.onchange('vat')
     def _onchange_vat_auto_identification_type(self):
         """
         Detectar automáticamente el tipo de identificación basándose en el VAT
-        y actualizar el campo l10n_latam_identification_type_id
         """
         if self.vat:
             vat_clean = str(self.vat).strip()
             _logger = logging.getLogger(__name__)
             _logger.info(f"=== DETECTANDO TIPO DE IDENTIFICACIÓN PARA: {vat_clean} ===")
             
-            # Buscar el tipo de identificación correspondiente
+            # Detectar automáticamente el tipo
             identification_type = self._get_identification_type_from_vat(vat_clean)
             
             if identification_type:
-                self.l10n_latam_identification_type_id = identification_type
-                _logger.info(f"Tipo de identificación detectado: {identification_type.name}")
+                self.identification_type = identification_type
+                _logger.info(f"Tipo de identificación detectado: {identification_type}")
             else:
                 _logger.info("No se pudo detectar el tipo de identificación automáticamente")
 
@@ -36,49 +77,30 @@ class ResPartner(models.Model):
         vat_clean = str(vat_number).strip()
         _logger = logging.getLogger(__name__)
         
-        # Buscar tipos de identificación disponibles
-        identification_types = self.env['l10n_latam.identification.type'].search([
-            ('active', '=', True)
-        ])
-        
-        _logger.info(f"Tipos de identificación disponibles: {identification_types.mapped('name')}")
-        
         # Detectar DNI (8 dígitos)
         if len(vat_clean) == 8 and vat_clean.isdigit():
-            dni_type = identification_types.filtered(lambda x: 'dni' in x.name.lower())
-            if dni_type:
-                _logger.info(f"DNI detectado: {vat_clean} -> {dni_type[0].name}")
-                return dni_type[0]
+            _logger.info(f"DNI detectado: {vat_clean}")
+            return 'dni'
         
         # Detectar RUC (11 dígitos)
         elif len(vat_clean) == 11 and vat_clean.isdigit():
-            ruc_type = identification_types.filtered(lambda x: 'ruc' in x.name.lower())
-            if ruc_type:
-                _logger.info(f"RUC detectado: {vat_clean} -> {ruc_type[0].name}")
-                return ruc_type[0]
+            _logger.info(f"RUC detectado: {vat_clean}")
+            return 'ruc'
         
         # Detectar VAT con prefijos peruanos (10 dígitos)
         elif len(vat_clean) == 10 and vat_clean.startswith(('10', '20', '15', '16', '17')):
-            ruc_type = identification_types.filtered(lambda x: 'ruc' in x.name.lower())
-            if ruc_type:
-                _logger.info(f"RUC con prefijo detectado: {vat_clean} -> {ruc_type[0].name}")
-                return ruc_type[0]
+            _logger.info(f"RUC con prefijo detectado: {vat_clean}")
+            return 'ruc'
         
         # Detectar DNI con prefijo 10 (10 dígitos)
         elif len(vat_clean) == 10 and vat_clean.startswith('10'):
-            dni_type = identification_types.filtered(lambda x: 'dni' in x.name.lower())
-            if dni_type:
-                _logger.info(f"DNI con prefijo 10 detectado: {vat_clean} -> {dni_type[0].name}")
-                return dni_type[0]
+            _logger.info(f"DNI con prefijo 10 detectado: {vat_clean}")
+            return 'dni'
         
-        # Buscar tipo de identificación fiscal por defecto
-        default_type = identification_types.filtered(lambda x: x.is_vat)
-        if default_type:
-            _logger.info(f"Usando tipo de identificación fiscal por defecto: {default_type[0].name}")
-            return default_type[0]
-        
-        _logger.info("No se pudo determinar el tipo de identificación")
-        return False
+        # Otros casos
+        else:
+            _logger.info(f"VAT genérico detectado: {vat_clean}")
+            return 'vat'
 
     @api.model
     def create(self, vals):
@@ -89,7 +111,7 @@ class ResPartner(models.Model):
             # Detectar tipo de identificación
             identification_type = self._get_identification_type_from_vat(vals['vat'])
             if identification_type:
-                vals['l10n_latam_identification_type_id'] = identification_type.id
+                vals['identification_type'] = identification_type
         
         return super().create(vals)
 
@@ -101,7 +123,7 @@ class ResPartner(models.Model):
             # Detectar tipo de identificación
             identification_type = self._get_identification_type_from_vat(vals['vat'])
             if identification_type:
-                vals['l10n_latam_identification_type_id'] = identification_type.id
+                vals['identification_type'] = identification_type
         
         return super().write(vals)
 
@@ -109,9 +131,16 @@ class ResPartner(models.Model):
         """
         Obtener el tipo de identificación para mostrar en la interfaz
         """
-        if self.l10n_latam_identification_type_id:
-            return self.l10n_latam_identification_type_id.name
-        return 'VAT'
+        type_mapping = {
+            'dni': 'DNI',
+            'ruc': 'RUC',
+            'vat': 'VAT',
+            'passport': 'Pasaporte',
+            'foreign_id': 'Cédula Extranjera',
+            'diplomatic': 'Carné Diplomático',
+            'non_domiciled': 'Documento de No Domiciliado',
+        }
+        return type_mapping.get(self.identification_type, 'VAT')
 
     @api.model
     def create(self, vals):
@@ -119,6 +148,7 @@ class ResPartner(models.Model):
         Al crear un partner, mapear DNI o RUC al campo VAT
         """
         
+        _logger = logging.getLogger(__name__)
         _logger.info("=== CREATE PARTNER ===")
         _logger.info(f"Valores recibidos: {vals}")
         
