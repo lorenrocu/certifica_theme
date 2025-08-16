@@ -390,148 +390,11 @@
                         this.value = this.value.replace(/[^0-9]/g, '').substring(0, 11);
                     });
                     
-                    // EJECUTAR AL CARGAR LA PÁGINA
+                    // Ejecutar al cargar la página
                     toggleFields();
                     
                     // Ejecutar cuando cambie el checkbox
                     invoiceCheckbox.addEventListener('change', toggleFields);
-                    
-                    // OVERRIDE AGRESIVO: DESACTIVAR TODA VALIDACIÓN HTML5
-                    console.log('=== DESACTIVANDO VALIDACIÓN HTML5 ===');
-                    
-                    // Desactivar validación en campos específicos
-                    const dniInput = document.getElementById('dni');
-                    const rucInput = document.getElementById('ruc');
-                    const streetInput = document.getElementById('street');
-                    const cityInput = document.getElementById('city');
-                    const countryInput = document.getElementById('country_id');
-                    
-                    if (dniInput) {
-                        dniInput.removeAttribute('required');
-                        dniInput.removeAttribute('pattern');
-                        dniInput.removeAttribute('maxlength');
-                        console.log('✅ Validación HTML5 removida de DNI');
-                    }
-                    
-                    if (rucInput) {
-                        rucInput.removeAttribute('required');
-                        rucInput.removeAttribute('pattern');
-                        rucInput.removeAttribute('maxlength');
-                        console.log('✅ Validación HTML5 removida de RUC');
-                    }
-                    
-                    if (streetInput) {
-                        streetInput.removeAttribute('required');
-                        console.log('✅ Validación HTML5 removida de Street');
-                    }
-                    
-                    if (cityInput) {
-                        cityInput.removeAttribute('required');
-                        console.log('✅ Validación HTML5 removida de City');
-                    }
-                    
-                    if (countryInput) {
-                        countryInput.removeAttribute('required');
-                        console.log('✅ Validación HTML5 removida de Country');
-                    }
-                    
-                    // Desactivar validación en todos los campos del formulario
-                    const allFormFields = document.querySelectorAll('.checkout_autoformat input, .checkout_autoformat select, .checkout_autoformat textarea');
-                    allFormFields.forEach(function(field) {
-                        field.removeAttribute('required');
-                        field.removeAttribute('pattern');
-                        field.removeAttribute('minlength');
-                        field.removeAttribute('maxlength');
-                        field.setAttribute('novalidate', 'true');
-                    });
-                    console.log(`✅ Validación HTML5 removida de ${allFormFields.length} campos`);
-                    
-                    console.log('=== VALIDACIÓN HTML5 COMPLETAMENTE DESACTIVADA ===');
-                    
-                    // OVERRIDE ADICIONAL: INTERCEPTAR VALIDACIÓN DE ODOO
-                    console.log('=== INTERCEPTANDO VALIDACIÓN DE ODOO ===');
-                    
-                    // Override de la función de validación nativa del navegador
-                    if (typeof HTMLFormElement !== 'undefined' && HTMLFormElement.prototype.checkValidity) {
-                        const originalCheckValidity = HTMLFormElement.prototype.checkValidity;
-                        HTMLFormElement.prototype.checkValidity = function() {
-                            console.log('🔒 Validación HTML5 interceptada y deshabilitada');
-                            return true; // Siempre retorna válido
-                        };
-                        console.log('✅ Función checkValidity() overrideada');
-                    }
-                    
-                    // Override de la función reportValidity
-                    if (typeof HTMLFormElement !== 'undefined' && HTMLFormElement.prototype.reportValidity) {
-                        const originalReportValidity = HTMLFormElement.prototype.reportValidity;
-                        HTMLFormElement.prototype.reportValidity = function() {
-                            console.log('🔒 reportValidity interceptado y deshabilitado');
-                            return true; // Siempre retorna válido
-                        };
-                        console.log('✅ Función reportValidity() overrideada');
-                    }
-                    
-                    // Override de la función validate
-                    if (typeof HTMLFormElement !== 'undefined' && HTMLFormElement.prototype.validate) {
-                        const originalValidate = HTMLFormElement.prototype.validate;
-                        HTMLFormElement.prototype.validate = function() {
-                            console.log('🔒 validate interceptado y deshabilitado');
-                            return true; // Siempre retorna válido
-                        };
-                        console.log('✅ Función validate() overrideada');
-                    }
-                    
-                    console.log('=== VALIDACIÓN DE ODOO INTERCEPTADA ===');
-                    
-                    // OVERRIDE FINAL: INTERCEPTAR EVENTOS DE VALIDACIÓN
-                    console.log('=== INTERCEPTANDO EVENTOS DE VALIDACIÓN ===');
-                    
-                    // Interceptar eventos de invalid en todos los campos
-                    const allInputs = document.querySelectorAll('input, select, textarea');
-                    allInputs.forEach(function(input) {
-                        input.addEventListener('invalid', function(e) {
-                            console.log('🔒 Evento invalid interceptado en:', input.name || input.id);
-                            e.preventDefault();
-                            e.stopPropagation();
-                            return false;
-                        });
-                        
-                        input.addEventListener('input', function(e) {
-                            // Remover cualquier validación que se haya agregado dinámicamente
-                            this.removeAttribute('required');
-                            this.removeAttribute('pattern');
-                            this.removeAttribute('minlength');
-                            this.removeAttribute('maxlength');
-                        });
-                    });
-                    
-                    // Interceptar eventos de submit en el formulario
-                    const forms = document.querySelectorAll('form');
-                    forms.forEach(function(form) {
-                        form.addEventListener('submit', function(e) {
-                            console.log('🔒 Evento submit interceptado en formulario:', form.className || form.id);
-                            // No prevenir el submit, solo loggear
-                        });
-                    });
-                    
-                    console.log('=== EVENTOS DE VALIDACIÓN INTERCEPTADOS ===');
-                    
-                    // FORZAR REMOCIÓN DE VALIDACIÓN CADA 100ms (por si acaso)
-                    setInterval(function() {
-                        const allFields = document.querySelectorAll('input, select, textarea');
-                        allFields.forEach(function(field) {
-                            if (field.hasAttribute('required') || field.hasAttribute('pattern') || 
-                                field.hasAttribute('minlength') || field.hasAttribute('maxlength')) {
-                                field.removeAttribute('required');
-                                field.removeAttribute('pattern');
-                                field.removeAttribute('minlength');
-                                field.removeAttribute('maxlength');
-                                console.log('🔄 Validación HTML5 removida de campo:', field.name || field.id);
-                            }
-                        });
-                    }, 100);
-                    
-                    console.log('✅ Override de validación HTML5 completamente implementado');
                     
                     // Validación del formulario antes del envío
                     document.querySelector('.checkout_autoformat').addEventListener('submit', function(e) {
@@ -721,10 +584,6 @@
                     // Validación robusta antes de enviar el formulario
                     const checkoutForm = document.querySelector('.checkout_autoformat');
                     if (checkoutForm) {
-                        // DESACTIVAR VALIDACIÓN HTML5 NATIVA
-                        checkoutForm.setAttribute('novalidate', 'true');
-                        console.log('✅ Validación HTML5 nativa desactivada');
-                        
                         checkoutForm.addEventListener('submit', function(e) {
                             console.log('=== VALIDACIÓN DEL FORMULARIO ===');
                             
@@ -734,19 +593,16 @@
                             
                             console.log('Opción de envío - Pickup:', isPickup, 'Delivery:', isDelivery);
                             
-                            // FORZAR REMOCIÓN DE VALIDACIÓN HTML5 EN TODOS LOS CAMPOS
-                            const allFields = checkoutForm.querySelectorAll('input, select, textarea');
-                            allFields.forEach(function(field) {
-                                field.removeAttribute('required');
-                                field.removeAttribute('pattern');
-                                field.removeAttribute('minlength');
-                                field.removeAttribute('maxlength');
-                                console.log(`Campo ${field.name || field.id}: validación HTML5 removida`);
-                            });
-                            
                             if (isPickup) {
-                                // Modo recogo: NO validar nada
-                                console.log('Modo recogo: NO se valida nada, procediendo con envío');
+                                // Modo recogo: remover required de campos de dirección
+                                console.log('Modo recogo: removiendo validación de campos de dirección');
+                                requiredFields.forEach(function(fieldId) {
+                                    const field = document.getElementById(fieldId);
+                                    if (field) {
+                                        field.removeAttribute('required');
+                                        console.log(`Campo ${fieldId}: required removido`);
+                                    }
+                                });
                                 
                                 // Asegurar que los campos tengan valores por defecto
                                 const street = document.getElementById('street');
@@ -765,7 +621,7 @@
                                     }
                                 }
                                 
-                                console.log('✅ Valores por defecto establecidos para modo recogo');
+                                console.log('Valores por defecto establecidos para modo recogo');
                                 
                             } else if (isDelivery) {
                                 // Modo envío: validar que los campos de dirección estén llenos
@@ -774,18 +630,14 @@
                                 let hasErrors = false;
                                 const errorMessages = [];
                                 
-                                // Solo validar campos de dirección para envío
-                                const addressFields = ['street', 'city', 'country_id'];
-                                addressFields.forEach(function(fieldId) {
+                                requiredFields.forEach(function(fieldId) {
                                     const field = document.getElementById(fieldId);
                                     if (field) {
                                         const value = field.value.trim();
-                                        if (!value || value === 'Sin dirección' || value === '') {
+                                        if (!value || value === 'Sin dirección') {
                                             hasErrors = true;
                                             errorMessages.push(`El campo ${fieldId} es requerido para envío a domicilio`);
-                                            console.log(`Error: campo ${fieldId} vacío o inválido - valor: "${value}"`);
-                                        } else {
-                                            console.log(`✅ Campo ${fieldId} válido: "${value}"`);
+                                            console.log(`Error: campo ${fieldId} vacío o inválido`);
                                         }
                                     }
                                 });
@@ -798,7 +650,7 @@
                                     return false;
                                 }
                                 
-                                console.log('✅ Validación de envío a domicilio exitosa');
+                                console.log('Validación de envío a domicilio exitosa');
                             }
                             
                             // Validación adicional del DNI/RUC según el tipo de comprobante
@@ -818,7 +670,7 @@
                                     razonSocialInput.focus();
                                     return false;
                                 }
-                                console.log('✅ Validación de factura exitosa');
+                                console.log('Validación de factura exitosa');
                             } else {
                                 // Validar DNI para boleta
                                 if (!dniInput.value || dniInput.value.length !== 8) {
@@ -827,7 +679,7 @@
                                     dniInput.focus();
                                     return false;
                                 }
-                                console.log('✅ Validación de boleta exitosa');
+                                console.log('Validación de boleta exitosa');
                             }
                             
                             console.log('✅ Formulario validado exitosamente, procediendo con el envío');
