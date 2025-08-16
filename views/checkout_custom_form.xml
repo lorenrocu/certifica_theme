@@ -398,6 +398,13 @@
                     
                     // Validación del formulario antes del envío
                     document.querySelector('.checkout_autoformat').addEventListener('submit', function(e) {
+                        // Asegurar que el campo invoice_type_hidden tenga el valor correcto
+                        if (invoiceCheckbox.checked) {
+                            invoiceTypeHidden.value = 'factura';
+                        } else {
+                            invoiceTypeHidden.value = 'boleta';
+                        }
+                        
                         if (invoiceCheckbox.checked) {
                             if (!rucInput.value || rucInput.value.length !== 11) {
                                 e.preventDefault();
@@ -419,6 +426,8 @@
                                 return false;
                             }
                         }
+                        
+                        console.log('Formulario enviado con invoice_type:', invoiceTypeHidden.value);
                     });
 
                     // Declarar shippingAddressFields solo una vez
