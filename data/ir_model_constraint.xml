@@ -4,7 +4,7 @@
         <!-- Sobrescribir la constraint de validación de VAT -->
         <record id="override_vat_constraint" model="ir.model.constraint">
             <field name="name">res_partner_vat_check</field>
-            <field name="model">res.partner</field>
+            <field name="model" ref="base.model_res_partner"/>
             <field name="module">base_vat</field>
             <field name="type">u</field>
             <field name="definition">CHECK (1=1)</field>

@@ -45,3 +45,31 @@ class ResPartnerLatamOverride(models.Model):
         _logger.info("=== VALIDACIÓN LATAM PERÚ DESHABILITADA ===")
         # No hacer ninguna validación
         return True
+
+    # Métodos específicos del módulo l10n_latam_base
+    def _check_vat_latam(self, *args, **kwargs):
+        """
+        Deshabilitar la validación del módulo l10n_latam_base
+        """
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== VALIDACIÓN LATAM DESHABILITADA ===")
+        return True
+
+    def _check_vat_latam_peru(self, *args, **kwargs):
+        """
+        Deshabilitar la validación específica para Perú del módulo l10n_latam_base
+        """
+        _logger = logging.getLogger(__name__)
+        _logger.info("=== VALIDACIÓN LATAM PERÚ ESPECÍFICA DESHABILITADA ===")
+        return True
+
+    # Interceptar cualquier método que comience con _check_vat
+    def __getattr__(self, name):
+        """
+        Interceptar cualquier método que comience con _check_vat
+        """
+        if name.startswith('_check_vat'):
+            _logger = logging.getLogger(__name__)
+            _logger.info(f"=== INTERCEPTANDO MÉTODO LATAM {name} - DESHABILITADO ===")
+            return lambda *args, **kwargs: True
+        return super().__getattr__(name)
