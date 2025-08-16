@@ -108,7 +108,6 @@ class ResPartner(models.Model):
         temp_partner._update_vat_field(vals)
         return super(ResPartner, self).create(vals)
 
-    @api.multi
     def write(self, vals):
         """
         Al actualizar un partner, mapear DNI o RUC al campo VAT según el tipo de comprobante
