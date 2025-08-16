@@ -19,12 +19,12 @@ class ResPartner(models.Model):
         
         try:
             # Verificar si el modelo está disponible
-            if 'l10n.latam.identification.type' not in self.env.registry:
-                _logger.warning("Modelo l10n.latam.identification.type no disponible")
+            if 'l10n_latam.identification.type' not in self.env.registry:
+                _logger.warning("Modelo l10n_latam.identification.type no disponible")
                 return False
             
             # Buscar el tipo de identificación en la base de datos
-            identification_type_model = self.env['l10n.latam.identification.type']
+            identification_type_model = self.env['l10n_latam.identification.type']
             
             # Detectar DNI (8 dígitos) - ID 5 en tu base de datos
             if len(vat_clean) == 8 and vat_clean.isdigit():
@@ -78,17 +78,17 @@ class ResPartner(models.Model):
                     _logger.warning("No se encontró el tipo DNI en la base de datos")
                     return False
             
-            # Otros casos - usar VAT genérico
+            # Otros casos - usar DNI por defecto (ID 5)
             else:
-                vat_type = identification_type_model.search([
-                    ('name', '=', 'VAT'),
+                dni_type = identification_type_model.search([
+                    ('name', '=', 'DNI'),
                     ('country_id', '=', 173)  # Perú
                 ], limit=1)
-                if vat_type:
-                    _logger.info(f"VAT genérico detectado: {vat_clean} -> Tipo ID: {vat_type.id}")
-                    return vat_type.id
+                if dni_type:
+                    _logger.info(f"VAT genérico detectado: {vat_clean} -> Usando DNI por defecto ID: {dni_type.id}")
+                    return dni_type.id
                 else:
-                    _logger.warning("No se encontró el tipo VAT en la base de datos")
+                    _logger.warning("No se encontró el tipo DNI en la base de datos")
                     return False
                     
         except Exception as e:
