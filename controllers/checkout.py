@@ -130,15 +130,18 @@ class WebsiteSaleCheckout(WebsiteSale):
             # Establecer tipo de comprobante - TEMPORALMENTE COMENTADO PARA EVITAR ERROR
             # checkout['invoice_type'] = 'factura' if is_invoice_requested else 'boleta'
 
-            # Mapear documentos directamente al campo VAT estándar de Odoo con prefijo PE
+            # Mapear DNI/RUC directamente al campo VAT estándar de Odoo
+            vat_value = None
             if ruc:
-                checkout['vat'] = f"PE{ruc}"
-                _logger.info(f"RUC mapeado a VAT: PE{ruc}")
+                vat_value = ruc.strip()
+                _logger.info(f"Usando RUC como VAT: {vat_value}")
             elif dni:
-                checkout['vat'] = f"PE{dni}"
-                _logger.info(f"DNI mapeado a VAT: PE{dni}")
-            else:
-                _logger.info("No se encontró RUC ni DNI para mapear a VAT")
+                vat_value = dni.strip()
+                _logger.info(f"Usando DNI como VAT: {vat_value}")
+            
+            if vat_value:
+                checkout['vat'] = vat_value
+                _logger.info(f"VAT asignado en checkout: {vat_value}")
 
             # Mapear razón social al name cuando es factura
             if is_invoice_requested and razon_social:
@@ -181,12 +184,10 @@ class WebsiteSaleCheckout(WebsiteSale):
             try:
                 created_partner = Partner.sudo().browse(partner_id)
                 _logger.info(f"Partner creado con ID: {partner_id}")
-                # _logger.info(f"DNI guardado: {getattr(created_partner, 'dni', None) or 'No especificado'}")
-                # _logger.info(f"RUC guardado: {getattr(created_partner, 'ruc', None) or 'No especificado'}")
-                _logger.info(f"VAT guardado: {getattr(created_partner, 'vat', None) or 'No especificado'}")
-                # _logger.info(f"Tipo de comprobante: {getattr(created_partner, 'invoice_type', None) or 'No especificado'}")
+                _logger.info(f"VAT guardado (DNI/RUC): {getattr(created_partner, 'vat', None) or 'No especificado'}")
                 _logger.info(f"Nombre guardado: {getattr(created_partner, 'name', None) or 'No especificado'}")
                 _logger.info(f"Email guardado: {getattr(created_partner, 'email', None) or 'No especificado'}")
+                _logger.info(f"Teléfono guardado: {getattr(created_partner, 'phone', None) or 'No especificado'}")
             except Exception as e:
                 _logger.error(f"Error al acceder a campos del partner creado: {e}")
                 _logger.info(f"Partner creado con ID: {partner_id} (información detallada no disponible)")
@@ -261,24 +262,32 @@ class WebsiteSaleCheckout(WebsiteSale):
         _logger.info(f"Procesando campos personalizados...")
         _logger.info(f"DNI en values: {values.get('dni')}")
         
-        # TEMPORALMENTE COMENTADO - campos personalizados
-        # if 'dni' in values and values['dni']:
-        #     new_values['dni'] = values['dni'].strip()
-        #     _logger.info(f"DNI procesado: {new_values['dni']}")
-        # else:
-        #     _logger.info("DNI no encontrado o vacío")
-            
+        # Mapear DNI/RUC al campo VAT estándar de Odoo
+        vat_value = None
+        
         # Solo incluir campos de factura si se solicita factura
         if is_invoice_requested:
             _logger.info("Procesando campos de factura...")
-            # if 'ruc' in values and values['ruc']:
-            #     new_values['ruc'] = values['ruc'].strip()
-            #     _logger.info(f"RUC procesado: {new_values['ruc']}")
+            if 'ruc' in values and values['ruc']:
+                vat_value = values['ruc'].strip()
+                _logger.info(f"RUC procesado para VAT: {vat_value}")
             if 'razon_social' in values and values['razon_social']:
                 new_values['name'] = values['razon_social'].strip()  # Mapear razón social al nombre
                 _logger.info(f"Razón social procesada: {new_values['name']}")
         else:
-            _logger.info("Campos de RUC no requeridos para boleta")
+            _logger.info("Procesando boleta - usando DNI si está disponible")
+            
+        # Si no hay RUC (factura), usar DNI (boleta)
+        if not vat_value and 'dni' in values and values['dni']:
+            vat_value = values['dni'].strip()
+            _logger.info(f"DNI procesado para VAT: {vat_value}")
+        
+        # Asignar VAT si tenemos un valor
+        if vat_value:
+            new_values['vat'] = vat_value
+            _logger.info(f"VAT final asignado: {vat_value}")
+        else:
+            _logger.info("No se encontró DNI ni RUC para asignar a VAT")
             
         _logger.info(f"Valores finales procesados: {new_values}")
         _logger.info("=== FIN CHECKOUT DEBUG - values_preprocess ===")
