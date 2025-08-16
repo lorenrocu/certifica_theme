@@ -194,69 +194,14 @@ class WebsiteSaleCheckout(WebsiteSale):
             
             self._logger.info(f"KW actualizados: {kw}")
         
-        # IMPLEMENTACIÓN PERSONALIZADA PARA EVITAR POSTPROCESAMIENTO DE WEBSITE_SALE
-        if request.httprequest.method == 'POST':
-            try:
-                # Obtener la orden actual
-                order = request.website.sale_get_order()
-                if not order:
-                    self._logger.error("No se encontró orden activa")
-                    return request.redirect('/shop')
-                
-                # Determinar el modo (new/edit)
-                partner_id = kw.get('partner_id')
-                if partner_id and partner_id.isdigit():
-                    mode = ('edit', int(partner_id))
-                else:
-                    mode = ('new', 'billing')
-                
-                # Preprocesar valores
-                data_values = self.values_preprocess(order, mode, kw)
-                
-                # Validar formulario
-                error, error_message = self.checkout_form_validate(mode, all_form_values, data_values)
-                
-                if error:
-                    self._logger.warning(f"Errores de validación: {error}")
-                    # Retornar formulario con errores
-                    return request.render('website_sale.address', {
-                        'website_sale_order': order,
-                        'partner': order.partner_id,
-                        'mode': mode,
-                        'checkout': all_form_values,
-                        'error': error,
-                        'error_message': error_message
-                    })
-                
-                # Guardar datos del formulario
-                partner_id = self._checkout_form_save(mode, all_form_values, data_values)
-                
-                # Actualizar la orden con el nuevo partner
-                if partner_id:
-                    order.partner_id = partner_id
-                    order.partner_invoice_id = partner_id
-                    order.partner_shipping_id = partner_id
-                    self._logger.info(f"Orden actualizada con partner: {partner_id}")
-                
-                self._logger.info("=== FORMULARIO PROCESADO EXITOSAMENTE ===")
-                
-                # REDIRECCIÓN TEMPORALMENTE DESHABILITADA PARA DEBUGGING
-                # return request.redirect('/shop/payment')
-                
-                # Retornar a la página de address para verificar que los datos se guardaron
-                return request.redirect('/shop/address')
-                
-            except Exception as e:
-                self._logger.error(f"Error en procesamiento personalizado: {str(e)}")
-                # Fallback al método original
-                result = super().address(**kw)
-                self._logger.info("Método super().address() ejecutado como fallback")
-                return result
-        else:
-            # Para GET requests, usar el método original
+        # Llamar al método original con los datos procesados
+        try:
             result = super().address(**kw)
-            self._logger.info("Método super().address() ejecutado para GET")
+            self._logger.info("Método super().address() ejecutado exitosamente")
             return result
+        except Exception as e:
+            self._logger.error(f"Error en super().address(): {str(e)}")
+            raise
 
     def _checkout_form_save(self, mode, checkout, all_values):
         """
@@ -344,8 +289,8 @@ class WebsiteSaleCheckout(WebsiteSale):
             checkout['country_id'] = 173  # Perú
             self._logger.info("Modo recogo: usando dirección por defecto")
         
-        # Filtrar solo campos válidos de res.partner (INCLUIR l10n_latam_identification_type_id)
-        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'is_company', 'l10n_latam_identification_type_id']
+        # Filtrar solo campos válidos de res.partner (EXCLUIR l10n_latam_identification_type_id)
+        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'is_company']
         filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields and v is not None and v != ''}
         
         self._logger.info(f"Checkout filtrado: {filtered_checkout}")
@@ -362,11 +307,15 @@ class WebsiteSaleCheckout(WebsiteSale):
             partner_id = Partner.create(filtered_checkout).id
             self._logger.info(f"Partner creado: {partner_id}")
         
-        # El campo l10n_latam_identification_type_id ya se incluye en filtered_checkout
+        # ACTUALIZAR EL CAMPO DE IDENTIFICACIÓN DESPUÉS DE CREAR/ACTUALIZAR
         if identification_type_id:
-            self._logger.info(f"✅ Campo de identificación incluido en la creación/actualización: {identification_type_id}")
+            success = self._update_partner_identification_type(partner_id, identification_type_id)
+            if success:
+                self._logger.info(f"✅ Campo de identificación actualizado exitosamente para partner {partner_id}")
+            else:
+                self._logger.error(f"❌ No se pudo actualizar el campo de identificación para partner {partner_id}")
         else:
-            self._logger.warning("⚠️ No se detectó tipo de identificación")
+            self._logger.warning("⚠️ No se detectó tipo de identificación, no se actualizará el campo")
         
         return partner_id
 
