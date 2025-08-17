@@ -17,6 +17,7 @@ from . import safe_cart_summary_fix
 from . import disable_aggressive_fixes
 from . import template_error_interceptor
 from . import website_sale_order_guarantee
+from . import template_render_interceptor
 
 # Ejecutar GARANTÍA COMPLETA de cart_summary al cargar el módulo
 def _cart_summary_guarantee_on_module_load():
@@ -55,6 +56,17 @@ def _cart_summary_guarantee_on_module_load():
                 _logger.warning("⚠️ GARANTÍA activada pero con advertencias")
         else:
             _logger.warning("⚠️ Método de garantía no disponible aún")
+        
+        # Activar interceptor de templates para cart_summary
+        qweb_model = env['ir.qweb']
+        if hasattr(qweb_model, '_ensure_cart_summary_never_fails'):
+            result = qweb_model._ensure_cart_summary_never_fails()
+            if result:
+                _logger.info("✅ INTERCEPTOR DE TEMPLATES ACTIVADO - CART_SUMMARY PROTEGIDO")
+            else:
+                _logger.warning("⚠️ Interceptor activado pero con advertencias")
+        else:
+            _logger.warning("⚠️ Método de interceptor no disponible aún")
             
     except Exception as e:
         _logger.error(f"❌ Error al ejecutar GARANTÍA de cart_summary: {str(e)}")

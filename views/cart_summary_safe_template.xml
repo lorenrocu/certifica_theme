@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="cart_summary_safe" name="Cart Summary Safe" inherit_id="website_sale.cart_summary">
+        <xpath expr="." position="replace">
+            <div class="oe_cart" t-if="website_sale_order and website_sale_order.pricelist_id and website_sale_order.pricelist_id.currency_id">
+                <!-- Template original seguro -->
+                <div class="row">
+                    <div class="col-md-6 offset-md-6 text-right">
+                        <table class="table table-sm">
+                            <tr class="border-black o_website_sale_total">
+                                <td>
+                                    <strong>Total</strong>
+                                </td>
+                                <td class="text-right">
+                                    <span id="amount_total_summary" class="monetary_field" t-field="website_sale_order.amount_total" t-options="{'widget': 'monetary', 'display_currency': website_sale_order.pricelist_id.currency_id}"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fallback cuando no hay orden válida -->
+            <div class="oe_cart" t-else="">
+                <div class="row">
+                    <div class="col-md-6 offset-md-6 text-right">
+                        <table class="table table-sm">
+                            <tr class="border-black o_website_sale_total">
+                                <td>
+                                    <strong>Total</strong>
+                                </td>
+                                <td class="text-right">
+                                    <span class="monetary_field">0.00</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>
