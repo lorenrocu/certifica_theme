@@ -227,9 +227,25 @@ class WebsiteSaleCheckout(WebsiteSale):
             request.context = dict(original_context, **no_validation_context)
             
             try:
-                result = super().address(**kw)
-                self._logger.info("✅ Método address() ejecutado sin validaciones de backend")
-                return result
+                # Si es POST con datos del formulario, procesar y redirigir al siguiente paso
+                if request.httprequest.method == 'POST' and (all_form_values.get('submitted') or len(all_form_values) > 1):
+                    # Procesar el formulario sin validaciones
+                    result = super().address(**kw)
+                    self._logger.info("✅ Método address() ejecutado sin validaciones de backend")
+                    
+                    # En lugar de permitir el redirect automático, redirigir directamente al checkout
+                    order = request.website.sale_get_order()
+                    if order and order.order_line:
+                        self._logger.info("🔄 Redirigiendo directamente al checkout para evitar recarga")
+                        return request.redirect('/shop/checkout')
+                    else:
+                        self._logger.info("🔄 No hay orden, redirigiendo al carrito")
+                        return request.redirect('/shop/cart')
+                else:
+                    # Si es GET, mostrar la página normalmente
+                    result = super().address(**kw)
+                    self._logger.info("✅ Método address() GET ejecutado sin validaciones de backend")
+                    return result
             finally:
                 # Restaurar contexto original
                 request.context = original_context
