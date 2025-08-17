@@ -138,6 +138,15 @@ class WebsiteSaleCheckout(WebsiteSale):
         all_form_values = request.httprequest.form.to_dict()
         self._logger.info(f"Todos los valores del formulario: {all_form_values}")
         
+        # Normalizar claves con espacios accidentales (p.ej., 'phone ')
+        sanitized_form_values = {k.strip(): v for k, v in all_form_values.items()}
+        if set(sanitized_form_values.keys()) != set(all_form_values.keys()):
+            self._logger.info(f"Normalizando claves del formulario: {set(all_form_values.keys())} -> {set(sanitized_form_values.keys())}")
+        all_form_values = sanitized_form_values
+        
+        # Fusionar KW con valores normalizados para asegurar consistencia aguas abajo
+        kw = {**kw, **all_form_values}
+        
         # Verificar si es un envío de formulario (POST con datos)
         if request.httprequest.method == 'POST' and (all_form_values.get('submitted') or len(all_form_values) > 1):
             self._logger.info("=== PROCESANDO ENVÍO DE FORMULARIO ===")
@@ -240,6 +249,22 @@ class WebsiteSaleCheckout(WebsiteSale):
                     try:
                         partner_id = self._checkout_form_save(mode, kw, {**kw, **data_values})
                         self._logger.info(f"✅ Partner guardado manualmente (id={partner_id})")
+
+                        # Vincular partner al pedido actual antes de redirigir
+                        if order:
+                            try:
+                                partner_rec = request.env['res.partner'].sudo().browse(partner_id)
+                                write_vals = {
+                                    'partner_id': partner_rec.commercial_partner_id.id or partner_rec.id,
+                                    'partner_invoice_id': partner_rec.id,
+                                    'partner_shipping_id': partner_rec.id,
+                                }
+                                order.sudo().write(write_vals)
+                                # Actualizar sesión para coherencia
+                                request.session['partner_id'] = partner_rec.id
+                                self._logger.info(f"🧩 Pedido {order.id} actualizado con partner {partner_rec.id} (invoice/shipping asignados)")
+                            except Exception as e:
+                                self._logger.error(f"❌ Error vinculando partner {partner_id} al pedido: {e}")
                     except Exception as e:
                         self._logger.error(f"❌ Error guardando partner manualmente: {e}")
                         # Como fallback, intentar con super() una sola vez

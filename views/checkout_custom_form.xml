@@ -109,13 +109,12 @@
                                                     <i class="fa fa-phone"></i>
                                                 </span>
                                             </div>
-                                            <input type="tel" 
+                                            <input type="text" 
                                                    class="form-control" 
                                                    id="phone" 
                                                    name="phone" 
-                                                   placeholder="+51 999 999 999"
-                                                   required="true"
-                                                   t-att-value="partner.phone if partner else ''"/>
+                                                   autocomplete="tel"
+                                                   placeholder="Ej: +51 912 345 678"/>
                                         </div>
                                     </div>
                                 </div>
