@@ -227,19 +227,33 @@ class WebsiteSaleCheckout(WebsiteSale):
             request.context = dict(original_context, **no_validation_context)
             
             try:
-                # Si es POST con datos del formulario, procesar y redirigir al siguiente paso
+                # Si es POST con datos del formulario, procesar y redirigir manualmente sin llamar al método padre
                 if request.httprequest.method == 'POST' and (all_form_values.get('submitted') or len(all_form_values) > 1):
-                    # Procesar el formulario sin validaciones
-                    result = super().address(**kw)
-                    self._logger.info("✅ Método address() ejecutado sin validaciones de backend")
-                    
-                    # En lugar de permitir el redirect automático, redirigir directamente al checkout
+                    self._logger.info("🧭 POST address(): guardado manual sin super() y redirección controlada")
+
+                    # Preprocesar valores (detecta vat e identificación)
+                    order = request.website.sale_get_order()
+                    mode = ('new', 'billing')
+                    data_values = self.values_preprocess(order, mode, kw)
+
+                    # Guardar partner sin validaciones
+                    try:
+                        partner_id = self._checkout_form_save(mode, kw, {**kw, **data_values})
+                        self._logger.info(f"✅ Partner guardado manualmente (id={partner_id})")
+                    except Exception as e:
+                        self._logger.error(f"❌ Error guardando partner manualmente: {e}")
+                        # Como fallback, intentar con super() una sola vez
+                        result = super().address(**kw)
+                        self._logger.info("↩️ Fallback a super().address() ejecutado")
+                        return result
+
+                    # Redirigir explícitamente después del guardado
                     order = request.website.sale_get_order()
                     if order and order.order_line:
-                        self._logger.info("🔄 Redirigiendo directamente al checkout para evitar recarga")
+                        self._logger.info("🔄 Redirigiendo a /shop/checkout (sin recarga de address)")
                         return request.redirect('/shop/checkout')
                     else:
-                        self._logger.info("🔄 No hay orden, redirigiendo al carrito")
+                        self._logger.info("🛒 No hay líneas de pedido, redirigiendo a /shop/cart")
                         return request.redirect('/shop/cart')
                 else:
                     # Si es GET, mostrar la página normalmente
