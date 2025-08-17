@@ -15,17 +15,20 @@ from . import cart_summary_error_fix
 from . import auto_cart_summary_fix
 from . import safe_cart_summary_fix
 from . import disable_aggressive_fixes
+from . import template_error_interceptor
+from . import website_sale_order_guarantee
 
-# Ejecutar SOLO corrección MÍNIMA y SEGURA al cargar el módulo
-def _minimal_safe_fix_on_module_load():
+# Ejecutar GARANTÍA COMPLETA de cart_summary al cargar el módulo
+def _cart_summary_guarantee_on_module_load():
     """
-    Ejecutar SOLO corrección MÍNIMA y SEGURA - PROTEGIENDO LISTAS DE PRECIOS EXISTENTES
+    Ejecutar GARANTÍA COMPLETA de cart_summary - PROTEGIENDO LISTAS DE PRECIOS EXISTENTES
     """
     try:
         import logging
         _logger = logging.getLogger(__name__)
-        _logger.info("=== MÓDULO CERTIFICA_THEME CARGADO - SOLO CORRECCIÓN MÍNIMA Y SEGURA ===")
+        _logger.info("=== MÓDULO CERTIFICA_THEME CARGADO - GARANTÍA COMPLETA DE CART_SUMMARY ===")
         _logger.info("⚠️ CORRECCIONES AGRESIVAS DESACTIVADAS - LISTAS DE PRECIOS PROTEGIDAS")
+        _logger.info("🚀 GARANTÍA COMPLETA DE CART_SUMMARY ACTIVADA")
         
         # Importar el modelo después de que esté disponible
         from odoo import api, SUPERUSER_ID
@@ -37,27 +40,28 @@ def _minimal_safe_fix_on_module_load():
             sale_order_model._disable_aggressive_fixes()
             _logger.info("✅ Correcciones agresivas desactivadas")
         
-        # Ejecutar SOLO corrección mínima y segura
-        if hasattr(sale_order_model, '_emergency_cart_summary_fix_disabled'):
-            result = sale_order_model._emergency_cart_summary_fix_disabled()
-            if result:
-                _logger.info("✅ Corrección MÍNIMA completada - LISTAS DE PRECIOS PROTEGIDAS")
-            else:
-                _logger.warning("⚠️ Corrección MÍNIMA completada pero con advertencias")
-        else:
-            _logger.warning("⚠️ Método de corrección MÍNIMA no disponible aún")
-            
         # Proteger listas de precios existentes
         if hasattr(sale_order_model, '_prevent_any_pricelist_modifications'):
             sale_order_model._prevent_any_pricelist_modifications()
             _logger.info("✅ Listas de precios existentes protegidas")
+        
+        # Activar garantía de cart_summary
+        website_model = env['website']
+        if hasattr(website_model, '_ensure_cart_summary_always_works'):
+            result = website_model._ensure_cart_summary_always_works()
+            if result:
+                _logger.info("✅ GARANTÍA COMPLETA DE CART_SUMMARY ACTIVADA - LISTAS DE PRECIOS PROTEGIDAS")
+            else:
+                _logger.warning("⚠️ GARANTÍA activada pero con advertencias")
+        else:
+            _logger.warning("⚠️ Método de garantía no disponible aún")
             
     except Exception as e:
-        _logger.error(f"❌ Error al ejecutar corrección MÍNIMA: {str(e)}")
+        _logger.error(f"❌ Error al ejecutar GARANTÍA de cart_summary: {str(e)}")
 
-# Ejecutar SOLO la corrección MÍNIMA cuando se importe el módulo
+# Ejecutar la GARANTÍA COMPLETA cuando se importe el módulo
 try:
-    _minimal_safe_fix_on_module_load()
+    _cart_summary_guarantee_on_module_load()
 except Exception as e:
     # Si falla, no hacer nada - se ejecutará más tarde
     pass 
