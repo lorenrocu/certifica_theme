@@ -5,4 +5,7 @@ from . import res_partner
 from . import base_vat_override
 from . import l10n_latam_override
 from . import vat_validation_override
-from . import vat_monkey_patch 
+from . import vat_monkey_patch
+from . import website_sale_validation_override
+from . import payment_validation_override
+from . import sale_validation_override 
