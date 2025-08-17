@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Template seguro para cart_summary que maneja pricelist_id None -->
+        <template id="cart_summary_safe" inherit_id="website_sale.cart_summary">
+            <!-- Reemplazar el span problemático con una versión segura -->
+            <xpath expr="//span[@id='amount_total_summary']" position="replace">
+                <span id="amount_total_summary" class="monetary_field">
+                    <t t-if="website_sale_order and website_sale_order.pricelist_id and website_sale_order.pricelist_id.currency_id">
+                        <!-- Caso normal: orden con pricelist y moneda -->
+                        <t t-field="website_sale_order.amount_total" 
+                           t-options="{'widget': 'monetary', 'display_currency': website_sale_order.pricelist_id.currency_id}"/>
+                    </t>
+                    <t t-elif="website_sale_order and website_sale_order.currency_id">
+                        <!-- Caso alternativo: orden con moneda pero sin pricelist -->
+                        <t t-field="website_sale_order.amount_total" 
+                           t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"/>
+                    </t>
+                    <t t-elif="website_sale_order">
+                        <!-- Caso de respaldo: orden sin moneda definida -->
+                        <span t-field="website_sale_order.amount_total"/> 
+                        <span t-if="request.env.ref('base.PEN', False)" 
+                              t-field="request.env.ref('base.PEN').symbol"/>
+                    </t>
+                    <t t-else="">
+                        <!-- Caso de emergencia: no hay orden -->
+                        <span>S/ 0.00</span>
+                    </t>
+                </span>
+            </xpath>
+            
+            <!-- Agregar verificaciones adicionales para otros elementos monetarios -->
+            <xpath expr="//span[contains(@class, 'monetary_field') and contains(@t-options, 'website_sale_order.pricelist_id.currency_id')]" position="replace">
+                <span t-att-class="'monetary_field ' + (span.get('class', '') or '')">
+                    <t t-if="website_sale_order and website_sale_order.pricelist_id and website_sale_order.pricelist_id.currency_id">
+                        <!-- Usar pricelist currency -->
+                        <t t-field="website_sale_order.amount_total" 
+                           t-options="{'widget': 'monetary', 'display_currency': website_sale_order.pricelist_id.currency_id}"/>
+                    </t>
+                    <t t-elif="website_sale_order and website_sale_order.currency_id">
+                        <!-- Usar order currency -->
+                        <t t-field="website_sale_order.amount_total" 
+                           t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"/>
+                    </t>
+                    <t t-else="">
+                        <!-- Fallback seguro -->
+                        <span>S/ 0.00</span>
+                    </t>
+                </span>
+            </xpath>
+        </template>
+    </data>
+</odoo>
