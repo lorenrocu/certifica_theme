@@ -212,6 +212,9 @@ class WebsiteSaleCheckout(WebsiteSale):
             if hasattr(request, 'website') and request.website.partner_id:
                 partner = request.website.partner_id
                 self._logger.info(f"  - Partner existente encontrado: ID {partner.id}")
+
+            # Normalizar claves de kw por si llegan con espacios (ej. 'phone ')
+            kw = {k.strip(): v for k, v in kw.items()}
             
             # Si hay partner, actualizar sin validaciones
             if partner and partner.id != request.website.user_id.partner_id.id:
@@ -270,6 +273,35 @@ class WebsiteSaleCheckout(WebsiteSale):
                         # Como fallback, intentar con super() una sola vez
                         result = super().address(**kw)
                         self._logger.info("↩️ Fallback a super().address() ejecutado")
+
+                        # Intentar enlazar partner al pedido si el super() no lo hizo
+                        try:
+                            order = request.website.sale_get_order()
+                            # Extraer partner_id potencial del contexto/resultados
+                            possible_pid = None
+                            # buscar en kw o all_form_values
+                            for key in ['partner_id', 'partner', 'partner_shipping_id', 'partner_invoice_id']:
+                                if key in kw and str(kw[key]).strip().isdigit():
+                                    possible_pid = int(str(kw[key]).strip())
+                                    break
+                            if not possible_pid and 'vat' in kw:
+                                # Buscar por VAT recientemente creado
+                                found = request.env['res.partner'].sudo().search([('vat', '=', kw['vat'])], limit=1)
+                                possible_pid = found.id if found else None
+                            if order and possible_pid:
+                                partner_rec = request.env['res.partner'].sudo().browse(possible_pid)
+                                if partner_rec and partner_rec.exists():
+                                    write_vals = {
+                                        'partner_id': partner_rec.commercial_partner_id.id or partner_rec.id,
+                                        'partner_invoice_id': partner_rec.id,
+                                        'partner_shipping_id': partner_rec.id,
+                                    }
+                                    order.sudo().write(write_vals)
+                                    request.session['partner_id'] = partner_rec.id
+                                    self._logger.info(f"🧩 Enlace post-super(): Pedido {order.id} actualizado con partner {partner_rec.id}")
+                        except Exception as e2:
+                            self._logger.error(f"❌ Error enlazando partner tras super(): {e2}")
+
                         return result
 
                     # Redirigir explícitamente después del guardado
@@ -301,6 +333,19 @@ class WebsiteSaleCheckout(WebsiteSale):
         self._logger.info(f"Mode: {mode}")
         self._logger.info(f"Checkout: {checkout}")
         self._logger.info(f"All values: {all_values}")
+        
+        # 🔧 NORMALIZAR TIPOS DE DATOS Y SANITIZAR CAMPOS
+        # Normalizar cualquier clave con espacios accidentales
+        sanitized_checkout = {k.strip(): v for k, v in checkout.items()}
+        sanitized_all_values = {k.strip(): v for k, v in all_values.items()}
+        
+        if set(sanitized_checkout.keys()) != set(checkout.keys()):
+            self._logger.info(f"Normalizando claves checkout: {set(checkout.keys())} -> {set(sanitized_checkout.keys())}")
+        if set(sanitized_all_values.keys()) != set(all_values.keys()):
+            self._logger.info(f"Normalizando claves all_values: {set(all_values.keys())} -> {set(sanitized_all_values.keys())}")
+        
+        checkout = sanitized_checkout
+        all_values = sanitized_all_values
         
         # Obtener valores del formulario
         dni = all_values.get('dni', '').strip()
@@ -365,13 +410,32 @@ class WebsiteSaleCheckout(WebsiteSale):
                 checkout['city'] = all_values.get('city', '')
                 self._logger.info(f"Ciudad asignada: {checkout['city']}")
             
-            if 'country_id' not in checkout or not checkout['country_id']:
-                country_id = all_values.get('country_id', '')
-                if country_id and country_id.isdigit():
-                    checkout['country_id'] = int(country_id)
-                    self._logger.info(f"País asignado: {checkout['country_id']}")
+            # Normalizar country_id (y otros posibles Many2one IDs)
+            def _to_int(val):
+                try:
+                    # Manejar valores como '173', 173, ' 173 ', None, ''
+                    if val is None:
+                        return None
+                    if isinstance(val, int):
+                        return val
+                    if isinstance(val, str):
+                        val = val.strip()
+                        return int(val) if val.isdigit() else None
+                    # Manejar floats accidentalmente
+                    if isinstance(val, float):
+                        return int(val)
+                    return None
+                except Exception:
+                    return None
+            
+            if 'country_id' in all_values or 'country_id' in checkout:
+                raw_country = checkout.get('country_id') or all_values.get('country_id')
+                normalized_country = _to_int(raw_country)
+                if normalized_country:
+                    checkout['country_id'] = normalized_country
+                    self._logger.info(f"País asignado (normalizado): {checkout['country_id']}")
                 else:
-                    self._logger.warning(f"País inválido: {country_id}")
+                    self._logger.warning(f"País inválido: {raw_country}")
         else:
             # Recojo en tienda: usar valores por defecto
             checkout['street'] = 'Sin dirección'
@@ -379,8 +443,18 @@ class WebsiteSaleCheckout(WebsiteSale):
             checkout['country_id'] = 173  # Perú
             self._logger.info("Modo recogo: usando dirección por defecto")
         
-        # Filtrar solo campos válidos de res.partner (EXCLUIR l10n_latam_identification_type_id)
-        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'is_company']
+        # Incluir l10n_latam_identification_type_id y normalizarlo si llega como string
+        if identification_type_id:
+            checkout['l10n_latam_identification_type_id'] = int(identification_type_id)
+        elif 'l10n_latam_identification_type_id' in checkout:
+            try:
+                checkout['l10n_latam_identification_type_id'] = int(str(checkout['l10n_latam_identification_type_id']).strip())
+            except Exception:
+                self._logger.warning(f"l10n_latam_identification_type_id inválido: {checkout.get('l10n_latam_identification_type_id')} (se omitirá)")
+                checkout.pop('l10n_latam_identification_type_id', None)
+
+        # Filtrar solo campos válidos de res.partner (incluye l10n_latam_identification_type_id)
+        valid_fields = ['name', 'email', 'phone', 'street', 'city', 'country_id', 'vat', 'is_company', 'l10n_latam_identification_type_id']
         filtered_checkout = {k: v for k, v in checkout.items() if k in valid_fields and v is not None and v != ''}
         
         self._logger.info(f"Checkout filtrado: {filtered_checkout}")
@@ -397,15 +471,11 @@ class WebsiteSaleCheckout(WebsiteSale):
             partner_id = Partner.create(filtered_checkout).id
             self._logger.info(f"Partner creado: {partner_id}")
         
-        # ACTUALIZAR EL CAMPO DE IDENTIFICACIÓN DESPUÉS DE CREAR/ACTUALIZAR
+        # Ya no es necesario actualizar después; se envió en el write/create
         if identification_type_id:
-            success = self._update_partner_identification_type(partner_id, identification_type_id)
-            if success:
-                self._logger.info(f"✅ Campo de identificación actualizado exitosamente para partner {partner_id}")
-            else:
-                self._logger.error(f"❌ No se pudo actualizar el campo de identificación para partner {partner_id}")
+            self._logger.info(f"✅ l10n_latam_identification_type_id enviado en create/write: {checkout.get('l10n_latam_identification_type_id')}")
         else:
-            self._logger.warning("⚠️ No se detectó tipo de identificación, no se actualizará el campo")
+            self._logger.warning("⚠️ No se detectó tipo de identificación, el campo puede no haberse enviado")
         
         return partner_id
 
