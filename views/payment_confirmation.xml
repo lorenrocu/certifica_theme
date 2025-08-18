@@ -57,6 +57,11 @@
                                             <t t-if="acquirer">
                                                 <p class="mb-1"><strong>Método de pago:</strong> <span t-esc="acquirer.name"/></p>
                                                 
+                                                <!-- Sufijo de WhatsApp cuando el cliente solicita factura (RUC) -->
+                                                <t t-set="partner_for_ruc" t-value="order.partner_invoice_id or order.partner_id"/>
+                                                <t t-set="is_ruc" t-value="partner_for_ruc and ((partner_for_ruc.l10n_latam_identification_type_id and partner_for_ruc.l10n_latam_identification_type_id.name == 'RUC') or (partner_for_ruc.vat and partner_for_ruc.vat.isdigit() and len(partner_for_ruc.vat) == 11))"/>
+                                                <t t-set="factura_suffix" t-value="'%20Estoy%20solicitando%20factura' if is_ruc else ''"/>
+                                                
                                                 <!-- Mostrar datos bancarios si es transferencia -->
                                                 <t t-if="acquirer.provider == 'transfer'">
                                                     <div class="mt-3 p-3 bg-light border rounded">
@@ -101,7 +106,8 @@
                                                                 <strong>Importante:</strong> Envía el comprobante de pago por WhatsApp o email:
                                                             </small>
                                                             <div class="mt-2">
-                                                                <a t-attf-href="https://wa.me/51948087498?text=Hola,%20adjunto%20comprobante%20de%20pago%20para%20el%20pedido%20{{order.name}}%20por%20un%20total%20de%20S/.%20{{order.amount_total}}" 
+                                                                <!-- WhatsApp: transferencia (agregar sufijo si solicita factura) -->
+                                                                <a t-attf-href="https://wa.me/51948087498?text=Hola,%20adjunto%20comprobante%20de%20pago%20para%20el%20pedido%20{{order.name}}%20por%20un%20total%20de%20S/.%20{{order.amount_total}}{{factura_suffix}}" 
                                                                    class="btn btn-success btn-sm mr-2" target="_blank">
                                                                     <i class="fab fa-whatsapp mr-1"></i>
                                                                     Enviar por WhatsApp
@@ -116,7 +122,7 @@
                                                     </div>
                                                 </t>
                                                 
-                                                <!-- Botón WhatsApp para pagos con tarjeta -->
+                                                <!-- Botón WhatsApp para pagos con tarjeta u otros métodos (no transferencia) -->
                                                 <t t-if="acquirer and acquirer.provider != 'transfer'">
                                                     <div class="alert alert-success mt-3">
                                                         <h6 class="text-success mb-3">
@@ -124,7 +130,8 @@
                                                             Pago procesado exitosamente
                                                         </h6>
                                                         <p class="mb-3">Tu pago con tarjeta ha sido procesado. ¡Notifica tu compra por WhatsApp!</p>
-                                                        <a t-attf-href="https://wa.me/51948087498?text=Hola,%20he%20realizado%20una%20compra%20con%20tarjeta.%20Pedido:%20{{order.name}}%20por%20un%20total%20de%20{{order.amount_total}}%20{{order.currency_id.symbol}}.%20¡Gracias!" 
+                                                        <!-- WhatsApp: tarjeta/otros (agregar sufijo si solicita factura) -->
+                                                        <a t-attf-href="https://wa.me/51948087498?text=Hola,%20he%20realizado%20una%20compra%20con%20tarjeta.%20Pedido:%20{{order.name}}%20por%20un%20total%20de%20{{order.amount_total}}%20{{order.currency_id.symbol}}.%20¡Gracias!{{factura_suffix}}" 
                                                            class="btn btn-success btn-lg" target="_blank">
                                                             <i class="fab fa-whatsapp mr-2"></i>
                                                             Notificar compra por WhatsApp
