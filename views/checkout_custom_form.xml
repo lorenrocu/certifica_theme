@@ -282,7 +282,7 @@
                                             </div>
                                         </div>
                                         <!-- País (oculto, predeterminado a Perú) -->
-                                        <input type="hidden" name="country_id" t-att-value="request.env.ref('base.pe').id"/>
+                        <input type="hidden" name="country_id" t-att-value="request.env.ref('base.pe').id"/>
                                     </div>
                                 </div>
                                 
