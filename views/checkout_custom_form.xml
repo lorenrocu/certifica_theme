@@ -281,29 +281,8 @@
                                                        t-att-value="partner.city if partner else ''"/>
                                             </div>
                                         </div>
-                                        <!-- País -->
-                                        <div class="col-md-6 mb-3">
-                                            <label for="country_id" class="form-label">
-                                                <strong>País</strong>
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text">
-                                                        <i class="fa fa-globe"></i>
-                                                    </span>
-                                                </div>
-                                                <select class="form-control" id="country_id" name="country_id" required="true">
-                                                    <option value="">Seleccione un país</option>
-                                                    <t t-foreach="countries or []" t-as="country">
-                                                        <option t-att-value="country.id" 
-                                                                t-att-selected="'selected' if partner and partner.country_id.id == country.id else None">
-                                                            <t t-esc="country.name"/>
-                                                        </option>
-                                                    </t>
-                                                </select>
-                                            </div>
-                                        </div>
+                                        <!-- País predeterminado oculto (Perú) -->
+                                        <input type="hidden" id="country_id" name="country_id" t-att-value="request.env.ref('base.pe').id"/>
                                     </div>
                                 </div>
                                 
@@ -339,6 +318,8 @@
                     const dniInput = document.getElementById('dni');
                     const rucInput = document.getElementById('ruc');
                     const razonSocialInput = document.getElementById('razon_social');
+                    // ID por defecto de Perú (base.pe)
+                    const defaultCountryId = <t t-esc="request.env.ref('base.pe').id or 0"/>;
                     
                     function toggleFields() {
                         if (invoiceCheckbox.checked) {
@@ -484,17 +465,11 @@
                             }
                             
                             if (country) {
-                                // Buscar Perú en las opciones
-                                for (let i = 0; i < country.options.length; i++) {
-                                    if (country.options[i].text.toLowerCase().includes('peru')) {
-                                        country.selectedIndex = i;
-                                        break;
-                                    }
-                                }
+                                country.value = defaultCountryId;
                                 country.readOnly = true;
                                 country.style.display = 'none';
                                 country.removeAttribute('required');
-                                console.log('Campo country: Perú seleccionado, readonly, required removido');
+                                console.log('Campo country: Perú por defecto, oculto, required removido');
                             }
                             
                             console.log('✅ Modo recogo configurado correctamente');
@@ -507,7 +482,7 @@
                                 shippingAddressFields.style.display = 'block';
                             }
                             
-                            // Agregar validación required
+                            // Agregar validación required a los visibles
                             setShippingFieldsRequired(true);
                             
                             // Habilitar campos para edición
@@ -528,11 +503,12 @@
                             }
                             
                             if (country) { 
-                                country.readOnly = false; 
-                                country.selectedIndex = 0; 
-                                country.style.display = '';
+                                // Mantener país oculto y fijado a Perú también en envío a domicilio
+                                country.value = defaultCountryId; 
+                                country.readOnly = true; 
+                                country.style.display = 'none';
                                 country.setAttribute('required', 'true');
-                                console.log('Campo country: habilitado, reset, required agregado');
+                                console.log('Campo country: oculto con Perú por defecto');
                             }
                             
                             console.log('✅ Modo envío a domicilio configurado correctamente');
@@ -611,13 +587,7 @@
                                 if (street) street.value = 'Sin dirección';
                                 if (city) city.value = 'Sin dirección';
                                 if (country) {
-                                    // Buscar Perú en las opciones
-                                    for (let i = 0; i < country.options.length; i++) {
-                                        if (country.options[i].text.toLowerCase().includes('peru')) {
-                                            country.selectedIndex = i;
-                                            break;
-                                        }
-                                    }
+                                    country.value = defaultCountryId;
                                 }
                                 
                                 console.log('Valores por defecto establecidos para modo recogo');
