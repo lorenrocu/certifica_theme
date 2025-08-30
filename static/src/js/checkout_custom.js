@@ -105,8 +105,7 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
                 'email': 'fa-envelope',
                 'phone': 'fa-phone',
                 'street': 'fa-map-marker-alt',
-                'city': 'fa-city',
-                'country_id': 'fa-globe'
+                'city': 'fa-city'
             };
             
             var self = this;
