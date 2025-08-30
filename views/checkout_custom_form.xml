@@ -35,6 +35,12 @@
                                             <strong>Nombre completo</strong>
                                             <span class="text-danger">*</span>
                                         </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-user"></i>
+                                                </span>
+                                            </div>
                                             <input type="text" 
                                                    class="form-control" 
                                                    id="name" 
@@ -276,7 +282,7 @@
                                             </div>
                                         </div>
                                         <!-- País (oculto, predeterminado a Perú) -->
-                        <input type="hidden" name="country_id" t-att-value="request.env.ref('base.pe').id"/>
+                                        <input type="hidden" name="country_id" t-att-value="request.env.ref('base.pe').id"/>
                                     </div>
                                 </div>
                                 
