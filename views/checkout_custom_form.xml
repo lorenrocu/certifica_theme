@@ -294,7 +294,7 @@
                                                 <i class="fa fa-arrow-left mr-2"></i>
                                                 Volver al carrito
                                             </a>
-                                            <button type="submit" class="btn btn-primary btn-lg">
+                                            <button type="submit" class="btn btn-primary btn-lg" formaction="/shop/payment">
                                                 <i class="fa fa-check mr-2"></i>
                                                 Confirmar pedido
                                             </button>

@@ -125,6 +125,23 @@ class WebsiteSaleCheckout(WebsiteSale):
             self._logger.error(f"❌ Error al actualizar campo de identificación: {e}")
             return False
 
+    @http.route(['/shop/checkout'], type='http', auth="public", website=True, sitemap=False)
+    def checkout(self, **post):
+        """
+        Sobrescribimos el método checkout para redirigir directamente a la página de pago
+        saltándose el paso intermedio
+        """
+        self._logger.info("=== CHECKOUT ROUTE (REDIRECT TO PAYMENT) ===")
+        order = request.website.sale_get_order()
+        
+        if not order or not order.order_line:
+            self._logger.info("🛒 No hay líneas de pedido, redirigiendo a /shop/cart")
+            return request.redirect('/shop/cart')
+        
+        # Redirigir directamente a la página de pago
+        self._logger.info("🔄 Redirigiendo directamente a /shop/payment")
+        return request.redirect('/shop/payment')
+        
     @http.route(['/shop/address'], type='http', auth="public", website=True, sitemap=False)
     def address(self, **kw):
         """
@@ -307,8 +324,8 @@ class WebsiteSaleCheckout(WebsiteSale):
                     # Redirigir explícitamente después del guardado
                     order = request.website.sale_get_order()
                     if order and order.order_line:
-                        self._logger.info("🔄 Redirigiendo a /shop/checkout (sin recarga de address)")
-                        return request.redirect('/shop/checkout')
+                        self._logger.info("🔄 Redirigiendo directamente a /shop/payment (sin recarga de address)")
+                        return request.redirect('/shop/payment')
                     else:
                         self._logger.info("🛒 No hay líneas de pedido, redirigiendo a /shop/cart")
                         return request.redirect('/shop/cart')
