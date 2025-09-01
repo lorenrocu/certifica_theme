@@ -5,7 +5,6 @@ from odoo.http import request
 from odoo.addons.website_sale.controllers.main import WebsiteSale
 from odoo.exceptions import ValidationError
 import logging
-import werkzeug
 
 
 class WebsiteSaleCheckout(WebsiteSale):
@@ -129,62 +128,18 @@ class WebsiteSaleCheckout(WebsiteSale):
     @http.route(['/shop/checkout'], type='http', auth="public", website=True, sitemap=False)
     def checkout(self, **post):
         """
-        Sobrescribimos el método checkout para procesar la lógica necesaria
-        y luego redirigir a la página de pago sin mostrar la vista intermedia
+        Sobrescribimos el método checkout para redirigir directamente a la página de pago
+        saltándose el paso intermedio
         """
-        self._logger.info("=== CHECKOUT ROUTE (PROCESS AND REDIRECT TO PAYMENT) ===")
+        self._logger.info("=== CHECKOUT ROUTE (REDIRECT TO PAYMENT) ===")
         order = request.website.sale_get_order()
         
         if not order or not order.order_line:
             self._logger.info("🛒 No hay líneas de pedido, redirigiendo a /shop/cart")
             return request.redirect('/shop/cart')
         
-        # Verificar que el partner_id esté establecido y sea diferente del partner_id del sitio web
-        if not order.partner_id or order.partner_id.id == request.website.partner_id.id:
-            self._logger.warning("⚠️ Partner no establecido o es el partner genérico del sitio web")
-            
-            # Intentar obtener el partner_id de la sesión
-            partner_id = request.session.get('partner_id')
-            if partner_id:
-                try:
-                    partner = request.env['res.partner'].sudo().browse(partner_id)
-                    if partner.exists():
-                        # Actualizar la orden con el partner
-                        order.sudo().write({
-                            'partner_id': partner.commercial_partner_id.id or partner.id,
-                            'partner_invoice_id': partner.id,
-                            'partner_shipping_id': partner.id,
-                        })
-                        self._logger.info(f"✅ Partner establecido desde sesión: {partner.id}")
-                    else:
-                        self._logger.warning(f"❌ Partner de sesión no existe: {partner_id}")
-                except Exception as e:
-                    self._logger.error(f"❌ Error estableciendo partner desde sesión: {e}")
-            else:
-                self._logger.warning("❌ No hay partner_id en la sesión")
-        else:
-            self._logger.info(f"✅ Partner ya establecido en la orden: {order.partner_id.id}")
-        
-        # Procesar la lógica del checkout original sin mostrar la vista
-        # Esto asegura que se ejecuten todas las validaciones necesarias
-        try:
-            # Llamar al método original de WebsiteSale pero capturar el resultado sin renderizarlo
-            result = super(WebsiteSaleCheckout, self).checkout(**post)
-            self._logger.info("✅ Procesamiento de checkout completado sin mostrar vista")
-        except Exception as e:
-            self._logger.error(f"❌ Error en procesamiento de checkout: {e}")
-            # Si hay un error, mostrar la vista de checkout para que el usuario pueda corregir
-            return super(WebsiteSaleCheckout, self).checkout(**post)
-        
-        # Verificar nuevamente que el partner_id esté establecido correctamente
-        order = request.website.sale_get_order()
-        if not order or not order.partner_id or order.partner_id.id == request.website.partner_id.id:
-            self._logger.error("❌ Partner no establecido después del procesamiento de checkout")
-            # Si aún no hay partner, mostrar la vista de checkout
-            return super(WebsiteSaleCheckout, self).checkout(**post)
-        
-        # Redirigir a la página de pago
-        self._logger.info("🔄 Redirigiendo a /shop/payment después del procesamiento")
+        # Redirigir directamente a la página de pago
+        self._logger.info("🔄 Redirigiendo directamente a /shop/payment")
         return request.redirect('/shop/payment')
         
     @http.route(['/shop/address'], type='http', auth="public", website=True, sitemap=False)
@@ -366,22 +321,20 @@ class WebsiteSaleCheckout(WebsiteSale):
 
                         return result
 
-                    # Redirigir explícitamente después del guardado
+                    # Asegurar que el partner esté correctamente asignado al pedido antes de redirigir
                     order = request.website.sale_get_order()
                     if order and order.order_line:
-                        # Verificar que el partner_id esté establecido correctamente
+                        # Verificar que el partner esté asignado
                         if not order.partner_id or order.partner_id.id == request.website.partner_id.id:
-                            self._logger.warning("⚠️ Partner no establecido correctamente antes de redirección a payment")
-                            # Intentar procesar el checkout para establecer el partner_id
-                            try:
-                                # Llamar al método checkout para procesar la lógica sin mostrar la vista
-                                checkout_result = self.checkout(**kw)
-                                self._logger.info("✅ Procesamiento de checkout completado antes de redirección")
-                                # Si checkout devuelve una redirección, usarla
-                                if isinstance(checkout_result, werkzeug.wrappers.Response):
-                                    return checkout_result
-                            except Exception as e:
-                                self._logger.error(f"❌ Error en procesamiento de checkout: {e}")
+                            # Asignar el partner recién creado
+                            partner_rec = request.env['res.partner'].sudo().browse(partner_id)
+                            if partner_rec.exists():
+                                order.write({
+                                    'partner_id': partner_rec.commercial_partner_id.id or partner_rec.id,
+                                    'partner_invoice_id': partner_rec.id,
+                                    'partner_shipping_id': partner_rec.id,
+                                })
+                                self._logger.info(f"✅ Partner {partner_rec.id} asignado al pedido {order.id}")
                         
                         self._logger.info("🔄 Redirigiendo directamente a /shop/payment (sin recarga de address)")
                         return request.redirect('/shop/payment')
@@ -544,8 +497,22 @@ class WebsiteSaleCheckout(WebsiteSale):
             partner.write(filtered_checkout)
             self._logger.info(f"Partner actualizado: {partner_id}")
         else:
-            partner_id = Partner.create(filtered_checkout).id
+            partner = Partner.create(filtered_checkout)
+            partner_id = partner.id
             self._logger.info(f"Partner creado: {partner_id}")
+            
+            # Asegurar que el partner se asigne al pedido actual
+            order = request.website.sale_get_order()
+            if order and order.exists():
+                try:
+                    order.write({
+                        'partner_id': partner.commercial_partner_id.id or partner.id,
+                        'partner_invoice_id': partner.id,
+                        'partner_shipping_id': partner.id,
+                    })
+                    self._logger.info(f"✅ Partner {partner_id} asignado al pedido {order.id}")
+                except Exception as e:
+                    self._logger.error(f"❌ Error asignando partner al pedido: {e}")
         
         # Ya no es necesario actualizar después; se envió en el write/create
         if identification_type_id:
