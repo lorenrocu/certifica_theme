@@ -16,10 +16,9 @@
                             </h4>
                         </div>
                         <div class="card-body">
-                            <form class="checkout_autoformat" action="/shop/address" method="post" id="checkout_form">
+                            <form class="checkout_autoformat" action="/shop/address" method="post">
                                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                 <input type="hidden" name="submitted" value="1"/>
-                                <input type="hidden" name="redirect_to" value="payment"/>
                                 
                                 <!-- Información Personal -->
                                 <div class="row mb-4">
@@ -295,7 +294,7 @@
                                                 <i class="fa fa-arrow-left mr-2"></i>
                                                 Volver al carrito
                                             </a>
-                                            <button type="submit" class="btn btn-primary btn-lg" id="confirm_order_btn">
+                                            <button type="submit" class="btn btn-primary btn-lg">
                                                 <i class="fa fa-check mr-2"></i>
                                                 Confirmar pedido
                                             </button>
@@ -662,38 +661,6 @@
                             }
                             
                             console.log('✅ Formulario validado exitosamente, procediendo con el envío');
-                            
-                            // Agregar indicador de procesamiento
-                            const submitBtn = document.getElementById('confirm_order_btn');
-                            if (submitBtn) {
-                                submitBtn.disabled = true;
-                                submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>Procesando...';
-                            }
-                        });
-                    }
-                    
-                    // Manejar el envío del formulario para asegurar la redirección
-                    const confirmOrderBtn = document.getElementById('confirm_order_btn');
-                    if (confirmOrderBtn) {
-                        confirmOrderBtn.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            
-                            console.log('=== CONFIRMANDO PEDIDO ===');
-                            
-                            // Validar el formulario
-                            if (checkoutForm.checkValidity()) {
-                                console.log('✅ Formulario válido, enviando...');
-                                
-                                // Mostrar indicador de procesamiento
-                                this.disabled = true;
-                                this.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>Procesando...';
-                                
-                                // Enviar formulario
-                                checkoutForm.submit();
-                            } else {
-                                console.log('❌ Formulario inválido, mostrando errores...');
-                                checkoutForm.reportValidity();
-                            }
                         });
                     }
                 });
