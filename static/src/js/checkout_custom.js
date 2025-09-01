@@ -51,22 +51,13 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
         },
 
         /**
-         * Configurar validación personalizada del formulario
+         * Configurar validaciones del formulario
          */
         _setupFormValidation: function () {
+            // Marcar campos requeridos
+            var requiredFields = ['name', 'email', 'phone', 'street', 'city'];
             var self = this;
             
-            // Campos requeridos personalizados
-            var requiredFields = [
-                'name',
-                'email', 
-                'phone',
-                'street',
-                'city',
-                'country_id'
-            ];
-            
-            // Agregar indicadores visuales para campos requeridos
             requiredFields.forEach(function(fieldName) {
                 var $field = self.$('input[name="' + fieldName + '"], select[name="' + fieldName + '"]');
                 var $label = self.$('label[for="' + fieldName + '"]');
@@ -153,253 +144,80 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
         },
 
         /**
-         * Manejar cambio del checkbox de tipo de comprobante
+         * Manejar cambio de tipo de factura
          */
         _onChangeInvoiceType: function (ev) {
-            console.log('📋 CAMBIO EN CHECKBOX DE FACTURA');
-            var $checkbox = $(ev.currentTarget);
-            var isChecked = $checkbox.is(':checked');
-            var $container = $checkbox.closest('#div_invoice_type');
-            var $invoiceFields = $('#invoice_fields');
-            var $razonSocial = $('#razon_social');
-            var $ruc = $('#ruc');
-            var $hiddenInput = this.$('#invoice_type_hidden');
+            var invoiceType = $(ev.currentTarget).val();
+            console.log('Tipo de factura cambiado:', invoiceType);
             
-            console.log('Checkbox marcado:', isChecked);
-            console.log('Campos de factura encontrados:', $invoiceFields.length);
-            console.log('Campo RUC encontrado:', $ruc.length);
-            console.log('Campo Razón Social encontrado:', $razonSocial.length);
-            
-            // Feedback visual del checkbox
-            if (isChecked) {
-                console.log('✅ Activando modo FACTURA');
-                $container.addClass('invoice-selected');
-                console.log('Factura solicitada');
+            // Aquí puedes agregar lógica específica según el tipo de factura
+            if (invoiceType === 'factura') {
+                // Mostrar campos adicionales para factura
+                this._showFacturaFields();
             } else {
-                console.log('✅ Activando modo BOLETA');
-                $container.removeClass('invoice-selected');
-                console.log('Boleta solicitada');
+                // Ocultar campos adicionales
+                this._hideFacturaFields();
             }
-            
-            // Mostrar/ocultar campos de facturación
-            if (isChecked) {
-                // Mostrar campos con animación
-                $invoiceFields.removeClass('hide').addClass('show').show();
-                
-                // Hacer campos requeridos
-                $razonSocial.attr('required', 'required');
-                $ruc.attr('required', 'required');
-                $hiddenInput.val('factura');
-                
-                console.log('Campos RUC y Razón Social marcados como requeridos');
-                
-                // Enfocar el primer campo
-                setTimeout(function() {
-                    $razonSocial.focus();
-                }, 400);
-                
-            } else {
-                // Ocultar campos con animación
-                $invoiceFields.removeClass('show').addClass('hide');
-                
-                // Remover validaciones requeridas
-                $razonSocial.removeAttr('required').removeClass('is-invalid');
-                $ruc.removeAttr('required').removeClass('is-invalid');
-                $hiddenInput.val('boleta');
-                
-                console.log('Campos RUC y Razón Social NO requeridos');
-                
-                // Limpiar valores
-                $razonSocial.val('');
-                $ruc.val('');
-                
-                // Ocultar después de la animación
-                setTimeout(function() {
-                    $invoiceFields.hide();
-                }, 400);
-            }
-            
-            console.log('Valor del input oculto:', $hiddenInput.val());
-            
-            // Agregar clase CSS para animación del checkbox
-            $container.addClass('checkbox-changed');
-            setTimeout(function() {
-                $container.removeClass('checkbox-changed');
-            }, 300);
+        },
+
+        /**
+         * Mostrar campos adicionales para factura
+         */
+        _showFacturaFields: function () {
+            this.$('.factura-fields').show();
+            this.$('.factura-fields input').attr('required', true);
+        },
+
+        /**
+         * Ocultar campos adicionales para factura
+         */
+        _hideFacturaFields: function () {
+            this.$('.factura-fields').hide();
+            this.$('.factura-fields input').removeAttr('required');
         },
 
         /**
          * Manejar envío del formulario
          */
         _onSubmitForm: function (ev) {
-            console.log('🚀 EVENTO ENVÍO FORMULARIO INICIADO');
-            console.log('Evento:', ev.type, 'Target:', ev.target.tagName);
-            
-            // Asegurar que los campos eliminados no bloqueen el envío
-            this.$('input[name="street2"], input[name="zip"]').removeAttr('required');
-            
-            // Obtener el estado del checkbox de factura
-            var isInvoiceChecked = this.$('input[name="invoice_type"]').is(':checked');
-            var $dniField = this.$('#dni');
-            
-            // Si no está marcada la factura, asegurarse de que el DNI no bloquee el envío
-            if (!isInvoiceChecked) {
-                $dniField.removeAttr('required');
-                $dniField.removeClass('is-invalid');
-            }
-            
-            var isFormValid = this._validateForm();
-            console.log('Resultado validación:', isFormValid);
-            
-            if (!isFormValid) {
-                console.log('❌ FORMULARIO INVÁLIDO - Previniendo envío');
-                ev.preventDefault();
-                ev.stopPropagation();
-                this._showValidationErrors();
-                return false;
-            } else {
-                console.log('✅ FORMULARIO VÁLIDO - Permitiendo envío');
-            }
+            console.log('Formulario enviado');
+            // Aquí puedes agregar validaciones adicionales antes del envío
         },
 
         /**
-         * Manejar cambios en los inputs
+         * Manejar cambios en los campos de entrada
          */
         _onInputChange: function (ev) {
-            var $input = $(ev.currentTarget);
-            if ($input.hasClass('is-invalid')) {
-                $input.removeClass('is-invalid');
-            }
+            var $target = $(ev.currentTarget);
             
-            // Limpiar mensajes de error específicos
-            if ($input.attr('id') === 'ruc') {
-                this.$('.ruc-error-message').remove();
-            }
-            if ($input.attr('id') === 'dni') {
-                this.$('.dni-error-message').remove();
-            }
-            if ($input.attr('id') === 'razon_social') {
-                this.$('.razon-social-error-message').remove();
-            }
-            
-            // Remover mensaje de error general si existe
-            this.$('.checkout-error-message').remove();
+            // Remover clases de validación mientras el usuario escribe
+            $target.removeClass('is-invalid is-valid');
         },
 
         /**
-         * Validar el formulario
-         */
-        _validateForm: function () {
-            var self = this;
-            var isValid = true;
-            var isInvoiceChecked = this.$('input[name="invoice_type"]').is(':checked');
-            
-            // Validar campos requeridos básicos
-            this.$('input[required], select[required]').each(function() {
-                var $field = $(this);
-                // Ignorar el DNI si no está marcada la factura
-                if ($field.attr('id') === 'dni' && !isInvoiceChecked) {
-                    return true;
-                }
-                
-                if (!$field.val().trim()) {
-                    $field.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    $field.removeClass('is-invalid');
-                }
-            });
-            
-            // Validar campos de factura solo si está marcada la opción
-            if (isInvoiceChecked) {
-                var $ruc = this.$('#ruc');
-                var $razonSocial = this.$('#razon_social');
-                
-                if (!$ruc.val().trim()) {
-                    $ruc.addClass('is-invalid');
-                    isValid = false;
-                }
-                
-                if (!$razonSocial.val().trim()) {
-                    $razonSocial.addClass('is-invalid');
-                    isValid = false;
-                }
-            }
-            
-            return isValid;
-        },
-
-        /**
-         * Mostrar errores de validación
-         */
-        _showValidationErrors: function () {
-            var $firstInvalid = this.$('.is-invalid').first();
-            if ($firstInvalid.length) {
-                $firstInvalid.focus();
-                
-                // Mostrar mensaje de error
-                if (!this.$('.checkout-error-message').length) {
-                    this.$el.prepend(
-                        '<div class="alert alert-danger checkout-error-message">' +
-                        '<i class="fa fa-exclamation-triangle mr-2"></i>' +
-                        'Por favor, complete todos los campos requeridos correctamente.' +
-                        '</div>'
-                    );
-                }
-                
-                // Scroll al mensaje de error
-                $('html, body').animate({
-                    scrollTop: this.$('.checkout-error-message').offset().top - 100
-                }, 500);
-            }
-        },
-
-        /**
-         * Manejar cambios en el campo VAT para autoselección de tipo de documento
+         * Manejar cambios en el campo VAT (RUC/DNI)
          */
         _onVatInputChange: function (ev) {
-            var self = this;
             var $vatInput = $(ev.currentTarget);
-            var vatValue = $vatInput.val().trim();
+            var vatValue = $vatInput.val().replace(/\D/g, ''); // Solo números
             
-            // Usar setTimeout para manejar el evento paste correctamente
-            setTimeout(function() {
-                vatValue = $vatInput.val().trim();
-                self._autoSelectDocumentType(vatValue);
-            }, 10);
+            // Actualizar el valor del campo
+            $vatInput.val(vatValue);
+            
+            // Detectar automáticamente el tipo de documento
+            this._autoDetectDocumentType(vatValue);
         },
 
         /**
-         * Autoseleccionar el tipo de documento basado en el número ingresado
+         * Detectar automáticamente el tipo de documento basado en el VAT
          */
-        _autoSelectDocumentType: function (vatValue) {
-            console.log('🔍 Autoselección de tipo de documento para:', vatValue);
-            
-            // Buscar el selector de tipo de documento
+        _autoDetectDocumentType: function (vatValue) {
             var $documentTypeSelect = this.$('select[name="l10n_latam_identification_type_id"]');
             
-            // Si no existe el selector estándar, buscar alternativas
             if (!$documentTypeSelect.length) {
-                $documentTypeSelect = this.$('select[name="vat_type"]');
-            }
-            if (!$documentTypeSelect.length) {
-                $documentTypeSelect = this.$('select[name="document_type"]');
-            }
-            if (!$documentTypeSelect.length) {
-                $documentTypeSelect = this.$('select').filter(function() {
-                    return $(this).find('option').text().toLowerCase().includes('dni') || 
-                           $(this).find('option').text().toLowerCase().includes('ruc');
-                });
-            }
-            
-            if (!$documentTypeSelect.length) {
-                console.log('⚠️ No se encontró selector de tipo de documento');
                 return;
             }
-            
-            console.log('✅ Selector de tipo de documento encontrado:', $documentTypeSelect.attr('name'));
-            
-            // Lógica de autoselección basada en la longitud del número
+
             var selectedValue = null;
             var selectedText = '';
             
@@ -421,60 +239,91 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
                 // Campo vacío, no hacer nada
                 return;
             }
-            
-            // Aplicar la selección si se encontró una opción válida
+
+            // Seleccionar automáticamente el tipo de documento si se encontró
             if (selectedValue) {
                 $documentTypeSelect.val(selectedValue).trigger('change');
-                console.log('✅ Tipo de documento autoseleccionado:', selectedText, 'con valor:', selectedValue);
-                
-                // Mostrar feedback visual temporal
-                this._showDocumentTypeNotification(selectedText);
-            } else {
-                console.log('❌ No se encontró opción para:', selectedText);
+                console.log('✅ Tipo de documento seleccionado automáticamente:', selectedText);
             }
         },
 
         /**
-         * Buscar opción en el select por texto
+         * Buscar una opción en un select por texto
          */
-        _findOptionByText: function ($select, textOptions) {
+        _findOptionByText: function ($select, searchTexts) {
             var foundValue = null;
             
             $select.find('option').each(function() {
-                var optionText = $(this).text().trim();
-                var optionValue = $(this).val();
+                var optionText = $(this).text().trim().toLowerCase();
                 
-                for (var i = 0; i < textOptions.length; i++) {
-                    if (optionText.toLowerCase().includes(textOptions[i].toLowerCase()) ||
-                        optionValue.toLowerCase().includes(textOptions[i].toLowerCase())) {
-                        foundValue = optionValue;
+                for (var i = 0; i < searchTexts.length; i++) {
+                    if (optionText.includes(searchTexts[i].toLowerCase())) {
+                        foundValue = $(this).val();
                         return false; // Salir del each
                     }
                 }
             });
             
             return foundValue;
-        },
-
-        /**
-         * Mostrar notificación temporal de autoselección
-         */
-        _showDocumentTypeNotification: function (documentType) {
-            var $notification = $('<div class="alert alert-info document-type-notification" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">' +
-                '<i class="fa fa-check-circle mr-2"></i>' +
-                'Tipo de documento autoseleccionado: <strong>' + documentType + '</strong>' +
-                '</div>');
-            
-            $('body').append($notification);
-            
-            // Remover la notificación después de 3 segundos
-            setTimeout(function() {
-                $notification.fadeOut(500, function() {
-                    $(this).remove();
-                });
-            }, 3000);
         }
     });
 
-    return publicWidget.registry.CheckoutCustom;
+    // Widget para manejar la página de payment
+    publicWidget.registry.PaymentCustom = publicWidget.Widget.extend({
+        selector: '.oe_website_sale',
+        events: {
+            'change input[name="pm_id"]': '_onPaymentMethodChange',
+        },
+
+        /**
+         * Inicialización del widget
+         */
+        start: function () {
+            this._super.apply(this, arguments);
+            this._checkTransferPayment();
+        },
+
+        /**
+         * Verificar si está seleccionada la transferencia bancaria al cargar
+         */
+        _checkTransferPayment: function () {
+            var $transferOption = this.$('input[name="pm_id"][data-provider="transfer"]:checked');
+            if ($transferOption.length) {
+                this._showTransferMessage($transferOption);
+            }
+        },
+
+        /**
+         * Manejar cambio de método de pago
+         */
+        _onPaymentMethodChange: function (ev) {
+            var $target = $(ev.currentTarget);
+            
+            // Remover mensajes existentes
+            this.$('.transfer-info-message').remove();
+            
+            // Si es transferencia bancaria, mostrar mensaje
+            if ($target.data('provider') === 'transfer') {
+                this._showTransferMessage($target);
+            }
+        },
+
+        /**
+         * Mostrar mensaje informativo para transferencia bancaria
+         */
+        _showTransferMessage: function ($transferInput) {
+            var $cardBody = $transferInput.closest('.card-body');
+            
+            // Verificar si ya existe el mensaje
+            if ($cardBody.find('.transfer-info-message').length === 0) {
+                var messageHtml = '<div class="transfer-info-message alert alert-info mt-3 mb-0">' +
+                    '<i class="fa fa-info-circle mr-2"></i>' +
+                    '<strong>Información:</strong> Los datos de nuestras cuentas bancarias se mostrarán al hacer clic en "Pagar ahora".' +
+                    '</div>';
+                
+                $cardBody.append(messageHtml);
+            }
+        }
+    });
+
 });
