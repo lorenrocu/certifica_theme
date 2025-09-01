@@ -128,10 +128,14 @@ class WebsiteSaleCheckout(WebsiteSale):
     @http.route(['/shop/checkout'], type='http', auth="public", website=True, sitemap=False)
     def checkout(self, **post):
         """
-        Sobrescribimos el método checkout para procesar la lógica necesaria
-        pero redirigir automáticamente a payment sin mostrar la vista
+        Sobrescribimos el método checkout para:
+        - Mostrar la vista cuando se accede para editar (GET sin parámetros POST)
+        - Procesar y redirigir automáticamente cuando viene del flujo normal
         """
-        self._logger.info("=== CHECKOUT ROUTE (PROCESSING + AUTO REDIRECT) ===")
+        self._logger.info("=== CHECKOUT ROUTE ===")
+        self._logger.info(f"Method: {request.httprequest.method}")
+        self._logger.info(f"POST data: {post}")
+        
         order = request.website.sale_get_order()
         
         if not order or not order.order_line:
@@ -143,7 +147,19 @@ class WebsiteSaleCheckout(WebsiteSale):
             self._logger.warning("⚠️ Partner no válido en el pedido, redirigiendo a /shop/address")
             return request.redirect('/shop/address')
         
-        # Procesar lógica de checkout (llamar al método padre para procesar)
+        # Si es GET sin parámetros POST (usuario quiere ver/editar), mostrar la vista
+        if request.httprequest.method == 'GET' and not post:
+            self._logger.info("👁️ Acceso GET para visualizar/editar checkout, mostrando vista")
+            try:
+                # Llamar al método padre para obtener la vista de checkout
+                result = super().checkout(**post)
+                return result
+            except Exception as e:
+                self._logger.error(f"❌ Error mostrando vista checkout: {str(e)}")
+                return request.redirect('/shop/address')
+        
+        # Si hay datos POST o parámetros, procesar y redirigir automáticamente
+        self._logger.info("🔄 Procesando checkout y redirigiendo automáticamente")
         try:
             # Llamar al método padre para ejecutar la lógica de checkout
             result = super().checkout(**post)
