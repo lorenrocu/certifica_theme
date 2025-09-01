@@ -360,8 +360,8 @@ class WebsiteSaleCheckout(WebsiteSale):
                     # Redirigir explícitamente después del guardado
                     order = request.website.sale_get_order()
                     if order and order.order_line:
-                        self._logger.info("🔄 Redirigiendo a /shop/checkout para procesamiento")
-                        return request.redirect('/shop/checkout')
+                        self._logger.info("💳 Redirigiendo directamente a /shop/payment")
+                        return request.redirect('/shop/payment')
                     else:
                         self._logger.info("🛒 No hay líneas de pedido, redirigiendo a /shop/cart")
                         return request.redirect('/shop/cart')
