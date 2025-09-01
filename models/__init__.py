@@ -7,3 +7,4 @@ from . import l10n_latam_override
 from . import vat_validation_override
 from . import vat_monkey_patch
 from . import disable_validations
+from . import sale_order_override

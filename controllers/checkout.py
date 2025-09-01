@@ -287,39 +287,31 @@ class WebsiteSaleCheckout(WebsiteSale):
                                 self._logger.error(f"❌ Error vinculando partner {partner_id} al pedido: {e}")
                     except Exception as e:
                         self._logger.error(f"❌ Error guardando partner manualmente: {e}")
-                        # Como fallback, intentar con super() una sola vez
-                        result = super().address(**kw)
-                        self._logger.info("↩️ Fallback a super().address() ejecutado")
+                        # No usar super() como fallback para evitar recargas
+                        self._logger.info("🚫 Evitando fallback a super().address() para prevenir recargas")
 
-                        # Intentar enlazar partner al pedido si el super() no lo hizo
-                        try:
-                            order = request.website.sale_get_order()
-                            # Extraer partner_id potencial del contexto/resultados
-                            possible_pid = None
-                            # buscar en kw o all_form_values
-                            for key in ['partner_id', 'partner', 'partner_shipping_id', 'partner_invoice_id']:
-                                if key in kw and str(kw[key]).strip().isdigit():
-                                    possible_pid = int(str(kw[key]).strip())
-                                    break
-                            if not possible_pid and 'vat' in kw:
-                                # Buscar por VAT recientemente creado
-                                found = request.env['res.partner'].sudo().search([('vat', '=', kw['vat'])], limit=1)
-                                possible_pid = found.id if found else None
-                            if order and possible_pid:
-                                partner_rec = request.env['res.partner'].sudo().browse(possible_pid)
+                        # En lugar de usar super() como fallback, forzar la redirección
+                        self._logger.info("🔄 Forzando redirección a /shop/payment después de error")
+                        
+                        # Intentar obtener el partner recién creado por VAT
+                        if 'vat' in kw and kw['vat']:
+                            try:
+                                partner_rec = request.env['res.partner'].sudo().search([('vat', '=', kw['vat'])], limit=1)
                                 if partner_rec and partner_rec.exists():
-                                    write_vals = {
-                                        'partner_id': partner_rec.commercial_partner_id.id or partner_rec.id,
-                                        'partner_invoice_id': partner_rec.id,
-                                        'partner_shipping_id': partner_rec.id,
-                                    }
-                                    order.sudo().write(write_vals)
-                                    request.session['partner_id'] = partner_rec.id
-                                    self._logger.info(f"🧩 Enlace post-super(): Pedido {order.id} actualizado con partner {partner_rec.id}")
-                        except Exception as e2:
-                            self._logger.error(f"❌ Error enlazando partner tras super(): {e2}")
-
-                        return result
+                                    # Asignar al pedido
+                                    order = request.website.sale_get_order()
+                                    if order:
+                                        order.write({
+                                            'partner_id': partner_rec.commercial_partner_id.id or partner_rec.id,
+                                            'partner_invoice_id': partner_rec.id,
+                                            'partner_shipping_id': partner_rec.id,
+                                        })
+                                        self._logger.info(f"✅ Partner {partner_rec.id} asignado al pedido {order.id} después de error")
+                            except Exception as e2:
+                                self._logger.error(f"❌ Error asignando partner después de error: {e2}")
+                        
+                        # Redirigir directamente a payment
+                        return request.redirect('/shop/payment')
 
                     # Asegurar que el partner esté correctamente asignado al pedido antes de redirigir
                     order = request.website.sale_get_order()
