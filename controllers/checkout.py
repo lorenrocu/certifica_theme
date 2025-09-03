@@ -151,6 +151,28 @@ class WebsiteSaleCheckout(WebsiteSale):
         if request.httprequest.method == 'GET':
             self._logger.info("👁️ Acceso GET (con o sin parámetros) -> mostrar vista de checkout para edición")
             try:
+                # Si venimos desde /shop/payment (from_payment=1), forzamos ir al editor de dirección
+                params = dict(request.params or {})
+                if params.get('from_payment'):
+                    order = request.website.sale_get_order()
+                    partner_id = None
+                    try:
+                        if order and order.partner_invoice_id:
+                            partner_id = int(order.partner_invoice_id.id)
+                        elif 'partner_id' in request.session and str(request.session['partner_id']).isdigit():
+                            partner_id = int(request.session['partner_id'])
+                        elif order and order.partner_id:
+                            partner_id = int(order.partner_id.id)
+                    except Exception:
+                        partner_id = None
+                    # Redirigir a /shop/address en modo edición para garantizar que se muestre el formulario
+                    if partner_id:
+                        redirect_url = f"/shop/address?partner_id={partner_id}&from_payment=1&mode=edit"
+                    else:
+                        redirect_url = "/shop/address?from_payment=1&mode=edit"
+                    self._logger.info(f"↪️ Redirigiendo a formulario de edición: {redirect_url}")
+                    return request.redirect(redirect_url)
+                # Caso general: mostrar checkout estándar
                 return super().checkout(**post)
             except Exception as e:
                 self._logger.error(f"❌ Error mostrando vista checkout: {str(e)}")
@@ -294,9 +316,21 @@ class WebsiteSaleCheckout(WebsiteSale):
                 if request.httprequest.method == 'POST' and (all_form_values.get('submitted') or len(all_form_values) > 1):
                     self._logger.info("🧭 POST address(): guardado manual sin super() y redirección controlada")
 
+                    # Determinar si es edición o creación según los parámetros recibidos
+                    editable_partner_id = None
+                    try:
+                        # Prioridad: valores del formulario (POST), luego kw normalizado
+                        for key in ['partner_id', 'partner', 'partner_invoice_id', 'partner_shipping_id']:
+                            raw_val = all_form_values.get(key) or kw.get(key)
+                            if raw_val is not None and str(raw_val).strip().isdigit():
+                                editable_partner_id = int(str(raw_val).strip())
+                                break
+                    except Exception:
+                        editable_partner_id = None
+
                     # Preprocesar valores (detecta vat e identificación)
                     order = request.website.sale_get_order()
-                    mode = ('new', 'billing')
+                    mode = ('edit', editable_partner_id) if editable_partner_id else ('new', 'billing')
                     data_values = self.values_preprocess(order, mode, kw)
 
                     # Guardar partner sin validaciones
@@ -365,6 +399,36 @@ class WebsiteSaleCheckout(WebsiteSale):
                         return request.redirect('/shop/cart')
                 else:
                     # Si es GET, mostrar la página normalmente
+                    # Mejora: si venimos desde la página de pago (from_payment=1)
+                    # y no nos pasan un partner_id explícito, deducirlo del pedido/sesión
+                    try:
+                        params = dict(request.params or {})
+                        from_payment = params.get('from_payment') or kw.get('from_payment')
+                        has_partner_in_kw = any(k in kw and str(kw[k]).strip().isdigit() for k in ['partner_id', 'partner', 'partner_invoice_id', 'partner_shipping_id'])
+                        if request.httprequest.method == 'GET' and from_payment and not has_partner_in_kw:
+                            order = request.website.sale_get_order()
+                            partner_id = None
+                            # Prioridad: partner_invoice_id del pedido -> session['partner_id'] -> partner_id del pedido
+                            try:
+                                if order and order.partner_invoice_id:
+                                    partner_id = int(order.partner_invoice_id.id)
+                                elif 'partner_id' in request.session and str(request.session['partner_id']).isdigit():
+                                    partner_id = int(request.session['partner_id'])
+                                elif order and order.partner_id:
+                                    partner_id = int(order.partner_id.id)
+                            except Exception:
+                                partner_id = None
+                        
+                            if partner_id:
+                                kw['partner_id'] = partner_id
+                                # En algunos flujos el modo determina si muestra el formulario de edición
+                                kw['mode'] = 'edit'
+                                self._logger.info(f"📝 address() GET from_payment: forzando edición de partner_id={partner_id}")
+                            else:
+                                self._logger.warning("⚠️ address() GET from_payment sin partner detectable; mostrando vista por defecto")
+                    except Exception as e:
+                        self._logger.error(f"❌ Error preparando parámetros de edición desde pago: {e}")
+                
                     result = super().address(**kw)
                     self._logger.info("✅ Método address() GET ejecutado sin validaciones de backend")
                     return result
@@ -417,23 +481,23 @@ class WebsiteSaleCheckout(WebsiteSale):
         identification_type_id = None
         if is_invoice_requested and ruc:
             # Modo factura: usar RUC
-            checkout['vat'] = ruc
+            new_values['vat'] = ruc
             identification_type_id = self._detect_identification_type_id(ruc)
             self._logger.info(f"Modo factura: RUC {ruc} detectado como ID: {identification_type_id}")
             
             # Si es empresa, usar razón social
             if razon_social:
-                checkout['name'] = razon_social
-                checkout['is_company'] = True
+                new_values['name'] = razon_social
+                new_values['is_company'] = True
                 self._logger.info(f"Empresa: {razon_social}")
         else:
             # Modo boleta: usar DNI
-            checkout['vat'] = dni
+            new_values['vat'] = dni
             identification_type_id = self._detect_identification_type_id(dni)
             self._logger.info(f"Modo boleta: DNI {dni} detectado como ID: {identification_type_id}")
             
             # Si no es empresa, usar nombre personal
-            checkout['is_company'] = False
+            new_values['is_company'] = False
         
         # Asegurar que el nombre esté presente
         if 'name' not in checkout or not checkout['name']:

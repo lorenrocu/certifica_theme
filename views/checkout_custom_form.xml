@@ -114,7 +114,8 @@
                                                    id="phone" 
                                                    name="phone" 
                                                    autocomplete="tel"
-                                                   placeholder="Ej: +51 912 345 678"/>
+                                                   placeholder="Ej: +51 912 345 678"
+                                                   t-att-value="(partner.phone or partner.mobile) if partner else ''"/>
                                         </div>
                                     </div>
                                 </div>
