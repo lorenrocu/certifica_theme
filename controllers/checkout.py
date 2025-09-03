@@ -147,15 +147,11 @@ class WebsiteSaleCheckout(WebsiteSale):
             self._logger.warning("⚠️ Partner no válido en el pedido, redirigiendo a /shop/address")
             return request.redirect('/shop/address')
         
-        # Si es GET (usuario quiere ver/editar) o viene desde payment, mostrar la vista
-        if request.httprequest.method == 'GET' and (not post or 'from_payment' in post):
-            self._logger.info("👁️ Acceso GET para visualizar/editar checkout, mostrando vista")
-            if 'from_payment' in post:
-                self._logger.info("🔄 Acceso desde página de payment para editar")
+        # Si es GET (aun con parámetros en querystring), siempre mostrar la vista para editar/visualizar
+        if request.httprequest.method == 'GET':
+            self._logger.info("👁️ Acceso GET (con o sin parámetros) -> mostrar vista de checkout para edición")
             try:
-                # Llamar al método padre para obtener la vista de checkout
-                result = super().checkout(**post)
-                return result
+                return super().checkout(**post)
             except Exception as e:
                 self._logger.error(f"❌ Error mostrando vista checkout: {str(e)}")
                 return request.redirect('/shop/address')

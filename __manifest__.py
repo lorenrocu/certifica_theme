@@ -31,7 +31,6 @@
         'views/product_page_custom.xml',
         'views/checkout_custom_form.xml',
         'views/payment_confirmation.xml',
-        'views/payment_custom.xml',
     ],
     'installable': True,
     'application': False,

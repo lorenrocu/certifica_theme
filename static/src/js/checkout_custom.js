@@ -273,6 +273,9 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
         selector: '.oe_website_sale',
         events: {
             'change input[name="pm_id"]': '_onPaymentMethodChange',
+            // Asegurar que cualquier enlace a /shop/checkout desde la página de pago
+            // incluya el parámetro from_payment=1
+            'click a[href*="/shop/checkout"]': '_onEditLinkClick',
         },
 
         /**
@@ -281,6 +284,54 @@ odoo.define('certifica_theme.checkout_custom', function (require) {
         start: function () {
             this._super.apply(this, arguments);
             this._checkTransferPayment();
+            this._ensureEditLinksParam();
+        },
+
+        /**
+         * Fuerza que los enlaces de "Editar" en la sección de dirección del pago
+         * apunten a /shop/checkout?from_payment=1
+         */
+        _ensureEditLinksParam: function () {
+            var self = this;
+            this.$('a[href*="/shop/checkout"]').each(function () {
+                var $a = $(this);
+                try {
+                    var url = new URL($a.attr('href'), window.location.origin);
+                    // Establecer o reemplazar el parámetro
+                    url.searchParams.set('from_payment', '1');
+                    $a.attr('href', url.toString());
+                } catch (e) {
+                    // Fallback simple por si el href es relativo o no válido para URL()
+                    var href = $a.attr('href') || '';
+                    if (href.indexOf('from_payment=1') === -1) {
+                        if (href.indexOf('?') === -1) {
+                            href += '?from_payment=1';
+                        } else {
+                            href += '&from_payment=1';
+                        }
+                        $a.attr('href', href);
+                    }
+                }
+            });
+        },
+
+        /**
+         * Interceptar click al enlace de editar para garantizar el parámetro
+         */
+        _onEditLinkClick: function (ev) {
+            try {
+                var href = ev.currentTarget.getAttribute('href') || '';
+                if (href.indexOf('/shop/checkout') !== -1) {
+                    ev.preventDefault();
+                    var url = new URL(href, window.location.origin);
+                    url.searchParams.set('from_payment', '1');
+                    window.location.href = url.toString();
+                }
+            } catch (e) {
+                // Ante cualquier error, redirigir de forma segura
+                ev.preventDefault();
+                window.location.href = '/shop/checkout?from_payment=1';
+            }
         },
 
         /**
