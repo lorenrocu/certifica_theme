@@ -360,8 +360,14 @@ class WebsiteSaleCheckout(WebsiteSale):
                     # Redirigir explícitamente después del guardado
                     order = request.website.sale_get_order()
                     if order and order.order_line:
-                        self._logger.info("💳 Redirigiendo directamente a /shop/payment")
-                        return request.redirect('/shop/payment')
+                        # Verificar si viene de una edición desde payment
+                        referer = request.httprequest.environ.get('HTTP_REFERER', '')
+                        if '/shop/payment' in referer or kw.get('from_payment') == '1':
+                            self._logger.info("🔄 Viene de edición desde payment, redirigiendo de vuelta a /shop/payment")
+                            return request.redirect('/shop/payment')
+                        else:
+                            self._logger.info("💳 Redirigiendo directamente a /shop/payment")
+                            return request.redirect('/shop/payment')
                     else:
                         self._logger.info("🛒 No hay líneas de pedido, redirigiendo a /shop/cart")
                         return request.redirect('/shop/cart')
