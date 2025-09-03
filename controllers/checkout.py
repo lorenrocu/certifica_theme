@@ -147,9 +147,11 @@ class WebsiteSaleCheckout(WebsiteSale):
             self._logger.warning("⚠️ Partner no válido en el pedido, redirigiendo a /shop/address")
             return request.redirect('/shop/address')
         
-        # Si es GET sin parámetros POST (usuario quiere ver/editar), mostrar la vista
-        if request.httprequest.method == 'GET' and not post:
+        # Si es GET (usuario quiere ver/editar) o viene desde payment, mostrar la vista
+        if request.httprequest.method == 'GET' and (not post or 'from_payment' in post):
             self._logger.info("👁️ Acceso GET para visualizar/editar checkout, mostrando vista")
+            if 'from_payment' in post:
+                self._logger.info("🔄 Acceso desde página de payment para editar")
             try:
                 # Llamar al método padre para obtener la vista de checkout
                 result = super().checkout(**post)
@@ -360,14 +362,8 @@ class WebsiteSaleCheckout(WebsiteSale):
                     # Redirigir explícitamente después del guardado
                     order = request.website.sale_get_order()
                     if order and order.order_line:
-                        # Verificar si viene de una edición desde payment
-                        referer = request.httprequest.environ.get('HTTP_REFERER', '')
-                        if '/shop/payment' in referer or kw.get('from_payment') == '1':
-                            self._logger.info("🔄 Viene de edición desde payment, redirigiendo de vuelta a /shop/payment")
-                            return request.redirect('/shop/payment')
-                        else:
-                            self._logger.info("💳 Redirigiendo directamente a /shop/payment")
-                            return request.redirect('/shop/payment')
+                        self._logger.info("💳 Redirigiendo directamente a /shop/payment")
+                        return request.redirect('/shop/payment')
                     else:
                         self._logger.info("🛒 No hay líneas de pedido, redirigiendo a /shop/cart")
                         return request.redirect('/shop/cart')
