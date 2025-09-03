@@ -481,23 +481,23 @@ class WebsiteSaleCheckout(WebsiteSale):
         identification_type_id = None
         if is_invoice_requested and ruc:
             # Modo factura: usar RUC
-            new_values['vat'] = ruc
+            checkout['vat'] = ruc
             identification_type_id = self._detect_identification_type_id(ruc)
             self._logger.info(f"Modo factura: RUC {ruc} detectado como ID: {identification_type_id}")
             
             # Si es empresa, usar razón social
             if razon_social:
-                new_values['name'] = razon_social
-                new_values['is_company'] = True
+                checkout['name'] = razon_social
+                checkout['is_company'] = True
                 self._logger.info(f"Empresa: {razon_social}")
         else:
             # Modo boleta: usar DNI
-            new_values['vat'] = dni
+            checkout['vat'] = dni
             identification_type_id = self._detect_identification_type_id(dni)
             self._logger.info(f"Modo boleta: DNI {dni} detectado como ID: {identification_type_id}")
             
             # Si no es empresa, usar nombre personal
-            new_values['is_company'] = False
+            checkout['is_company'] = False
         
         # Asegurar que el nombre esté presente
         if 'name' not in checkout or not checkout['name']:
