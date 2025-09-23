@@ -172,6 +172,11 @@
             </t>
         </xpath>
 
+        <!-- Redefinir variable x_icon de forma segura para evitar 'NoneType.image_url' -->
+        <xpath expr="//t[@t-set='x_icon']" position="replace">
+            <t t-set="x_icon" t-value="website and website.image_url(website, 'favicon') or '/web/static/img/favicon.ico'"/>
+        </xpath>
+
         <!-- Info de sesión/contexto robusto: eliminamos la definición problemática -->
         <xpath expr="//head" position="inside">
             <!-- Variable frontend_session_info se omite intencionalmente para evitar TypeError -->
