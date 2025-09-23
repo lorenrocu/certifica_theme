@@ -192,5 +192,12 @@
         <xpath expr="//div[@id='wrapwrap']" position="attributes">
             <attribute name="t-attf-class">#{pageName or ''} #{request.env['res.lang']._lang_get(request.env.lang).direction == 'rtl' and 'o_rtl' or ''} #{'o_portal' if is_portal else ''} #{'o_header_overlay' if (main_object and ('header_overlay' in main_object) and main_object.header_overlay) else ''}</attribute>
         </xpath>
+
+        <!-- Reemplazar bloque Marketplace para evitar website.env cuando website es None -->
+        <xpath expr="//t[contains(@t-if, 'website.env')]" position="replace">
+            <t t-if="website and request.env.user.sudo().partner_id.seller">
+                <a href="/my/marketplace" class="dropdown-item" role="menuitem" groups="odoo_marketplace.marketplace_draft_seller_group">Marketplace</a>
+            </t>
+        </xpath>
     </template>
 </odoo>
