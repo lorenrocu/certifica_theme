@@ -187,5 +187,10 @@
         <xpath expr="//input[contains(concat(' ', normalize-space(@class), ' '), ' o_page_option_data ')]" position="replace">
             <input t-if="main_object and (optionName in main_object)" type="hidden" class="o_page_option_data" t-att-name="optionName" t-att-value="main_object[optionName]"/>
         </xpath>
+
+        <!-- Proteger clase o_header_overlay cuando main_object es None -->
+        <xpath expr="//div[@id='wrapwrap']" position="attributes">
+            <attribute name="t-attf-class">#{pageName or ''} #{request.env['res.lang']._lang_get(request.env.lang).direction == 'rtl' and 'o_rtl' or ''} #{'o_portal' if is_portal else ''} #{'o_header_overlay' if (main_object and ('header_overlay' in main_object) and main_object.header_overlay) else ''}</attribute>
+        </xpath>
     </template>
 </odoo>
