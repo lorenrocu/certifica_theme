@@ -167,4 +167,11 @@
             <t t-set="x_icon" t-value="(website and website.image_url(website, 'favicon')) or '/web/static/src/img/favicon.ico'"/>
         </xpath>
     </template>
+
+    <!-- Fix: evitar error cuando request.website no existe en JsonRequest context -->
+    <template id="fix_frontend_layout_session_info" inherit_id="web.frontend_layout" name="Fix session info when request.website is None" priority="98">
+        <xpath expr="//t[@t-set='frontend_session_info']" position="replace">
+            <t t-set="frontend_session_info" t-value="request.env['ir.http'].get_frontend_session_info() if hasattr(request, 'website') and request.website else {}"/>
+        </xpath>
+    </template>
 </odoo>
