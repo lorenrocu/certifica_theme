@@ -16,6 +16,7 @@
     'website': 'https://www.certifica.com.pe',
     'depends': [
         'base',
+        'web',
         'website',
         'website_sale',
         'base_vat',
