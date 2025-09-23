@@ -174,8 +174,10 @@
 
         <!-- Info de sesión/contexto robusto: no invocar get_context() ni nada que pueda ser None -->
         <xpath expr="//head" position="inside">
-            <t t-set="frontend_session_info" 
-               t-value="request.env.context if (request and hasattr(request, 'env') and request.env) else {}"/>
+            <t t-set="frontend_session_info" t-value="{}"/>
+            <t t-if="request and hasattr(request, 'env') and request.env">
+                <t t-set="frontend_session_info" t-value="request.env.context"/>
+            </t>
         </xpath>
     </template>
 </odoo>
