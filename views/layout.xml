@@ -172,12 +172,10 @@
             </t>
         </xpath>
 
-        <!-- Info de sesión/contexto robusto: no invocar get_context() ni nada que pueda ser None -->
+        <!-- Info de sesión/contexto robusto: eliminamos la definición problemática -->
         <xpath expr="//head" position="inside">
-            <t t-set="frontend_session_info" t-value="{}"/>
-            <t t-if="request and hasattr(request, 'env') and request.env">
-                <t t-set="frontend_session_info" t-value="request.env.context"/>
-            </t>
+            <!-- Variable frontend_session_info se omite intencionalmente para evitar TypeError -->
+            <!-- El template web.frontend_layout debe manejar esta variable internamente -->
         </xpath>
     </template>
 </odoo>
