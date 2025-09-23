@@ -191,6 +191,14 @@
         <!-- Proteger clase o_header_overlay cuando main_object es None -->
         <xpath expr="//div[@id='wrapwrap']" position="attributes">
             <attribute name="t-attf-class">#{pageName or ''} #{request.env['res.lang']._lang_get(request.env.lang).direction == 'rtl' and 'o_rtl' or ''} #{'o_portal' if is_portal else ''} #{'o_header_overlay' if (main_object and ('header_overlay' in main_object) and main_object.header_overlay) else ''}</attribute>
+            <attribute name="t-if">website</attribute>
+        </xpath>
+
+        <!-- Fallback mínimo cuando no hay website para evitar evaluaciones de website.env en subnodos -->
+        <xpath expr="//div[@id='wrapwrap']" position="after">
+            <t t-if="not website">
+                <div id="wrapwrap"></div>
+            </t>
         </xpath>
 
         <!-- Reemplazar bloques Marketplace que referencian website.env por versión segura -->
