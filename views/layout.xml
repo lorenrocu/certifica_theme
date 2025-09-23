@@ -161,9 +161,8 @@
         </xpath>
     </template>
 
-    <!-- Layout: overrides seguros sin depender de nodos frágiles -->
     <template id="safe_frontend_layout_overrides" inherit_id="web.frontend_layout" priority="20">
-        <!-- Favicon robusto, no falla cuando website es None -->
+        <!-- Favicon robusto -->
         <xpath expr="//head" position="inside">
             <t t-if="website">
                 <link rel="shortcut icon" t-att-href="website.image_url(website, 'favicon')"/>
@@ -173,10 +172,10 @@
             </t>
         </xpath>
 
-        <!-- Variable de sesión robusta y global -->
+        <!-- Info de sesión/contexto robusto: no invocar get_context() ni nada que pueda ser None -->
         <xpath expr="//head" position="inside">
             <t t-set="frontend_session_info" 
-               t-value="(request and hasattr(request, 'session') and request.session.get_context()) or {}"/>
+               t-value="request.env.context if (request and hasattr(request, 'env') and request.env) else {}"/>
         </xpath>
     </template>
 </odoo>
