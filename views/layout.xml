@@ -160,4 +160,11 @@
             <!--End of Tawk.to Script-->
         </xpath>
     </template>
+
+    <!-- Fix: evitar error cuando 'website' es None al calcular favicon en web.frontend_layout -->
+    <template id="fix_frontend_layout_favicon" inherit_id="web.frontend_layout" name="Fix favicon when website is None" priority="99">
+        <xpath expr="//t[@t-set='x_icon']" position="replace">
+            <t t-set="x_icon" t-value="(website and website.image_url(website, 'favicon')) or '/web/static/src/img/favicon.ico'"/>
+        </xpath>
+    </template>
 </odoo>
