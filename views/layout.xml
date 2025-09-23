@@ -201,11 +201,6 @@
             </t>
         </xpath>
 
-        <!-- Reemplazar bloques Marketplace que referencian website.env por versión segura -->
-        <xpath expr="//t[contains(@t-if, 'partner_id.seller')]" position="replace">
-            <t t-if="website and request.env.user.sudo().partner_id.seller">
-                <a href="/my/marketplace" class="dropdown-item" role="menuitem" groups="odoo_marketplace.marketplace_draft_seller_group">Marketplace</a>
-            </t>
-        </xpath>
+        <!-- Eliminado: XPath no fiable que buscaba partner_id.seller en la vista padre -->
     </template>
 </odoo>
