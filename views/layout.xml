@@ -178,7 +178,7 @@
         </xpath>
 
         <!-- Info de sesión/contexto robusto: eliminamos la definición problemática -->
-        <xpath expr='//head/script/t[@t-raw="json.dumps(request.env[\'ir.http\'].get_frontend_session_info())"]' position="replace">
+        <xpath expr="//head/script/t[contains(@t-raw, 'get_frontend_session_info')]" position="replace">
             <t t-if="website"
                t-raw="json.dumps(request.env['ir.http'].get_frontend_session_info())"/>
         </xpath>
