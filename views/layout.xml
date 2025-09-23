@@ -178,9 +178,9 @@
         </xpath>
 
         <!-- Info de sesión/contexto robusto: eliminamos la definición problemática -->
-        <xpath expr="//head" position="inside">
-            <!-- Variable frontend_session_info se omite intencionalmente para evitar TypeError -->
-            <!-- El template web.frontend_layout debe manejar esta variable internamente -->
+        <xpath expr="//head/script/t[@t-raw=\"json.dumps(request.env['ir.http'].get_frontend_session_info())\"]" position="replace">
+            <t t-if="getattr(request, 'website', False)"
+               t-raw="json.dumps(request.env['ir.http'].get_frontend_session_info())"/>
         </xpath>
     </template>
 </odoo>
