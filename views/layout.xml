@@ -182,5 +182,10 @@
             <t t-if="website"
                t-raw="json.dumps(request.env['ir.http'].get_frontend_session_info())"/>
         </xpath>
+
+        <!-- Proteger chequeo de pertenencia cuando main_object es None -->
+        <xpath expr="//input[contains(concat(' ', normalize-space(@class), ' '), ' o_page_option_data ')]" position="replace">
+            <input t-if="main_object and (optionName in main_object)" type="hidden" class="o_page_option_data" t-att-name="optionName" t-att-value="main_object[optionName]"/>
+        </xpath>
     </template>
 </odoo>
