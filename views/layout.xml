@@ -203,4 +203,16 @@
 
         <!-- Eliminado: XPath no fiable que buscaba partner_id.seller en la vista padre -->
     </template>
+
+    <!-- Vista para corregir el error de add_footer_arrow -->
+    <template id="add_footer_arrow" inherit_id="web.login_layout" name="Add Footer Arrow">
+        <!-- XPath más seguro que busca el body o un elemento que siempre existe -->
+        <xpath expr="//body" position="inside">
+            <!-- Contenido del footer arrow si es necesario -->
+            <div class="footer-arrow-container" style="display: none;">
+                <!-- Placeholder para funcionalidad futura -->
+                <!-- Este div corrige el error de XPath faltante -->
+            </div>
+        </xpath>
+    </template>
 </odoo>
