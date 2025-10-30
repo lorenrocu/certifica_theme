@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Certifica Theme',
-    'version': '13.0.1.0.1',
+    'version': '13.0.1.0.2',
     'category': 'Website',
     'summary': 'Tema personalizado para Certifica',
     'description': """
