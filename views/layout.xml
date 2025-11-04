@@ -203,6 +203,4 @@
 
         <!-- Eliminado: XPath no fiable que buscaba partner_id.seller en la vista padre -->
     </template>
-
-
 </odoo>
