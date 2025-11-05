@@ -6,6 +6,7 @@ from odoo.http import request, Response
 from odoo.addons.website_sale.controllers.main import WebsiteSale
 from odoo.addons.website.controllers.main import QueryURL
 from odoo.addons.website.controllers.main import Website
+from werkzeug.utils import redirect
 
 
 class WebsiteSaleCustom(WebsiteSale):
@@ -143,8 +144,8 @@ class WebsiteLogout(http.Controller):
     donde /web/logout no está expuesto.
     """
 
-    @http.route(['/logout'], type='http', auth='public', website=True)
-    def logout(self, redirect='/', **kw):
+    @http.route(['/logout'], type='http', auth='public', website=True, csrf=False)
+    def logout(self, next_url='/', **kw):
         """Cierra la sesión actual y redirige al inicio del sitio.
 
         - auth='public' permite que el endpoint sea accesible incluso si la sesión
@@ -157,4 +158,13 @@ class WebsiteLogout(http.Controller):
         except Exception:
             # Ignorar posibles errores de sesión; en cualquier caso redirigimos
             pass
-        return request.redirect(redirect)
+
+        # Redirigir a la home del website si está configurada; de lo contrario a '/'
+        target = next_url
+        try:
+            if request.website and request.website.homepage_url:
+                target = request.website.homepage_url
+        except Exception:
+            target = next_url
+
+        return redirect(target)
