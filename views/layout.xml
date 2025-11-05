@@ -19,6 +19,10 @@
                         <li><a href="/">INICIO</a></li>
                         <li><a href="/shop">PRODUCTOS</a></li>
                         <li><a href="https://certificalatam.com/index.php/contacto/">CONTACTANOS</a></li>
+                        <!-- Opción de salir (solo usuarios autenticados) -->
+                        <t t-if="request.env.user and not request.env.user._is_public()">
+                            <li><a href="/web/logout">SALIR</a></li>
+                        </t>
                     </ul>
                 </div>
                 <label for="menu-checkbox" class="menu-overlay"></label>
@@ -74,6 +78,10 @@
                                         </div>
                                     </div>
                                 </form>
+                                <!-- Enlace salir (solo usuarios autenticados) -->
+                                <t t-if="request.env.user and not request.env.user._is_public()">
+                                    <a href="/web/logout" class="ml-3 nav-link" style="white-space: nowrap;">Salir</a>
+                                </t>
                             </div>
                         </div>
                     </div>
