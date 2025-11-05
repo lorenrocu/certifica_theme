@@ -159,12 +159,5 @@ class WebsiteLogout(http.Controller):
             # Ignorar posibles errores de sesión; en cualquier caso redirigimos
             pass
 
-        # Redirigir a la home del website si está configurada; de lo contrario a '/'
-        target = next_url
-        try:
-            if request.website and request.website.homepage_url:
-                target = request.website.homepage_url
-        except Exception:
-            target = next_url
-
-        return redirect(target)
+        # Redirigir directamente a la página de inicio '/'
+        return redirect('/')
