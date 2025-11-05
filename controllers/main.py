@@ -135,3 +135,26 @@ class WebsiteSaleCustom(WebsiteSale):
             result += f"- {product.name}: Lista: {list_price}, Pricelist: {price_with_pricelist}<br>"
         
         return result
+
+
+class WebsiteLogout(http.Controller):
+    """Controlador de logout para el sitio web.
+    Usa una ruta propia accesible desde el frontend para evitar 404 en dominios
+    donde /web/logout no está expuesto.
+    """
+
+    @http.route(['/logout'], type='http', auth='public', website=True)
+    def logout(self, redirect='/', **kw):
+        """Cierra la sesión actual y redirige al inicio del sitio.
+
+        - auth='public' permite que el endpoint sea accesible incluso si la sesión
+          ya no es válida.
+        - website=True asegura que la ruta funcione correctamente en dominios de
+          Website.
+        """
+        try:
+            request.session.logout()
+        except Exception:
+            # Ignorar posibles errores de sesión; en cualquier caso redirigimos
+            pass
+        return request.redirect(redirect)
