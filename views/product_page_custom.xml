@@ -89,11 +89,13 @@
                                         </a>
                                     </div>
                                 
-                                <!-- Stock simulado -->
+                                <!-- Stock real del producto -->
                                 <div class="product-stock mb-3">
-                                    <t t-set="fake_stock" t-value="5 + (product.id % 46)"/>
-                                    <span class="badge badge-success">
-                                        En stock: <t t-esc="fake_stock"/>
+                                    <span class="badge badge-success" t-if="product.sudo().qty_available > 0">
+                                        En stock: <t t-esc="int(product.sudo().qty_available)"/>
+                                    </span>
+                                    <span class="badge badge-danger" t-if="product.sudo().qty_available &lt;= 0">
+                                        Agotado
                                     </span>
                                 </div>
                                 
