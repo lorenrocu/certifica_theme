@@ -150,18 +150,6 @@
                                         </div>
                                     </form>
                                 </t>
-                                <!-- Mensaje cuando está agotado -->
-                                <t t-if="stock_qty &lt;= 0">
-                                    <div class="product-out-of-stock mb-4">
-                                        <button type="button" class="btn btn-lg px-5 py-3 btn-secondary" disabled="disabled" style="cursor: not-allowed; opacity: 0.7;">
-                                            <i class="fa fa-ban mr-2"></i>
-                                            Producto Agotado
-                                        </button>
-                                        <p class="text-muted mt-2" style="font-size: 0.9rem;">
-                                            Este producto no está disponible actualmente.
-                                        </p>
-                                    </div>
-                                </t>
                                 
 
                                 <!-- Bloque de opciones del producto (requerido para wishlist y otros módulos) -->
