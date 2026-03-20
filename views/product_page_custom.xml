@@ -89,12 +89,13 @@
                                         </a>
                                     </div>
                                 
-                                <!-- Stock real del producto -->
+                                <!-- Stock real del producto (calculado directamente desde stock.quant) -->
+                                <t t-set="stock_qty" t-value="real_qty if 'real_qty' in dir() else int(max(0, sum(request.env['stock.quant'].sudo().search([('product_id.product_tmpl_id', '=', product.id), ('location_id.usage', '=', 'internal')]).mapped('quantity')) - sum(request.env['stock.quant'].sudo().search([('product_id.product_tmpl_id', '=', product.id), ('location_id.usage', '=', 'internal')]).mapped('reserved_quantity'))))"/>
                                 <div class="product-stock mb-3">
-                                    <span class="badge badge-success" t-if="product.sudo().qty_available > 0">
-                                        En stock: <t t-esc="int(product.sudo().qty_available)"/>
+                                    <span class="badge badge-success" t-if="stock_qty > 0">
+                                        En stock: <t t-esc="stock_qty"/>
                                     </span>
-                                    <span class="badge badge-danger" t-if="product.sudo().qty_available &lt;= 0">
+                                    <span class="badge badge-danger" t-if="stock_qty &lt;= 0">
                                         Agotado
                                     </span>
                                 </div>

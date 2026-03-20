@@ -96,6 +96,37 @@ class WebsiteSaleCustom(WebsiteSale):
                 response.qcontext['products'] = products
         return response
 
+    @http.route([
+        '/shop/<model("product.template"):product>',
+    ], type='http', auth='public', website=True)
+    def product(self, product, category='', search='', **kwargs):
+        """
+        Sobreescribe la página de producto para inyectar el stock real
+        consultando stock.quant directamente, ignorando el contexto de warehouse
+        de la sesión del sitio web que puede dar valores incorrectos.
+        """
+        response = super(WebsiteSaleCustom, self).product(
+            product, category=category, search=search, **kwargs
+        )
+        if hasattr(response, 'qcontext') and response.qcontext is not None:
+            try:
+                # Consultamos stock.quant directamente en ubicaciones internas
+                # para obtener el stock físico real, sin depender del
+                # contexto de warehouse del usuario del sitio web.
+                quants = request.env['stock.quant'].sudo().search([
+                    ('product_id.product_tmpl_id', '=', product.id),
+                    ('location_id.usage', '=', 'internal'),
+                ])
+                qty_on_hand = sum(quants.mapped('quantity'))
+                reserved = sum(quants.mapped('reserved_quantity'))
+                real_qty = max(0, int(qty_on_hand - reserved))
+                response.qcontext['real_qty'] = real_qty
+            except Exception:
+                # Si falla por cualquier motivo, dejamos el valor vacío
+                # y el template usará el fallback
+                response.qcontext['real_qty'] = 0
+        return response
+
     @http.route(['/shop/cart/quantity'], type='json', auth="public", website=True)
     def cart_quantity(self):
         """Devuelve la cantidad de artículos en el carrito como JSON."""
