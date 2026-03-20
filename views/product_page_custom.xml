@@ -118,36 +118,50 @@
                                     <p t-field="product.description_sale" class="text-muted" style="font-size: 1.1rem; line-height: 1.6;"/>
                                 </div>
                                 
-                                <!-- Formulario de añadir al carrito -->
-                                <form action="/shop/cart/update" method="post" class="add_to_cart_form">
-                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                    <input type="hidden" name="product_id" t-att-value="product.product_variant_ids[0].id if product.product_variant_ids else product.id"/>
-                                    <input type="hidden" name="product_template_id" t-att-value="product.id"/>
-                                    <!-- Selector de cantidad -->
-                                    <div class="product-quantity mb-4">
-                                        <label class="form-label font-weight-bold mb-2" style="font-size: 1.1rem;">Cantidad:</label>
-                                        <div class="input-group" style="max-width: 150px;">
-                                            <div class="input-group-prepend">
-                                                <button type="button" class="btn btn-outline-secondary quantity-btn" data-action="decrease">
-                                                    <i class="fa fa-minus"></i>
-                                                </button>
-                                            </div>
-                                            <input type="number" name="add_qty" value="1" min="1" class="form-control text-center quantity-input" />
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary quantity-btn" data-action="increase">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
+                                <!-- Formulario de añadir al carrito (solo si hay stock) -->
+                                <t t-if="stock_qty &gt; 0">
+                                    <form action="/shop/cart/update" method="post" class="add_to_cart_form">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="product_id" t-att-value="product.product_variant_ids[0].id if product.product_variant_ids else product.id"/>
+                                        <input type="hidden" name="product_template_id" t-att-value="product.id"/>
+                                        <!-- Selector de cantidad -->
+                                        <div class="product-quantity mb-4">
+                                            <label class="form-label font-weight-bold mb-2" style="font-size: 1.1rem;">Cantidad:</label>
+                                            <div class="input-group" style="max-width: 150px;">
+                                                <div class="input-group-prepend">
+                                                    <button type="button" class="btn btn-outline-secondary quantity-btn" data-action="decrease">
+                                                        <i class="fa fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                                <input type="number" name="add_qty" value="1" min="1" class="form-control text-center quantity-input" />
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-outline-secondary quantity-btn" data-action="increase">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <!-- Botón de añadir al carrito -->
-                                    <div class="product-add-cart mb-4">
-                                        <button type="submit" class="btn btn-lg px-5 py-3 a-submit">
-                                            <i class="fa fa-shopping-cart mr-2"></i>
-                                            Añadir al Carrito
+                                        <!-- Botón de añadir al carrito -->
+                                        <div class="product-add-cart mb-4">
+                                            <button type="submit" class="btn btn-lg px-5 py-3 a-submit">
+                                                <i class="fa fa-shopping-cart mr-2"></i>
+                                                Añadir al Carrito
+                                            </button>
+                                        </div>
+                                    </form>
+                                </t>
+                                <!-- Mensaje cuando está agotado -->
+                                <t t-if="stock_qty &lt;= 0">
+                                    <div class="product-out-of-stock mb-4">
+                                        <button type="button" class="btn btn-lg px-5 py-3 btn-secondary" disabled="disabled" style="cursor: not-allowed; opacity: 0.7;">
+                                            <i class="fa fa-ban mr-2"></i>
+                                            Producto Agotado
                                         </button>
+                                        <p class="text-muted mt-2" style="font-size: 0.9rem;">
+                                            Este producto no está disponible actualmente.
+                                        </p>
                                     </div>
-                                </form>
+                                </t>
                                 
 
                                 <!-- Bloque de opciones del producto (requerido para wishlist y otros módulos) -->
