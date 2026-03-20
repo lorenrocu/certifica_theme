@@ -97,7 +97,7 @@ class WebsiteSaleCustom(WebsiteSale):
         return response
 
     @http.route([
-        '/shop/<model("product.template"):product>',
+        '/shop/product/<model("product.template"):product>',
     ], type='http', auth='public', website=True)
     def product(self, product, category='', search='', **kwargs):
         """
