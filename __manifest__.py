@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Certifica Theme new',
-    'version': '13.0.1.0.7',
+    'version': '13.0.1.0.8',
     'category': 'Website',
     'summary': 'Tema personalizado para Certifica',
     'description': """
@@ -19,6 +19,7 @@
         'web',
         'website',
         'website_sale',
+        'website_sale_stock',
         'base_vat',
         'l10n_latam_base',
         'l10n_pe',
