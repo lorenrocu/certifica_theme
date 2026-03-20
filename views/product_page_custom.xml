@@ -90,8 +90,9 @@
                                     </div>
                                 
                                 <!-- Stock real del producto (desde stock.quant directo) -->
-                                <t t-set="sq" t-value="request.env['stock.quant'].sudo().search([('product_id.product_tmpl_id', '=', product.id), ('location_id.usage', '=', 'internal')])"/>
-                                <t t-set="stock_qty" t-value="int(max(0, sum(sq.mapped('quantity')) - sum(sq.mapped('reserved_quantity'))))"/>
+                                <t t-set="variant_ids" t-value="product.sudo().product_variant_ids.ids"/>
+                                <t t-set="sq" t-value="request.env['stock.quant'].sudo().search([('product_id', 'in', variant_ids), ('location_id.usage', '=', 'internal')])"/>
+                                <t t-set="stock_qty" t-value="int(sum(sq.mapped('quantity')) - sum(sq.mapped('reserved_quantity')))"/>
                                 <div class="product-stock mb-3">
                                     <span class="badge badge-success" t-if="stock_qty > 0">
                                         En stock: <t t-esc="stock_qty"/>
