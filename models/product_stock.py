@@ -1,51 +1,55 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, api
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    website_real_qty = fields.Float(
-        string='Stock Real (Web)',
-        compute='_compute_website_real_qty',
-    )
-
-    def _compute_website_real_qty(self):
+    def _get_combination_info(self, combination=False, product_id=False,
+                              add_qty=1, pricelist=False,
+                              parent_combination=False, only_template=False):
         """
-        Calcula el stock físico real consultando stock.quant directamente,
-        ignorando el contexto de warehouse de la sesión del usuario web.
-        Esto evita que qty_available (que depende del warehouse context)
-        muestre valores incorrectos en el frontend.
+        Sobreescribe _get_combination_info para reemplazar el valor de
+        virtual_available (que website_sale_stock usa en su widget JS)
+        con el stock físico real calculado directamente desde stock.quant.
+
+        website_sale_stock inyecta 'virtual_available' en este dict,
+        que incluye pedidos de compra pendientes (stock previsto).
+        Nosotros lo reemplazamos con la cantidad física real en
+        ubicaciones internas.
         """
-        for product in self:
-            quants = self.env['stock.quant'].search([
-                ('product_id.product_tmpl_id', '=', product.id),
-                ('location_id.usage', '=', 'internal'),
-            ])
-            qty_on_hand = sum(quants.mapped('quantity'))
-            reserved = sum(quants.mapped('reserved_quantity'))
-            product.website_real_qty = max(0.0, qty_on_hand - reserved)
+        res = super(ProductTemplate, self)._get_combination_info(
+            combination=combination,
+            product_id=product_id,
+            add_qty=add_qty,
+            pricelist=pricelist,
+            parent_combination=parent_combination,
+            only_template=only_template,
+        )
 
+        # Si website_sale_stock añadió virtual_available, lo reemplazamos
+        if 'virtual_available' in res:
+            try:
+                pid = res.get('product_id', product_id)
+                if pid:
+                    quants = self.env['stock.quant'].sudo().search([
+                        ('product_id', '=', pid),
+                        ('location_id.usage', '=', 'internal'),
+                    ])
+                    qty_on_hand = sum(quants.mapped('quantity'))
+                    reserved = sum(quants.mapped('reserved_quantity'))
+                    real_qty = max(0.0, qty_on_hand - reserved)
+                    res['virtual_available'] = real_qty
+                    _logger.debug(
+                        'certifica_theme: product_id=%s real_qty=%s '
+                        '(was virtual_available=%s)',
+                        pid, real_qty, res.get('virtual_available'))
+            except Exception as e:
+                _logger.warning(
+                    'certifica_theme: error computing real stock: %s', e)
 
-class ProductProduct(models.Model):
-    _inherit = 'product.product'
-
-    website_real_qty = fields.Float(
-        string='Stock Real (Web)',
-        compute='_compute_product_website_real_qty',
-    )
-
-    def _compute_product_website_real_qty(self):
-        """
-        Igual que en product.template pero para la variante específica.
-        Lo usa website_sale_stock para mostrar disponibilidad por variante.
-        """
-        for product in self:
-            quants = self.env['stock.quant'].search([
-                ('product_id', '=', product.id),
-                ('location_id.usage', '=', 'internal'),
-            ])
-            qty_on_hand = sum(quants.mapped('quantity'))
-            reserved = sum(quants.mapped('reserved_quantity'))
-            product.website_real_qty = max(0.0, qty_on_hand - reserved)
+        return res
