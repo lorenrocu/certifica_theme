@@ -225,7 +225,7 @@ if _has_website_sale_stock:
         incorrectas basadas en órdenes de compra pendientes.
         """
 
-        @http.route()
+        @http.route(['/shop/get_combination_info_website'], type='json', auth="public", website=True)
         def get_combination_info_website(self, product_template_id, product_id,
                                          combination, add_qty, pricelist_id,
                                          **kw):
