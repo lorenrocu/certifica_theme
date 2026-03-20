@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import logging
+_logger = logging.getLogger(__name__)
+_logger.warning('=== CERTIFICA STOCK: LOADING MODELS DIRECTORY ===')
+
 # Importar todos los modelos personalizados
 from . import res_partner
 from . import base_vat_override

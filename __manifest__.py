@@ -19,6 +19,7 @@
         'web',
         'website',
         'website_sale',
+        'website_sale_stock',
         'base_vat',
         'l10n_latam_base',
         'l10n_pe',
