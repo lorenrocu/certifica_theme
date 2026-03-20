@@ -46,17 +46,16 @@ class ProductTemplate(models.Model):
                 ])
 
             qty_on_hand = sum(quants.mapped('quantity'))
-            reserved = sum(quants.mapped('reserved_quantity'))
-            real_qty = qty_on_hand - reserved
+            # Usar solo qty_on_hand para mostrar lo que hay "a mano" en almacén
+            real_qty = qty_on_hand
 
             # SIEMPRE establecer virtual_available con el stock real
-            old_val = res.get('virtual_available', 'NOT_SET')
             res['virtual_available'] = real_qty
 
             _logger.warning(
                 '=== CERTIFICA STOCK: product_id=%s, quants=%s, '
-                'on_hand=%s, reserved=%s, real_qty=%s, old_virtual=%s',
-                pid, len(quants), qty_on_hand, reserved, real_qty, old_val)
+                'on_hand=%s, disp_qty=%s',
+                pid, len(quants), qty_on_hand, real_qty)
 
         except Exception as e:
             _logger.warning(
