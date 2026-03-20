@@ -8,6 +8,13 @@ from odoo.addons.website.controllers.main import QueryURL
 from odoo.addons.website.controllers.main import Website
 from werkzeug.utils import redirect
 
+try:
+    from odoo.addons.website_sale_stock.controllers.main import WebsiteSaleStock as _WebsiteSaleStockBase
+    _has_website_sale_stock = True
+except ImportError:
+    _has_website_sale_stock = False
+
+
 
 class WebsiteSaleCustom(WebsiteSale):
     def _prepare_page_values(self, values=None):
@@ -192,3 +199,43 @@ class WebsiteLogout(http.Controller):
 
         # Redirigir directamente a la página de inicio '/'
         return redirect('/')
+
+
+def _get_real_qty(env, product_id):
+    """
+    Devuelve el stock físico real de un product.product buscando en stock.quant,
+    sin depender del warehouse context de la sesión web.
+    """
+    quants = env['stock.quant'].sudo().search([
+        ('product_id', '=', product_id),
+        ('location_id.usage', '=', 'internal'),
+    ])
+    qty_on_hand = sum(quants.mapped('quantity'))
+    reserved = sum(quants.mapped('reserved_quantity'))
+    return max(0.0, qty_on_hand - reserved)
+
+
+if _has_website_sale_stock:
+    class WebsiteSaleStockCustom(_WebsiteSaleStockBase):
+        """
+        Sobrescribe website_sale_stock para reemplazar virtual_available
+        (stock previsto = stock físico + entradas pendientes - salidas)
+        con el stock físico real (qty de stock.quant en ubicaciones internas).
+        Esto evita que el widget JS de website_sale_stock muestre cantidades
+        incorrectas basadas en órdenes de compra pendientes.
+        """
+
+        @http.route()
+        def get_combination_info_website(self, product_template_id, product_id,
+                                         combination, add_qty, pricelist_id,
+                                         **kw):
+            res = super().get_combination_info_website(
+                product_template_id, product_id, combination,
+                add_qty, pricelist_id, **kw
+            )
+            if res and product_id:
+                real_qty = _get_real_qty(request.env, int(product_id))
+                res['virtual_available'] = real_qty
+                res['product_type'] = res.get('product_type', 'product')
+            return res
+
